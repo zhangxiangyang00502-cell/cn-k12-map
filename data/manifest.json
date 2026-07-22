@@ -1,0 +1,238 @@
+{
+  "name": "中国 K12 知识地图数据集",
+  "version": "0.1.0",
+  "generatedAt": "2026-07-22",
+  "totals": {
+    "topics": 279,
+    "completeTopics": 130,
+    "skeletonTopics": 149,
+    "dependencies": 270,
+    "subjects": 15
+  },
+  "bySubject": {
+    "道德与法治": {
+      "topics": 130,
+      "complete": 130,
+      "skeleton": 0,
+      "gradeCoverage": [
+        7,
+        8,
+        9
+      ]
+    },
+    "语文": {
+      "topics": 12,
+      "complete": 0,
+      "skeleton": 12,
+      "gradeCoverage": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "数学": {
+      "topics": 15,
+      "complete": 0,
+      "skeleton": 15,
+      "gradeCoverage": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "英语": {
+      "topics": 11,
+      "complete": 0,
+      "skeleton": 11,
+      "gradeCoverage": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "科学": {
+      "topics": 10,
+      "complete": 0,
+      "skeleton": 10,
+      "gradeCoverage": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    "物理": {
+      "topics": 14,
+      "complete": 0,
+      "skeleton": 14,
+      "gradeCoverage": [
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "化学": {
+      "topics": 10,
+      "complete": 0,
+      "skeleton": 10,
+      "gradeCoverage": [
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "生物": {
+      "topics": 12,
+      "complete": 0,
+      "skeleton": 12,
+      "gradeCoverage": [
+        7,
+        8,
+        10,
+        11,
+        12
+      ]
+    },
+    "历史": {
+      "topics": 12,
+      "complete": 0,
+      "skeleton": 12,
+      "gradeCoverage": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "地理": {
+      "topics": 11,
+      "complete": 0,
+      "skeleton": 11,
+      "gradeCoverage": [
+        7,
+        8,
+        10,
+        11,
+        12
+      ]
+    },
+    "思想政治": {
+      "topics": 11,
+      "complete": 0,
+      "skeleton": 11,
+      "gradeCoverage": [
+        10,
+        11,
+        12
+      ]
+    },
+    "信息科技": {
+      "topics": 10,
+      "complete": 0,
+      "skeleton": 10,
+      "gradeCoverage": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "体育与健康": {
+      "topics": 8,
+      "complete": 0,
+      "skeleton": 8,
+      "gradeCoverage": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "艺术": {
+      "topics": 6,
+      "complete": 0,
+      "skeleton": 6,
+      "gradeCoverage": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "劳动": {
+      "topics": 7,
+      "complete": 0,
+      "skeleton": 7,
+      "gradeCoverage": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    }
+  }
+}

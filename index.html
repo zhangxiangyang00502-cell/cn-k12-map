@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中国 K12 知识地图</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-border: #2a2f3a;
+    --text: #e8eaf0;
+    --text-dim: #9aa3b2;
+    --accent: #4da3ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+  header { padding: 10px 16px 6px; border-bottom: 1px solid var(--panel-border); background: var(--panel); }
+  header h1 { font-size: 18px; font-weight: 700; }
+  header .sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  #toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 16px;
+    border-bottom: 1px solid var(--panel-border); background: var(--panel); }
+  #search { flex: 0 1 260px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--panel-border);
+    background: #0d0f13; color: var(--text); font-size: 13px; outline: none; }
+  #search:focus { border-color: var(--accent); }
+  #chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--panel-border); background: #0d0f13;
+    color: var(--text-dim); font-size: 12px; cursor: pointer; user-select: none; display: flex; align-items: center; gap: 5px; }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .chip.on { color: var(--text); border-color: var(--chip-color, var(--accent)); background: #1a2230; }
+  .chip.off { opacity: 0.45; }
+  .toggle { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-dim); cursor: pointer; user-select: none; }
+  #main { flex: 1; display: flex; min-height: 0; position: relative; }
+  #canvas-wrap { flex: 1; position: relative; min-width: 0; }
+  canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+  canvas.dragging { cursor: grabbing; }
+  #tooltip { position: absolute; pointer-events: none; background: rgba(20,24,32,0.95); border: 1px solid var(--panel-border);
+    border-radius: 6px; padding: 5px 9px; font-size: 12px; max-width: 280px; display: none; z-index: 10; }
+  #tooltip .tt-name { font-weight: 600; }
+  #tooltip .tt-meta { color: var(--text-dim); font-size: 11px; margin-top: 2px; }
+  #panel { width: 340px; flex: 0 0 340px; border-left: 1px solid var(--panel-border); background: var(--panel);
+    overflow-y: auto; padding: 16px; transition: margin-right .2s; }
+  #panel.hidden { margin-right: -340px; }
+  @media (max-width: 860px) {
+    #panel { position: absolute; right: 0; top: 0; bottom: 0; z-index: 15; box-shadow: -8px 0 24px rgba(0,0,0,0.55); }
+  }
+  #panel h2 { font-size: 16px; line-height: 1.4; margin-bottom: 6px; }
+  #panel .badges { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--panel-border); color: var(--text-dim); }
+  .badge.skeleton { color: #e0b34a; border-color: #6b5420; }
+  .badge.type { color: #7fc4ff; border-color: #28527c; }
+  .badge.grade { color: #9fe6a0; border-color: #2f6b31; }
+  #panel .desc { font-size: 13px; line-height: 1.7; color: var(--text); margin: 10px 0; }
+  #panel h3 { font-size: 13px; color: var(--text-dim); margin: 14px 0 6px; border-top: 1px solid var(--panel-border); padding-top: 12px; }
+  #panel ul { padding-left: 18px; font-size: 12.5px; line-height: 1.8; }
+  #panel .assess { font-size: 12.5px; line-height: 1.7; background: #10202f; border-left: 3px solid var(--accent);
+    padding: 8px 10px; border-radius: 0 6px 6px 0; }
+  .chain-item { font-size: 12.5px; padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; cursor: pointer;
+    background: #0d0f13; border: 1px solid var(--panel-border); line-height: 1.5; }
+  .chain-item:hover { border-color: var(--accent); }
+  .chain-item .r { color: var(--text-dim); font-size: 11px; display: block; }
+  .chain-item.hard { border-left: 3px solid #e0645a; }
+  .chain-item.soft { border-left: 3px solid #4a90d9; }
+  #panel .placeholder-note { font-size: 12px; color: #e0b34a; background: #241e10; padding: 8px 10px;
+    border-radius: 6px; margin-top: 10px; }
+  #panel-close { float: right; background: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; }
+  #empty-hint { color: var(--text-dim); font-size: 13px; line-height: 2; }
+  #legend { position: absolute; left: 12px; bottom: 12px; font-size: 11px; color: var(--text-dim);
+    background: rgba(20,24,32,0.85); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--panel-border); line-height: 1.8; }
+  #search-results { position: absolute; top: 6px; left: 16px; z-index: 20; background: var(--panel);
+    border: 1px solid var(--panel-border); border-radius: 8px; max-height: 260px; overflow-y: auto; display: none; min-width: 280px; }
+  .sr-item { padding: 7px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #1e222b; }
+  .sr-item:hover { background: #1a2230; }
+  .sr-item .m { color: var(--text-dim); font-size: 11px; }
+  #loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: var(--text-dim); font-size: 14px; z-index: 30; background: var(--bg); }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>中国 K12 知识地图</h1>
+    <div class="sub">每个点是一个微知识点 · 颜色 = 学科 · 纵轴 = 年级（1 在下，12 在上）· 连线 = 先修关系 · 数据对齐 2022 版义务教育课程标准 · 「道德与法治」学科已完整填充（130 个知识点），其余学科为骨架占位</div>
+  </header>
+  <div id="toolbar">
+    <input id="search" type="text" placeholder="搜索知识点名称…" autocomplete="off">
+    <div id="chips"></div>
+    <label class="toggle"><input type="checkbox" id="cb-alledges"> 显示全部先修线（默认只显示道法内部）</label>
+  </div>
+  <div id="main">
+    <div id="canvas-wrap">
+      <canvas id="map"></canvas>
+      <div id="tooltip"></div>
+      <div id="search-results"></div>
+      <div id="legend">纵轴：年级（下 1 年级 → 上 12 年级）<br>实色圆点 = 完整知识点 · 虚线半透明 = 骨架占位<br>滚轮缩放 · 拖拽平移 · 点击节点查看详情</div>
+      <div id="loading">正在加载数据…</div>
+    </div>
+    <div id="panel"><div id="empty-hint">点击地图上的任意节点，查看知识点的详细说明、掌握证据、课标对齐，以及它的「先修链」和「解锁链」。</div></div>
+  </div>
+</div>
+
+<script>
+(async function () {
+  const [topicsData, depsData, standardsData, clustersData] = await Promise.all([
+    fetch('data/topics.json').then(r => r.json()),
+    fetch('data/dependencies.json').then(r => r.json()),
+    fetch('data/curriculum-standards.json').then(r => r.json()),
+    fetch('data/clusters.json').then(r => r.json()),
+  ]);
+  document.getElementById('loading').remove();
+
+  const topics = topicsData.topics;
+  const deps = depsData.dependencies;
+  const topicById = new Map(topics.map(t => [t.id, t]));
+  const stdByKey = new Map();
+  for (const c of standardsData.curricula) for (const s of c.standards) stdByKey.set(s.key, s);
+  const clusterByKey = new Map(clustersData.clusters.map(c => [c.subject + '|' + c.domain, c]));
+
+  // ---------- 布局 ----------
+  const SUBJECT_ORDER = ['道德与法治','语文','数学','英语','科学','物理','化学','生物','历史','地理','思想政治','信息科技','体育与健康','艺术','劳动'];
+  const COLORS = {
+    '道德与法治':'#e0564b','语文':'#e8913a','数学':'#3a8ee8','英语':'#9a6ae8','科学':'#4cc38a',
+    '物理':'#38b6d9','化学':'#d94f9e','生物':'#7bc043','历史':'#c98a4b','地理':'#4aa06a',
+    '思想政治':'#d94f4f','信息科技':'#5a6ee0','体育与健康':'#e0c23a','艺术':'#e06ab0','劳动':'#8a8f6a'
+  };
+  const COL_W = 300, ROW_H = 78, GRADE_BASE = 0;   // y 世界坐标向上为正
+  const subjects = SUBJECT_ORDER.filter(s => topics.some(t => t.subject === s));
+  const subjX = new Map(subjects.map((s, i) => [s, i * COL_W + COL_W / 2]));
+
+  // 同（学科, 年级）内按 domain 聚簇排列，行列微抖开
+  const groups = new Map();
+  for (const t of topics) {
+    const gMid = (t.gradeRangeStart + t.gradeRangeEnd) / 2;
+    const key = t.subject + '|' + Math.round(gMid);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(t);
+  }
+  for (const [key, list] of groups) {
+    list.sort((a, b) => a.domain.localeCompare(b.domain, 'zh') || a.name.localeCompare(b.name, 'zh'));
+    const PER_ROW = 5, DX = 52, DY = 15;
+    list.forEach((t, i) => {
+      const gMid = (t.gradeRangeStart + t.gradeRangeEnd) / 2;
+      const col = i % PER_ROW, row = Math.floor(i / PER_ROW);
+      t._x = subjX.get(t.subject) + (col - (Math.min(PER_ROW, list.length) - 1) / 2) * DX + ((row % 2) ? 9 : -9);
+      t._y = GRADE_BASE + gMid * ROW_H - row * DY;
+      t._color = COLORS[t.subject] || '#999';
+    });
+  }
+
+  // ---------- 依赖图 ----------
+  const prereqsOf = new Map();   // id -> [{id, strength, reason}]
+  const unlocksOf = new Map();   // id -> [{id, strength, reason}]
+  for (const d of deps) {
+    if (!topicById.has(d.topicId) || !topicById.has(d.prerequisiteId)) continue;
+    if (!prereqsOf.has(d.topicId)) prereqsOf.set(d.topicId, []);
+    prereqsOf.get(d.topicId).push({ id: d.prerequisiteId, strength: d.strength, reason: d.reason });
+    if (!unlocksOf.has(d.prerequisiteId)) unlocksOf.set(d.prerequisiteId, []);
+    unlocksOf.get(d.prerequisiteId).push({ id: d.topicId, strength: d.strength, reason: d.reason });
+  }
+  function collectChain(startId, map) {
+    const seen = new Map();  // id -> {strength, reason, from}
+    const stack = [startId];
+    while (stack.length) {
+      const cur = stack.pop();
+      for (const e of (map.get(cur) || [])) {
+        if (!seen.has(e.id) && e.id !== startId) {
+          seen.set(e.id, { ...e, from: cur });
+          stack.push(e.id);
+        }
+      }
+    }
+    return seen;
+  }
+
+  // ---------- Canvas ----------
+  const wrap = document.getElementById('canvas-wrap');
+  const canvas = document.getElementById('map');
+  const ctx = canvas.getContext('2d');
+  const tooltip = document.getElementById('tooltip');
+  let W = 0, H = 0, dpr = 1;
+  let scale = 0.8, tx = 0, ty = 0;   // screen = world*scale + t ; y 翻转
+  function worldToScreen(x, y) { return [x * scale + tx, H - (y * scale + ty)]; }
+  function screenToWorld(sx, sy) { return [(sx - tx) / scale, (H - sy - ty) / scale]; }
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W = wrap.clientWidth; H = wrap.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  window.addEventListener('resize', resize);
+
+  // 初始视野：包含所有点（带缩放下限，避免窗口窄时挤成一团），并居中
+  function fitView() {
+    const xs = topics.map(t => t._x), ys = topics.map(t => t._y);
+    const minX = Math.min(...xs) - 80, maxX = Math.max(...xs) + 80;
+    const minY = 0.3 * ROW_H, maxY = Math.max(...ys) + 90;
+    scale = Math.min(W / (maxX - minX), H / (maxY - minY));
+    scale = Math.max(0.2, Math.min(1.0, scale));
+    tx = (W - (minX + maxX) * scale) / 2;
+    ty = (H - (minY + maxY) * scale) / 2;
+  }
+
+  // ---------- 状态 ----------
+  const activeSubjects = new Set(subjects);
+  let showAllEdges = false;
+  let selectedId = null, hoverId = null;
+  let highlightSet = new Set(), highlightEdges = new Set(); // "a>b"
+  let searchMatches = new Set();
+
+  function visible(t) { return activeSubjects.has(t.subject); }
+
+  // ---------- 绘制 ----------
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // 年级横线 + 标签
+    ctx.font = '11px sans-serif';
+    for (let g = 1; g <= 12; g++) {
+      const [x0, sy] = worldToScreen(0, g * ROW_H);
+      ctx.strokeStyle = g % 3 === 1 ? '#232833' : '#1a1e27';
+      ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
+      ctx.fillStyle = '#5a6373';
+      ctx.fillText(g + ' 年级', 6, sy - 4);
+    }
+    // 学段分隔标注
+    const bandLabel = [[1, '小学'], [7, '初中'], [10, '高中']];
+    for (const [g, name] of bandLabel) {
+      const [, sy] = worldToScreen(0, g * ROW_H + 30);
+      ctx.fillStyle = '#3d4452'; ctx.font = 'bold 13px sans-serif';
+      ctx.fillText(name, W - 46, sy);
+    }
+    // 学科列标题
+    ctx.font = 'bold 13px sans-serif';
+    for (const s of subjects) {
+      if (!activeSubjects.has(s)) continue;
+      const [sx] = worldToScreen(subjX.get(s), 0);
+      ctx.fillStyle = COLORS[s];
+      ctx.textAlign = 'center';
+      ctx.fillText(s, sx, 20);
+      ctx.textAlign = 'left';
+    }
+
+    // 边
+    for (const d of deps) {
+      const a = topicById.get(d.prerequisiteId), b = topicById.get(d.topicId);
+      if (!a || !b || !visible(a) || !visible(b)) continue;
+      const isDf = a.subject === '道德与法治' && b.subject === '道德与法治';
+      const inHL = highlightEdges.has(d.prerequisiteId + '>' + d.topicId);
+      if (!inHL && !showAllEdges && !isDf) continue;
+      const [x1, y1] = worldToScreen(a._x, a._y);
+      const [x2, y2] = worldToScreen(b._x, b._y);
+      if ((x1 < -50 && x2 < -50) || (x1 > W + 50 && x2 > W + 50)) continue;
+      if ((y1 < -50 && y2 < -50) || (y1 > H + 50 && y2 > H + 50)) continue;
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      const dx = Math.max(-60, Math.min(60, (x2 - x1) * 0.25));
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.quadraticCurveTo(mx + dx, my, x2, y2);
+      if (inHL) {
+        ctx.strokeStyle = 'rgba(255,214,90,0.95)'; ctx.lineWidth = 1.8;
+      } else {
+        ctx.strokeStyle = d.strength === 'hard' ? 'rgba(140,150,170,0.28)' : 'rgba(120,130,150,0.14)';
+        ctx.lineWidth = 1;
+      }
+      ctx.stroke();
+    }
+
+    // 节点
+    for (const t of topics) {
+      if (!visible(t)) continue;
+      const [sx, sy] = worldToScreen(t._x, t._y);
+      if (sx < -30 || sx > W + 30 || sy < -30 || sy > H + 30) continue;
+      const r = (t.id === selectedId ? 9 : t.id === hoverId ? 8 : 6.5) * Math.min(1.3, Math.max(0.6, scale));
+      const skeleton = t.status === 'skeleton';
+      ctx.beginPath();
+      ctx.arc(sx, sy, r, 0, Math.PI * 2);
+      if (skeleton) {
+        ctx.globalAlpha = 0.45;
+        ctx.fillStyle = t._color; ctx.fill();
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = t._color; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.globalAlpha = 1;
+      } else {
+        ctx.fillStyle = t._color; ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1; ctx.stroke();
+      }
+      if (highlightSet.has(t.id)) {
+        ctx.beginPath(); ctx.arc(sx, sy, r + 4, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,214,90,0.9)'; ctx.lineWidth = 2; ctx.stroke();
+      }
+      if (searchMatches.has(t.id)) {
+        ctx.beginPath(); ctx.arc(sx, sy, r + 7, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(77,163,255,0.8)'; ctx.lineWidth = 2;
+        ctx.setLineDash([4, 3]); ctx.stroke(); ctx.setLineDash([]);
+      }
+    }
+    // 选中节点名
+    if (selectedId) {
+      const t = topicById.get(selectedId);
+      const [sx, sy] = worldToScreen(t._x, t._y);
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+      ctx.fillText(t.name, sx, sy - 14);
+      ctx.textAlign = 'left';
+    }
+  }
+
+  // ---------- 交互：缩放/平移 ----------
+  canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const [wx, wy] = screenToWorld(mx, my);
+    const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+    scale = Math.min(6, Math.max(0.12, scale * factor));
+    tx = mx - wx * scale; ty = (H - my) - wy * scale;
+    draw();
+  }, { passive: false });
+
+  let dragging = false, moved = 0, lastX = 0, lastY = 0;
+  canvas.addEventListener('pointerdown', (e) => {
+    dragging = true; moved = 0; lastX = e.clientX; lastY = e.clientY;
+    canvas.classList.add('dragging'); canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    if (dragging) {
+      const dx = e.clientX - lastX, dy = e.clientY - lastY;
+      moved += Math.abs(dx) + Math.abs(dy);
+      tx += dx; ty -= dy; lastX = e.clientX; lastY = e.clientY;
+      draw();
+    } else {
+      // hover 检测
+      const [wx, wy] = screenToWorld(mx, my);
+      let best = null, bestD = 14 / scale + 8;
+      for (const t of topics) {
+        if (!visible(t)) continue;
+        const d = Math.hypot(t._x - wx, t._y - wy);
+        if (d < bestD) { bestD = d; best = t; }
+      }
+      const newHover = best ? best.id : null;
+      if (newHover !== hoverId) {
+        hoverId = newHover;
+        if (best) {
+          tooltip.style.display = 'block';
+          tooltip.style.left = (mx + 14) + 'px';
+          tooltip.style.top = (my + 10) + 'px';
+          tooltip.innerHTML = `<div class="tt-name" style="color:${best._color}">${best.name}</div>
+            <div class="tt-meta">${best.subject} · ${best.domain} · ${best.gradeRangeStart === best.gradeRangeEnd ? best.gradeRangeStart + '年级' : best.gradeRangeStart + '-' + best.gradeRangeEnd + '年级'}${best.status === 'skeleton' ? ' · 骨架占位' : ''}</div>`;
+        } else tooltip.style.display = 'none';
+        draw();
+      } else if (best) {
+        tooltip.style.left = (mx + 14) + 'px';
+        tooltip.style.top = (my + 10) + 'px';
+      }
+    }
+  });
+  canvas.addEventListener('pointerup', (e) => {
+    dragging = false; canvas.classList.remove('dragging');
+    if (moved < 5) {  // 视为点击
+      const rect = canvas.getBoundingClientRect();
+      const [wx, wy] = screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
+      let best = null, bestD = 16 / scale + 8;
+      for (const t of topics) {
+        if (!visible(t)) continue;
+        const d = Math.hypot(t._x - wx, t._y - wy);
+        if (d < bestD) { bestD = d; best = t; }
+      }
+      if (best) selectTopic(best.id);
+    }
+  });
+
+  // ---------- 详情面板 ----------
+  const panel = document.getElementById('panel');
+  const TYPE_CN = { CONCEPTUAL: '概念理解', PROCEDURAL: '方法技能', REPRESENTATIONAL: '表征方式', LANGUAGE: '语言表达', META: '元认知' };
+  function chainHtml(chain, title) {
+    if (!chain.size) return '';
+    const items = [...chain.entries()].map(([id, e]) => {
+      const t = topicById.get(id);
+      return `<div class="chain-item ${e.strength}" data-id="${id}">
+        <span style="color:${t._color}">${t.name}</span>
+        <span class="r">${t.gradeRangeStart === t.gradeRangeEnd ? t.gradeRangeStart + '年级' : t.gradeRangeStart + '-' + t.gradeRangeEnd + '年级'} · ${e.strength === 'hard' ? '硬依赖' : '软依赖'}：${e.reason}</span>
+      </div>`;
+    }).join('');
+    return `<h3>${title}（${chain.size}）</h3>${items}`;
+  }
+  function selectTopic(id) {
+    selectedId = id;
+    const t = topicById.get(id);
+    const pre = collectChain(id, prereqsOf);
+    const unlock = collectChain(id, unlocksOf);
+    highlightSet = new Set([...pre.keys(), ...unlock.keys()]);
+    highlightEdges = new Set();
+    for (const d of deps) {
+      const inPath = (highlightSet.has(d.prerequisiteId) || d.prerequisiteId === id) &&
+                     (highlightSet.has(d.topicId) || d.topicId === id);
+      if (inPath && (pre.has(d.prerequisiteId) || d.prerequisiteId === id || unlock.has(d.topicId) || d.topicId === id)) {
+        if (pre.has(d.topicId) || unlock.has(d.prerequisiteId) || d.prerequisiteId === id || d.topicId === id)
+          highlightEdges.add(d.prerequisiteId + '>' + d.topicId);
+      }
+    }
+    const cluster = clusterByKey.get(t.subject + '|' + t.domain);
+    const gradeTxt = t.gradeRangeStart === t.gradeRangeEnd ? t.gradeRangeStart + ' 年级' : t.gradeRangeStart + '–' + t.gradeRangeEnd + ' 年级';
+    const stdHtml = (t.standards || []).map(k => {
+      const s = stdByKey.get(k);
+      return s ? `<div style="margin-bottom:6px"><b style="font-size:12px">${s.title}</b><div style="font-size:12px;color:var(--text-dim);line-height:1.6">${s.summary}</div></div>` : '';
+    }).join('');
+    panel.innerHTML = `
+      <button id="panel-close" title="关闭">×</button>
+      <h2 style="color:${t._color}">${t.name}</h2>
+      <div class="badges">
+        <span class="badge" style="color:${t._color};border-color:${t._color}">${t.subject} · ${t.domain}</span>
+        <span class="badge type">${TYPE_CN[t.type] || t.type}</span>
+        <span class="badge grade">${gradeTxt}</span>
+        ${t.status === 'skeleton' ? '<span class="badge skeleton">骨架占位</span>' : '<span class="badge" style="color:#9fe6a0;border-color:#2f6b31">已完整填充</span>'}
+      </div>
+      <div class="desc">${t.description}</div>
+      ${t.status === 'skeleton' ? '<div class="placeholder-note">⚠ 骨架占位节点：内容待按该学科课标逐步填充，当前仅展示知识结构位置。</div>' : ''}
+      ${(t.evidence && t.evidence.length) ? `<h3>掌握证据（能做到这些就算学会）</h3><ul>${t.evidence.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
+      ${t.assessmentPrompt ? `<h3>家长可以这样检验</h3><div class="assess">${t.assessmentPrompt}</div>` : ''}
+      ${stdHtml ? `<h3>课标对齐（2022 年版义务教育课程标准）</h3>${stdHtml}` : ''}
+      ${cluster ? `<h3>本单元概述</h3><div class="desc" style="font-size:12.5px;color:var(--text-dim)">${cluster.summary}</div>` : ''}
+      ${chainHtml(pre, '↑ 先学这些（先修链）')}
+      ${chainHtml(unlock, '↓ 学会后能解锁（后续知识点）')}
+      <div style="height:20px"></div>`;
+    panel.classList.remove('hidden');
+    panel.querySelector('#panel-close').onclick = () => { panel.classList.add('hidden'); selectedId = null; highlightSet.clear(); highlightEdges.clear(); draw(); };
+    panel.querySelectorAll('.chain-item').forEach(el => el.onclick = () => { selectTopic(el.dataset.id); ensureVisible(topicById.get(el.dataset.id)); });
+    draw();
+  }
+  function ensureVisible(t) {
+    const [sx, sy] = worldToScreen(t._x, t._y);
+    const m = 80;
+    if (sx < m || sx > W - m || sy < m || sy > H - m) {
+      tx = W / 2 - t._x * scale; ty = H / 2 - t._y * scale; draw();
+    }
+  }
+
+  // ---------- 搜索 ----------
+  const searchInput = document.getElementById('search');
+  const srBox = document.getElementById('search-results');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim();
+    searchMatches.clear();
+    if (!q) { srBox.style.display = 'none'; draw(); return; }
+    const hits = topics.filter(t => visible(t) && (t.name.includes(q) || t.description.includes(q) || t.domain.includes(q))).slice(0, 12);
+    hits.forEach(t => searchMatches.add(t.id));
+    if (hits.length) {
+      srBox.innerHTML = hits.map(t => `<div class="sr-item" data-id="${t.id}"><span style="color:${t._color}">${t.name}</span> <span class="m">${t.subject} · ${t.gradeRangeStart}年级</span></div>`).join('');
+      srBox.style.display = 'block';
+      srBox.querySelectorAll('.sr-item').forEach(el => el.onclick = () => {
+        selectTopic(el.dataset.id); ensureVisible(topicById.get(el.dataset.id));
+        srBox.style.display = 'none';
+      });
+    } else {
+      srBox.innerHTML = '<div class="sr-item" style="color:var(--text-dim)">没有匹配的知识点</div>';
+      srBox.style.display = 'block';
+    }
+    draw();
+  });
+  document.addEventListener('click', (e) => { if (!srBox.contains(e.target) && e.target !== searchInput) srBox.style.display = 'none'; });
+
+  // ---------- 学科筛选 chips ----------
+  const chipsBox = document.getElementById('chips');
+  for (const s of subjects) {
+    const chip = document.createElement('div');
+    chip.className = 'chip on';
+    chip.style.setProperty('--chip-color', COLORS[s]);
+    const count = topics.filter(t => t.subject === s).length;
+    chip.innerHTML = `<span class="dot" style="background:${COLORS[s]}"></span>${s} ${count}`;
+    chip.onclick = () => {
+      if (activeSubjects.has(s)) { activeSubjects.delete(s); chip.classList.add('off'); chip.classList.remove('on'); }
+      else { activeSubjects.add(s); chip.classList.remove('off'); chip.classList.add('on'); }
+      draw();
+    };
+    chipsBox.appendChild(chip);
+  }
+  document.getElementById('cb-alledges').onchange = (e) => { showAllEdges = e.target.checked; draw(); };
+
+  // ---------- 启动 ----------
+  if (window.innerWidth < 860) panel.classList.add('hidden');
+  resize();
+  fitView();
+  draw();
+})();
+</script>
+</body>
+</html>

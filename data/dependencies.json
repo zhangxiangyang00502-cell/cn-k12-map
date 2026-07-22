@@ -1,0 +1,1624 @@
+{
+ "dependencies": [
+  {
+   "topicId": "cn_df_cjjp_02",
+   "prerequisiteId": "cn_df_cjjp_01",
+   "strength": "hard",
+   "reason": "中学时代的新起点为少年确立梦想提供了新的机会与可能"
+  },
+  {
+   "topicId": "cn_df_cjjp_03",
+   "prerequisiteId": "cn_df_cjjp_01",
+   "strength": "soft",
+   "reason": "进入中学后学习内容与方式剧变，需要先接受新起点再重建学习观念"
+  },
+  {
+   "topicId": "cn_df_cjjp_04",
+   "prerequisiteId": "cn_df_cjjp_03",
+   "strength": "hard",
+   "reason": "只有先理解学习的意义、树立主动学习观，掌握方法才有内在动力"
+  },
+  {
+   "topicId": "cn_df_cjjp_05",
+   "prerequisiteId": "cn_df_cjjp_03",
+   "strength": "soft",
+   "reason": "认识自己本身也是一种学习，学习观为自我探索提供方法视角"
+  },
+  {
+   "topicId": "cn_df_cjjp_06",
+   "prerequisiteId": "cn_df_cjjp_05",
+   "strength": "hard",
+   "reason": "正确认识自己是接纳、欣赏自己并做更好自己的逻辑前提"
+  },
+  {
+   "topicId": "cn_df_yy_01",
+   "prerequisiteId": "cn_df_cjjp_05",
+   "strength": "soft",
+   "reason": "看清自己的性格与需求，才能理解自己在友谊中的位置和期待"
+  },
+  {
+   "topicId": "cn_df_yy_02",
+   "prerequisiteId": "cn_df_yy_01",
+   "strength": "hard",
+   "reason": "澄清竞争、原则等误区，必须建立在理解友谊特质的基础上"
+  },
+  {
+   "topicId": "cn_df_yy_03",
+   "prerequisiteId": "cn_df_yy_01",
+   "strength": "soft",
+   "reason": "知道友谊是平等双向的，才明白建立友谊为什么要主动付出"
+  },
+  {
+   "topicId": "cn_df_yy_04",
+   "prerequisiteId": "cn_df_yy_03",
+   "strength": "hard",
+   "reason": "先建立友谊，才谈得上呵护友谊与处理冲突"
+  },
+  {
+   "topicId": "cn_df_yy_04",
+   "prerequisiteId": "cn_df_yy_02",
+   "strength": "hard",
+   "reason": "处理冲突时守住原则、辨别是非，依赖对友谊误区的澄清"
+  },
+  {
+   "topicId": "cn_df_yy_05",
+   "prerequisiteId": "cn_df_yy_01",
+   "strength": "soft",
+   "reason": "网络交往是否真诚可信，要用现实中友谊的特质去辨别"
+  },
+  {
+   "topicId": "cn_df_ss_02",
+   "prerequisiteId": "cn_df_ss_01",
+   "strength": "hard",
+   "reason": "接纳不同老师的风格，才能做到教学相长、正确对待表扬批评"
+  },
+  {
+   "topicId": "cn_df_ss_04",
+   "prerequisiteId": "cn_df_ss_03",
+   "strength": "hard",
+   "reason": "理解家的意味与亲情，才能以爱为底色化解亲子冲突"
+  },
+  {
+   "topicId": "cn_df_ss_05",
+   "prerequisiteId": "cn_df_ss_04",
+   "strength": "hard",
+   "reason": "化解亲子冲突的沟通方法，正是建设和谐家庭的直接应用"
+  },
+  {
+   "topicId": "cn_df_sm_02",
+   "prerequisiteId": "cn_df_sm_01",
+   "strength": "hard",
+   "reason": "知道生命来之不易、独特且不可逆，才会真正生起敬畏之心"
+  },
+  {
+   "topicId": "cn_df_sm_03",
+   "prerequisiteId": "cn_df_sm_02",
+   "strength": "hard",
+   "reason": "敬畏生命落实到日常行动，就是爱护身体、养护精神"
+  },
+  {
+   "topicId": "cn_df_sm_04",
+   "prerequisiteId": "cn_df_sm_03",
+   "strength": "soft",
+   "reason": "守护生命的过程必然遭遇挫折，韧性是守护生命的支撑能力"
+  },
+  {
+   "topicId": "cn_df_sm_05",
+   "prerequisiteId": "cn_df_sm_02",
+   "strength": "hard",
+   "reason": "先确立生命至上的价值立场，才会进一步追问生命的意义"
+  },
+  {
+   "topicId": "cn_df_sm_06",
+   "prerequisiteId": "cn_df_sm_05",
+   "strength": "hard",
+   "reason": "理解怎样的一生值得过，才知道如何在平凡中活出精彩"
+  },
+  {
+   "topicId": "cn_df_qc_01",
+   "prerequisiteId": "cn_df_sm_01",
+   "strength": "soft",
+   "reason": "青春期的身体发育正是感受生命独特与奇妙的活生生一课"
+  },
+  {
+   "topicId": "cn_df_qc_02",
+   "prerequisiteId": "cn_df_qc_01",
+   "strength": "soft",
+   "reason": "矛盾心理的出现正是独立意识发展的信号，需顺势引导为独立思考"
+  },
+  {
+   "topicId": "cn_df_qc_03",
+   "prerequisiteId": "cn_df_qc_01",
+   "strength": "hard",
+   "reason": "悦纳自己的生理变化，是正确看待性别差异与优势互补的基础"
+  },
+  {
+   "topicId": "cn_df_qc_04",
+   "prerequisiteId": "cn_df_qc_03",
+   "strength": "hard",
+   "reason": "先学会与异性正常交往、优势互补，才能健康处理朦胧情感"
+  },
+  {
+   "topicId": "cn_df_qc_05",
+   "prerequisiteId": "cn_df_qc_02",
+   "strength": "soft",
+   "reason": "独立思考与批判精神是自信表达、自强不息的内在支撑"
+  },
+  {
+   "topicId": "cn_df_qc_05",
+   "prerequisiteId": "cn_df_sm_04",
+   "strength": "soft",
+   "reason": "战胜挫折的生命韧性，正是自强品格的底色"
+  },
+  {
+   "topicId": "cn_df_qc_06",
+   "prerequisiteId": "cn_df_qc_05",
+   "strength": "soft",
+   "reason": "青春飞扬需要底线意识护航，自信自强同时要知耻守格"
+  },
+  {
+   "topicId": "cn_df_qc_06",
+   "prerequisiteId": "cn_df_qc_02",
+   "strength": "hard",
+   "reason": "止于至善要求养成自我省察的习惯，这依赖批判性思维能力"
+  },
+  {
+   "topicId": "cn_df_xq_01",
+   "prerequisiteId": "cn_df_qc_01",
+   "strength": "soft",
+   "reason": "青春期情绪反应强烈、波动明显，直接源于身心的剧烈变化"
+  },
+  {
+   "topicId": "cn_df_xq_02",
+   "prerequisiteId": "cn_df_xq_01",
+   "strength": "hard",
+   "reason": "了解情绪的类型、特点和影响因素，才谈得上恰当表达"
+  },
+  {
+   "topicId": "cn_df_xq_03",
+   "prerequisiteId": "cn_df_xq_02",
+   "strength": "hard",
+   "reason": "先认识到情绪需要恰当表达，才需要学习具体的调节方法"
+  },
+  {
+   "topicId": "cn_df_xq_04",
+   "prerequisiteId": "cn_df_xq_01",
+   "strength": "hard",
+   "reason": "情感由情绪在生活中积累强化而来，理解情绪是理解情感的前提"
+  },
+  {
+   "topicId": "cn_df_xq_05",
+   "prerequisiteId": "cn_df_xq_04",
+   "strength": "hard",
+   "reason": "知道情感有哪些种类，才能体会情感如何影响判断与行动"
+  },
+  {
+   "topicId": "cn_df_xq_06",
+   "prerequisiteId": "cn_df_xq_05",
+   "strength": "hard",
+   "reason": "理解情感驱动行动的作用，才会主动去创造和传递正能量"
+  },
+  {
+   "topicId": "cn_df_xq_06",
+   "prerequisiteId": "cn_df_jt_02",
+   "strength": "soft",
+   "reason": "集体的温暖是体验与传递情感正能量最常见的场域"
+  },
+  {
+   "topicId": "cn_df_jt_01",
+   "prerequisiteId": "cn_df_yy_01",
+   "strength": "soft",
+   "reason": "友谊是最小的'集体'，是理解更大集体的微观经验"
+  },
+  {
+   "topicId": "cn_df_jt_02",
+   "prerequisiteId": "cn_df_jt_01",
+   "strength": "hard",
+   "reason": "先理解什么是集体、集体带来什么，才能分析集体力量的来源"
+  },
+  {
+   "topicId": "cn_df_jt_03",
+   "prerequisiteId": "cn_df_jt_02",
+   "strength": "soft",
+   "reason": "明白集体力量来自团结协作，才理解集体生活如何成就个人"
+  },
+  {
+   "topicId": "cn_df_jt_04",
+   "prerequisiteId": "cn_df_jt_03",
+   "strength": "hard",
+   "reason": "在集体中成长的个体，必然遇到个人意愿与集体规则的冲突"
+  },
+  {
+   "topicId": "cn_df_jt_05",
+   "prerequisiteId": "cn_df_jt_04",
+   "strength": "hard",
+   "reason": "规则冲突的背后是个人利益与集体利益的价值排序问题"
+  },
+  {
+   "topicId": "cn_df_jt_05",
+   "prerequisiteId": "cn_df_qc_06",
+   "strength": "soft",
+   "reason": "行己有耻的底线意识，支撑人在利益冲突中做出正确选择"
+  },
+  {
+   "topicId": "cn_df_jt_06",
+   "prerequisiteId": "cn_df_jt_05",
+   "strength": "soft",
+   "reason": "认同集体主义价值，才能理解美好集体应该是什么样子"
+  },
+  {
+   "topicId": "cn_df_jt_07",
+   "prerequisiteId": "cn_df_jt_06",
+   "strength": "hard",
+   "reason": "明确美好集体的特征之后，共建行动才有方向和标准"
+  },
+  {
+   "topicId": "cn_df_fz_01",
+   "prerequisiteId": "cn_df_jt_05",
+   "strength": "soft",
+   "reason": "集体中的规则与利益关系，是理解法律为何存在的近端经验"
+  },
+  {
+   "topicId": "cn_df_fz_02",
+   "prerequisiteId": "cn_df_fz_01",
+   "strength": "hard",
+   "reason": "知道法律与生活息息相关，才需要进一步认识法律的三大特征"
+  },
+  {
+   "topicId": "cn_df_fz_03",
+   "prerequisiteId": "cn_df_fz_02",
+   "strength": "hard",
+   "reason": "法律的规范作用与保护作用，由其强制力和普遍约束力所支撑"
+  },
+  {
+   "topicId": "cn_df_fz_04",
+   "prerequisiteId": "cn_df_fz_03",
+   "strength": "hard",
+   "reason": "理解法律的保护作用，才能理解未成年人为什么需要专门保护"
+  },
+  {
+   "topicId": "cn_df_fz_04",
+   "prerequisiteId": "cn_df_sm_03",
+   "strength": "soft",
+   "reason": "特殊保护的核心正是守护未成年人的生命健康与全面发展"
+  },
+  {
+   "topicId": "cn_df_fz_05",
+   "prerequisiteId": "cn_df_fz_03",
+   "strength": "hard",
+   "reason": "知道法律保护我们，遇到问题时才懂得用法治方式表达诉求"
+  },
+  {
+   "topicId": "cn_df_fz_06",
+   "prerequisiteId": "cn_df_fz_05",
+   "strength": "hard",
+   "reason": "依法办事成为习惯并内化于心，才形成真正的法治意识"
+  },
+  {
+   "topicId": "cn_df_fz_06",
+   "prerequisiteId": "cn_df_qc_06",
+   "strength": "soft",
+   "reason": "行己有耻的道德底线意识，与法治意识内在相通、相互强化"
+  },
+  {
+   "topicId": "cn_df_sh_01",
+   "prerequisiteId": "cn_df_jt_03",
+   "strength": "soft",
+   "reason": "在集体中成长的社会化经验，可以推广到对整个社会的理解"
+  },
+  {
+   "topicId": "cn_df_sh_02",
+   "prerequisiteId": "cn_df_sh_01",
+   "strength": "hard",
+   "reason": "明确个人离不开社会，才会主动亲近社会、养成亲社会行为"
+  },
+  {
+   "topicId": "cn_df_sh_04",
+   "prerequisiteId": "cn_df_sh_03",
+   "strength": "hard",
+   "reason": "全面认识网络的利与弊，才能谈理性参与和合理利用"
+  },
+  {
+   "topicId": "cn_df_gz_01",
+   "prerequisiteId": "cn_df_jt_04",
+   "strength": "hard",
+   "reason": "个人意愿与集体规则的处理经验，是理解社会规则的最小样本"
+  },
+  {
+   "topicId": "cn_df_gz_02",
+   "prerequisiteId": "cn_df_gz_01",
+   "strength": "hard",
+   "reason": "理解规则保障秩序，才能进一步理解规则如何划定并保障自由"
+  },
+  {
+   "topicId": "cn_df_gz_03",
+   "prerequisiteId": "cn_df_gz_02",
+   "strength": "soft",
+   "reason": "认同规则背后是对他人的尊重，尊重他人是文明交往的起点"
+  },
+  {
+   "topicId": "cn_df_gz_04",
+   "prerequisiteId": "cn_df_gz_03",
+   "strength": "hard",
+   "reason": "礼的核心是尊重，尊重他人是以礼待人的内在依据"
+  },
+  {
+   "topicId": "cn_df_gz_05",
+   "prerequisiteId": "cn_df_gz_04",
+   "strength": "soft",
+   "reason": "由外在言行之礼走向内在品质之诚，是道德修养的自然深化"
+  },
+  {
+   "topicId": "cn_df_gz_06",
+   "prerequisiteId": "cn_df_gz_01",
+   "strength": "hard",
+   "reason": "法律是最刚性的社会规则，认识规则体系后才能聚焦违法行为"
+  },
+  {
+   "topicId": "cn_df_gz_06",
+   "prerequisiteId": "cn_df_fz_02",
+   "strength": "hard",
+   "reason": "判断什么是违法行为，必须用到法律的特征知识"
+  },
+  {
+   "topicId": "cn_df_gz_07",
+   "prerequisiteId": "cn_df_gz_06",
+   "strength": "hard",
+   "reason": "划清一般违法与犯罪的界限，才能谈如何预防犯罪"
+  },
+  {
+   "topicId": "cn_df_gz_08",
+   "prerequisiteId": "cn_df_gz_06",
+   "strength": "hard",
+   "reason": "知道违法行为及其后果，才知道权益受侵害时该向谁依法求助"
+  },
+  {
+   "topicId": "cn_df_gz_08",
+   "prerequisiteId": "cn_df_fz_05",
+   "strength": "soft",
+   "reason": "善用法律维权是依法办事要求在具体情境中的展开"
+  },
+  {
+   "topicId": "cn_df_zr_01",
+   "prerequisiteId": "cn_df_jt_07",
+   "strength": "soft",
+   "reason": "在集体建设中担当的经历，让人真切理解责任从何而来"
+  },
+  {
+   "topicId": "cn_df_zr_02",
+   "prerequisiteId": "cn_df_zr_01",
+   "strength": "hard",
+   "reason": "明确责任的含义与来源，才能理性分析承担的代价与回报"
+  },
+  {
+   "topicId": "cn_df_zr_02",
+   "prerequisiteId": "cn_df_jt_05",
+   "strength": "soft",
+   "reason": "把集体利益置于个人利益之上，正是负责任选择的典型情境"
+  },
+  {
+   "topicId": "cn_df_zr_03",
+   "prerequisiteId": "cn_df_zr_02",
+   "strength": "hard",
+   "reason": "对自己、对他人负责的态度，落实为关爱他人的具体行动"
+  },
+  {
+   "topicId": "cn_df_zr_03",
+   "prerequisiteId": "cn_df_sh_02",
+   "strength": "soft",
+   "reason": "关爱他人正是亲社会行为在日常交往中的具体表现"
+  },
+  {
+   "topicId": "cn_df_zr_04",
+   "prerequisiteId": "cn_df_zr_03",
+   "strength": "hard",
+   "reason": "从关爱身边人到服务社会，是责任感由近及远的扩展"
+  },
+  {
+   "topicId": "cn_df_ly_01",
+   "prerequisiteId": "cn_df_zr_01",
+   "strength": "soft",
+   "reason": "责任概念从个人、集体层面扩展到国家层面，引出国家利益"
+  },
+  {
+   "topicId": "cn_df_ly_02",
+   "prerequisiteId": "cn_df_ly_01",
+   "strength": "hard",
+   "reason": "先弄清国家利益包含什么，才能理解它与人民利益的关系"
+  },
+  {
+   "topicId": "cn_df_ly_03",
+   "prerequisiteId": "cn_df_ly_01",
+   "strength": "hard",
+   "reason": "国家安全是国家核心利益，谈总体国家安全观必须先界定国家利益"
+  },
+  {
+   "topicId": "cn_df_ly_03",
+   "prerequisiteId": "cn_df_ly_02",
+   "strength": "soft",
+   "reason": "国家安全是人民幸福安康的前提，呼应国家利益与人民利益的统一"
+  },
+  {
+   "topicId": "cn_df_ly_04",
+   "prerequisiteId": "cn_df_ly_03",
+   "strength": "hard",
+   "reason": "树立总体国家安全观之后，履行维护国家安全的义务才有方向"
+  },
+  {
+   "topicId": "cn_df_ly_05",
+   "prerequisiteId": "cn_df_ly_02",
+   "strength": "soft",
+   "reason": "理解国家利益与人民利益统一，才会以主人翁姿态关心国家发展"
+  },
+  {
+   "topicId": "cn_df_ly_06",
+   "prerequisiteId": "cn_df_ly_05",
+   "strength": "hard",
+   "reason": "看到国家发展的成就与问题，才会理解劳动实干、接力奋斗的责任"
+  },
+  {
+   "topicId": "cn_df_ly_06",
+   "prerequisiteId": "cn_df_zr_04",
+   "strength": "soft",
+   "reason": "服务社会的责任意识，升华为'天下兴亡匹夫有责'的家国担当"
+  },
+  {
+   "topicId": "cn_df_xf_01",
+   "prerequisiteId": "cn_df_fz_01",
+   "strength": "hard",
+   "reason": "先理解法律与生活息息相关，才能理解宪法作为根本法的分量"
+  },
+  {
+   "topicId": "cn_df_xf_01",
+   "prerequisiteId": "cn_df_fz_02",
+   "strength": "hard",
+   "reason": "宪法是法律体系的核心，理解它必须先掌握法律的一般特征"
+  },
+  {
+   "topicId": "cn_df_xf_02",
+   "prerequisiteId": "cn_df_xf_01",
+   "strength": "hard",
+   "reason": "明确宪法根本法地位，才能理解它如何组织国家机构、规范权力运行"
+  },
+  {
+   "topicId": "cn_df_xf_03",
+   "prerequisiteId": "cn_df_xf_01",
+   "strength": "hard",
+   "reason": "最高法律效力是根本法地位在法律体系内部的具体展开"
+  },
+  {
+   "topicId": "cn_df_xf_04",
+   "prerequisiteId": "cn_df_xf_03",
+   "strength": "hard",
+   "reason": "正因为宪法具有最高效力，依法治国才必须首先依宪治国"
+  },
+  {
+   "topicId": "cn_df_xf_05",
+   "prerequisiteId": "cn_df_xf_04",
+   "strength": "hard",
+   "reason": "依宪治国要落地，必须靠宪法监督与合宪性审查作制度保障"
+  },
+  {
+   "topicId": "cn_df_xf_06",
+   "prerequisiteId": "cn_df_xf_04",
+   "strength": "soft",
+   "reason": "国家层面的依宪治国，需要公民层面的宪法意识相呼应"
+  },
+  {
+   "topicId": "cn_df_qy_01",
+   "prerequisiteId": "cn_df_xf_01",
+   "strength": "hard",
+   "reason": "公民基本权利由宪法确认和保障，必须立足宪法来学习"
+  },
+  {
+   "topicId": "cn_df_qy_02",
+   "prerequisiteId": "cn_df_qy_01",
+   "strength": "hard",
+   "reason": "知道享有哪些权利，才能谈权利行使的界限与维权程序"
+  },
+  {
+   "topicId": "cn_df_qy_02",
+   "prerequisiteId": "cn_df_gz_08",
+   "strength": "soft",
+   "reason": "协商、调解、仲裁、诉讼的维权程序，与依法求助的途径一脉相承"
+  },
+  {
+   "topicId": "cn_df_qy_03",
+   "prerequisiteId": "cn_df_xf_01",
+   "strength": "hard",
+   "reason": "公民基本义务同样由宪法规定，承接宪法根本法知识"
+  },
+  {
+   "topicId": "cn_df_qy_04",
+   "prerequisiteId": "cn_df_qy_03",
+   "strength": "hard",
+   "reason": "认识基本义务的内容后，才能理解权利与义务的统一关系"
+  },
+  {
+   "topicId": "cn_df_qy_04",
+   "prerequisiteId": "cn_df_qy_02",
+   "strength": "hard",
+   "reason": "行使权利有界限、履行义务须依法，二者统一于法治原则之下"
+  },
+  {
+   "topicId": "cn_df_rm_01",
+   "prerequisiteId": "cn_df_xf_02",
+   "strength": "hard",
+   "reason": "人大制度是宪法组织国家机构、规范权力运行原则的制度载体"
+  },
+  {
+   "topicId": "cn_df_rm_01",
+   "prerequisiteId": "cn_df_ly_02",
+   "strength": "soft",
+   "reason": "国家一切权力属于人民，呼应国家利益与人民利益的高度统一"
+  },
+  {
+   "topicId": "cn_df_rm_02",
+   "prerequisiteId": "cn_df_rm_01",
+   "strength": "soft",
+   "reason": "多党合作和政协制度与人大制度协同，需先理解根本政治制度"
+  },
+  {
+   "topicId": "cn_df_rm_02",
+   "prerequisiteId": "cn_df_qy_01",
+   "strength": "soft",
+   "reason": "参政议政、民主监督依托公民政治权利与自由的知识"
+  },
+  {
+   "topicId": "cn_df_rm_03",
+   "prerequisiteId": "cn_df_rm_01",
+   "strength": "soft",
+   "reason": "民族自治地方的自治机关同样由本级人大产生，需先理解人大制度"
+  },
+  {
+   "topicId": "cn_df_rm_04",
+   "prerequisiteId": "cn_df_rm_01",
+   "strength": "soft",
+   "reason": "基层群众自治与人大制度共同构成人民当家作主的制度体系"
+  },
+  {
+   "topicId": "cn_df_rm_05",
+   "prerequisiteId": "cn_df_xf_01",
+   "strength": "soft",
+   "reason": "基本经济制度由宪法确认，学习它需要以宪法知识为基础"
+  },
+  {
+   "topicId": "cn_df_rm_06",
+   "prerequisiteId": "cn_df_xf_02",
+   "strength": "hard",
+   "reason": "宪法组织国家机构的知识，是理解各国家机关职权的直接基础"
+  },
+  {
+   "topicId": "cn_df_rm_06",
+   "prerequisiteId": "cn_df_rm_01",
+   "strength": "hard",
+   "reason": "国家机构由人大产生、对人大负责，必须先理解人大制度"
+  },
+  {
+   "topicId": "cn_df_fs_01",
+   "prerequisiteId": "cn_df_gz_02",
+   "strength": "hard",
+   "reason": "自由与规则不可分的认识，上升为自由与法治关系的法治表达"
+  },
+  {
+   "topicId": "cn_df_fs_01",
+   "prerequisiteId": "cn_df_fz_03",
+   "strength": "soft",
+   "reason": "法治对自由的保障作用，建立在法律规范与保护作用之上"
+  },
+  {
+   "topicId": "cn_df_fs_02",
+   "prerequisiteId": "cn_df_fs_01",
+   "strength": "hard",
+   "reason": "自由在法律范围内行使，平等要求法律面前人人同等对待"
+  },
+  {
+   "topicId": "cn_df_fs_02",
+   "prerequisiteId": "cn_df_qy_01",
+   "strength": "soft",
+   "reason": "平等意味着每个人同等享有宪法确认的基本权利"
+  },
+  {
+   "topicId": "cn_df_fs_03",
+   "prerequisiteId": "cn_df_fs_02",
+   "strength": "hard",
+   "reason": "平等是公平的前提，没有平等就谈不上权利、规则、机会公平"
+  },
+  {
+   "topicId": "cn_df_fs_04",
+   "prerequisiteId": "cn_df_fs_03",
+   "strength": "hard",
+   "reason": "正义是对公平底线的守护，守护公平必然要求捍卫正义"
+  },
+  {
+   "topicId": "cn_df_fs_04",
+   "prerequisiteId": "cn_df_gz_08",
+   "strength": "soft",
+   "reason": "善用法律、见义智为，正是个人守护正义的具体路径"
+  },
+  {
+   "topicId": "cn_df_fc_01",
+   "prerequisiteId": "cn_df_ly_05",
+   "strength": "hard",
+   "reason": "关心国家发展时看到的辉煌成就，正是改革开放成就的延续"
+  },
+  {
+   "topicId": "cn_df_fc_02",
+   "prerequisiteId": "cn_df_fc_01",
+   "strength": "hard",
+   "reason": "改革开放解决了'富起来'的问题，走向共同富裕是它的深化"
+  },
+  {
+   "topicId": "cn_df_fc_02",
+   "prerequisiteId": "cn_df_rm_05",
+   "strength": "soft",
+   "reason": "基本经济制度为共享发展、共同富裕提供了制度保障"
+  },
+  {
+   "topicId": "cn_df_fc_03",
+   "prerequisiteId": "cn_df_fc_01",
+   "strength": "soft",
+   "reason": "改革开放释放了全社会的创新活力，创新故事从改革讲起"
+  },
+  {
+   "topicId": "cn_df_fc_04",
+   "prerequisiteId": "cn_df_fc_03",
+   "strength": "hard",
+   "reason": "认识创新如何改变生活，才理解国家为何把创新摆在核心位置"
+  },
+  {
+   "topicId": "cn_df_fc_05",
+   "prerequisiteId": "cn_df_fc_04",
+   "strength": "hard",
+   "reason": "创新驱动发展战略的部署，为建设创新型国家提供了路径"
+  },
+  {
+   "topicId": "cn_df_fc_05",
+   "prerequisiteId": "cn_df_fc_02",
+   "strength": "soft",
+   "reason": "创新是引领发展的第一动力，是实现共同富裕的重要支撑"
+  },
+  {
+   "topicId": "cn_df_mz_01",
+   "prerequisiteId": "cn_df_rm_01",
+   "strength": "hard",
+   "reason": "人民代表大会制度正是人民当家作主这一本质特征的制度体现"
+  },
+  {
+   "topicId": "cn_df_mz_01",
+   "prerequisiteId": "cn_df_rm_06",
+   "strength": "soft",
+   "reason": "国家机构的设置与运行，处处体现人民当家作主的本质"
+  },
+  {
+   "topicId": "cn_df_mz_02",
+   "prerequisiteId": "cn_df_mz_01",
+   "strength": "hard",
+   "reason": "理解民主的本质特征，才知道公民参与民主生活的意义与形式"
+  },
+  {
+   "topicId": "cn_df_mz_02",
+   "prerequisiteId": "cn_df_qy_01",
+   "strength": "hard",
+   "reason": "参与民主生活，本质上是行使选举、监督等政治权利与自由"
+  },
+  {
+   "topicId": "cn_df_mz_02",
+   "prerequisiteId": "cn_df_xf_06",
+   "strength": "soft",
+   "reason": "依法有序的政治参与，需要宪法法律意识作支撑"
+  },
+  {
+   "topicId": "cn_df_mz_03",
+   "prerequisiteId": "cn_df_fz_03",
+   "strength": "soft",
+   "reason": "从法律的作用进一步上升为对法治价值（良法善治）的追求"
+  },
+  {
+   "topicId": "cn_df_mz_04",
+   "prerequisiteId": "cn_df_mz_03",
+   "strength": "hard",
+   "reason": "明确良法善治的要求后，才能理解全面依法治国的总目标与布局"
+  },
+  {
+   "topicId": "cn_df_mz_04",
+   "prerequisiteId": "cn_df_xf_04",
+   "strength": "hard",
+   "reason": "全面依法治国首先要依宪治国，直接承接宪法至上的知识"
+  },
+  {
+   "topicId": "cn_df_mz_04",
+   "prerequisiteId": "cn_df_fs_04",
+   "strength": "soft",
+   "reason": "公正司法守护正义，是全面依法治国在司法环节的要求"
+  },
+  {
+   "topicId": "cn_df_mz_05",
+   "prerequisiteId": "cn_df_mz_04",
+   "strength": "hard",
+   "reason": "法治政府建设是全面依法治国的主体工程，承接总体布局"
+  },
+  {
+   "topicId": "cn_df_mz_05",
+   "prerequisiteId": "cn_df_rm_06",
+   "strength": "hard",
+   "reason": "法治政府以国家机构中行政机关的性质与职权知识为前提"
+  },
+  {
+   "topicId": "cn_df_mz_06",
+   "prerequisiteId": "cn_df_mz_05",
+   "strength": "hard",
+   "reason": "厉行法治是对政府、社会组织和全体公民的共同要求，承接法治政府"
+  },
+  {
+   "topicId": "cn_df_mz_06",
+   "prerequisiteId": "cn_df_qc_06",
+   "strength": "soft",
+   "reason": "德治与法治相结合，可上溯到行己有耻、止于至善的道德修养"
+  },
+  {
+   "topicId": "cn_df_wm_01",
+   "prerequisiteId": "cn_df_ss_03",
+   "strength": "soft",
+   "reason": "孝亲敬长的家庭美德，是青少年触摸中华文化的最近起点"
+  },
+  {
+   "topicId": "cn_df_wm_02",
+   "prerequisiteId": "cn_df_wm_01",
+   "strength": "hard",
+   "reason": "认识中华文化的特点与价值，才能谈坚定文化自信"
+  },
+  {
+   "topicId": "cn_df_wm_03",
+   "prerequisiteId": "cn_df_wm_01",
+   "strength": "hard",
+   "reason": "传统美德是中华文化的精髓，先懂文化再讲美德"
+  },
+  {
+   "topicId": "cn_df_wm_04",
+   "prerequisiteId": "cn_df_wm_03",
+   "strength": "soft",
+   "reason": "民族精神在传统美德与民族志向的基础上凝练升华"
+  },
+  {
+   "topicId": "cn_df_wm_05",
+   "prerequisiteId": "cn_df_wm_04",
+   "strength": "hard",
+   "reason": "核心价值观是当代中国精神（含民族精神）的集中体现"
+  },
+  {
+   "topicId": "cn_df_wm_05",
+   "prerequisiteId": "cn_df_gz_05",
+   "strength": "soft",
+   "reason": "诚信既是传统道德规范，也是核心价值观的个人层面要求"
+  },
+  {
+   "topicId": "cn_df_wm_06",
+   "prerequisiteId": "cn_df_fc_02",
+   "strength": "soft",
+   "reason": "发展不平衡不充分的矛盾，包含人口资源环境的深层制约"
+  },
+  {
+   "topicId": "cn_df_wm_07",
+   "prerequisiteId": "cn_df_wm_06",
+   "strength": "hard",
+   "reason": "正视人口资源环境问题，才能理解绿色发展道路的选择"
+  },
+  {
+   "topicId": "cn_df_wm_07",
+   "prerequisiteId": "cn_df_wm_05",
+   "strength": "soft",
+   "reason": "绿色低碳生活方式，是核心价值观在生态领域的日常践行"
+  },
+  {
+   "topicId": "cn_df_hx_01",
+   "prerequisiteId": "cn_df_rm_03",
+   "strength": "hard",
+   "reason": "民族区域自治制度是维护民族团结的制度保障，先制度后实践"
+  },
+  {
+   "topicId": "cn_df_hx_01",
+   "prerequisiteId": "cn_df_qy_03",
+   "strength": "soft",
+   "reason": "维护国家统一和民族团结本身就是公民的基本义务"
+  },
+  {
+   "topicId": "cn_df_hx_02",
+   "prerequisiteId": "cn_df_hx_01",
+   "strength": "soft",
+   "reason": "民族团结与祖国统一共同服务于中华民族的最高利益"
+  },
+  {
+   "topicId": "cn_df_hx_02",
+   "prerequisiteId": "cn_df_ly_04",
+   "strength": "soft",
+   "reason": "反对分裂是维护国家安全、领土完整义务的直接体现"
+  },
+  {
+   "topicId": "cn_df_hx_03",
+   "prerequisiteId": "cn_df_fc_01",
+   "strength": "soft",
+   "reason": "改革开放奠定的物质基础，使中国梦成为可感可及的目标"
+  },
+  {
+   "topicId": "cn_df_hx_03",
+   "prerequisiteId": "cn_df_ly_02",
+   "strength": "soft",
+   "reason": "中国梦把国家利益与人民幸福的统一具体化为共同追求"
+  },
+  {
+   "topicId": "cn_df_hx_04",
+   "prerequisiteId": "cn_df_hx_03",
+   "strength": "hard",
+   "reason": "理解中国梦的内涵后，才能把握实现它的战略安排与时间表"
+  },
+  {
+   "topicId": "cn_df_hx_05",
+   "prerequisiteId": "cn_df_hx_04",
+   "strength": "hard",
+   "reason": "知道新时代的战略安排与成就，才有做自信中国人的底气"
+  },
+  {
+   "topicId": "cn_df_hx_05",
+   "prerequisiteId": "cn_df_wm_02",
+   "strength": "soft",
+   "reason": "文化自信是中国人自信底气的重要来源"
+  },
+  {
+   "topicId": "cn_df_sj_01",
+   "prerequisiteId": "cn_df_sh_03",
+   "strength": "soft",
+   "reason": "网络让世界变成'地球村'，是理解经济全球化的直观入口"
+  },
+  {
+   "topicId": "cn_df_sj_02",
+   "prerequisiteId": "cn_df_sj_01",
+   "strength": "soft",
+   "reason": "经济全球化带来人员与商品流动，文化交往随之日益频繁"
+  },
+  {
+   "topicId": "cn_df_sj_03",
+   "prerequisiteId": "cn_df_sj_01",
+   "strength": "hard",
+   "reason": "经济全球化重塑国际力量对比，是世界多极化的深层动力"
+  },
+  {
+   "topicId": "cn_df_sj_04",
+   "prerequisiteId": "cn_df_sj_03",
+   "strength": "soft",
+   "reason": "多极化格局下判断战争与和平问题，需要时代主题的分析框架"
+  },
+  {
+   "topicId": "cn_df_sj_05",
+   "prerequisiteId": "cn_df_sj_04",
+   "strength": "hard",
+   "reason": "全球性问题威胁和平与发展，构建人类命运共同体是必然选择"
+  },
+  {
+   "topicId": "cn_df_sj_05",
+   "prerequisiteId": "cn_df_sj_02",
+   "strength": "soft",
+   "reason": "开放包容的世界，建立在对文化多样性的尊重之上"
+  },
+  {
+   "topicId": "cn_df_zg_01",
+   "prerequisiteId": "cn_df_sj_05",
+   "strength": "soft",
+   "reason": "中国担当正是人类命运共同体理念在国家层面的实践"
+  },
+  {
+   "topicId": "cn_df_zg_01",
+   "prerequisiteId": "cn_df_ly_03",
+   "strength": "soft",
+   "reason": "参与国际安全合作，是总体国家安全观在国际维度的延伸"
+  },
+  {
+   "topicId": "cn_df_zg_02",
+   "prerequisiteId": "cn_df_zg_01",
+   "strength": "hard",
+   "reason": "在承担责任的基础上，中国进一步为全球治理贡献智慧与方案"
+  },
+  {
+   "topicId": "cn_df_zg_02",
+   "prerequisiteId": "cn_df_sj_04",
+   "strength": "soft",
+   "reason": "中国方案针对的正是和平与发展进程中的全球性问题"
+  },
+  {
+   "topicId": "cn_df_zg_03",
+   "prerequisiteId": "cn_df_sj_02",
+   "strength": "hard",
+   "reason": "文明交流互鉴的理念，建立在尊重文化多样性的认识之上"
+  },
+  {
+   "topicId": "cn_df_zg_03",
+   "prerequisiteId": "cn_df_zg_01",
+   "strength": "soft",
+   "reason": "中国越积极担当，与世界各国的互动就越深入"
+  },
+  {
+   "topicId": "cn_df_zg_04",
+   "prerequisiteId": "cn_df_zg_01",
+   "strength": "hard",
+   "reason": "深度参与全球治理的中国，必然同时面对新的机遇与挑战"
+  },
+  {
+   "topicId": "cn_df_zg_05",
+   "prerequisiteId": "cn_df_zg_04",
+   "strength": "hard",
+   "reason": "面对机遇与挑战，中国的选择是携手合作、共享发展"
+  },
+  {
+   "topicId": "cn_df_zg_05",
+   "prerequisiteId": "cn_df_sj_03",
+   "strength": "soft",
+   "reason": "合作共赢是对复杂多变国际关系的理性回应"
+  },
+  {
+   "topicId": "cn_df_wl_01",
+   "prerequisiteId": "cn_df_hx_05",
+   "strength": "soft",
+   "reason": "自信的中国人，正是'少年强则国强'在当代青少年身上的表达"
+  },
+  {
+   "topicId": "cn_df_wl_01",
+   "prerequisiteId": "cn_df_ly_06",
+   "strength": "soft",
+   "reason": "实干兴邦的担当落到青少年身上，就是少年当自强"
+  },
+  {
+   "topicId": "cn_df_wl_02",
+   "prerequisiteId": "cn_df_cjjp_04",
+   "strength": "soft",
+   "reason": "七年级学会学习的方法论，在毕业年级升级为终身学习观"
+  },
+  {
+   "topicId": "cn_df_wl_03",
+   "prerequisiteId": "cn_df_wl_02",
+   "strength": "soft",
+   "reason": "在实践中学习的经历，为职业兴趣和选择积累真实体验"
+  },
+  {
+   "topicId": "cn_df_wl_04",
+   "prerequisiteId": "cn_df_wl_03",
+   "strength": "hard",
+   "reason": "思考职业方向之后，才能系统地畅想未来、规划人生"
+  },
+  {
+   "topicId": "cn_df_wl_04",
+   "prerequisiteId": "cn_df_cjjp_02",
+   "strength": "soft",
+   "reason": "七年级种下的少年梦想，在毕业年的人生规划中具体化"
+  },
+  {
+   "topicId": "cn_df_wl_05",
+   "prerequisiteId": "cn_df_wl_04",
+   "strength": "soft",
+   "reason": "回望成长是为了校准方向，让未来规划更加清醒务实"
+  },
+  {
+   "topicId": "cn_df_wl_05",
+   "prerequisiteId": "cn_df_cjjp_06",
+   "strength": "soft",
+   "reason": "做更好的自己的方法，在毕业自我总结中再次派上用场"
+  },
+  {
+   "topicId": "cn_df_qc_07",
+   "prerequisiteId": "cn_df_qc_02",
+   "strength": "hard",
+   "reason": "创造源于独立思考与批判精神，敢于质疑权威才可能打破常规"
+  },
+  {
+   "topicId": "cn_df_qc_07",
+   "prerequisiteId": "cn_df_qc_05",
+   "strength": "soft",
+   "reason": "自信自强的心态让人敢于尝试创造、不怕失败"
+  },
+  {
+   "topicId": "cn_df_jt_08",
+   "prerequisiteId": "cn_df_jt_05",
+   "strength": "hard",
+   "reason": "多重集体中的角色冲突与小团体主义，本质仍是个人与集体利益的排序问题"
+  },
+  {
+   "topicId": "cn_df_jt_08",
+   "prerequisiteId": "cn_df_jt_04",
+   "strength": "soft",
+   "reason": "处理多重集体节奏冲突，用到个人意愿服从集体共同要求的方法"
+  },
+  {
+   "topicId": "cn_df_mz_07",
+   "prerequisiteId": "cn_df_mz_01",
+   "strength": "hard",
+   "reason": "先理解人民当家作主是民主的本质，才需要追问它靠什么制度实现"
+  },
+  {
+   "topicId": "cn_df_mz_07",
+   "prerequisiteId": "cn_df_rm_01",
+   "strength": "hard",
+   "reason": "九上的民主制度保障正是八下人民代表大会制度等内容的再现与升华"
+  },
+  {
+   "topicId": "cn_df_mz_07",
+   "prerequisiteId": "cn_df_rm_04",
+   "strength": "soft",
+   "reason": "基层群众自治是人民当家作主制度体系中最贴近生活的部分"
+  },
+  {
+   "topicId": "cn_yw_02",
+   "prerequisiteId": "cn_yw_01",
+   "strength": "hard",
+   "reason": "主动识字与规范书写以拼音和基本识字量为基础"
+  },
+  {
+   "topicId": "cn_yw_03",
+   "prerequisiteId": "cn_yw_01",
+   "strength": "hard",
+   "reason": "朗读默读训练以足够的识字量为前提"
+  },
+  {
+   "topicId": "cn_yw_04",
+   "prerequisiteId": "cn_yw_03",
+   "strength": "hard",
+   "reason": "把握文章主要内容建立在朗读默读与理解词句的能力之上"
+  },
+  {
+   "topicId": "cn_yw_05",
+   "prerequisiteId": "cn_yw_04",
+   "strength": "hard",
+   "reason": "说明文议论文的要点把握是记叙文概括能力的迁移与升级"
+  },
+  {
+   "topicId": "cn_yw_06",
+   "prerequisiteId": "cn_yw_04",
+   "strength": "soft",
+   "reason": "现代文阅读的理解方法可迁移到浅易文言文"
+  },
+  {
+   "topicId": "cn_yw_07",
+   "prerequisiteId": "cn_yw_04",
+   "strength": "soft",
+   "reason": "诗歌鉴赏需要一般的阅读理解与情感体会能力"
+  },
+  {
+   "topicId": "cn_yw_08",
+   "prerequisiteId": "cn_yw_04",
+   "strength": "soft",
+   "reason": "整本书阅读需要基本的概括与感受能力支撑长文本耐力"
+  },
+  {
+   "topicId": "cn_yw_09",
+   "prerequisiteId": "cn_yw_03",
+   "strength": "hard",
+   "reason": "写作从词句段的理解与积累起步"
+  },
+  {
+   "topicId": "cn_yw_10",
+   "prerequisiteId": "cn_yw_09",
+   "strength": "hard",
+   "reason": "议论文写作以记叙文的内容组织能力为基础"
+  },
+  {
+   "topicId": "cn_yw_11",
+   "prerequisiteId": "cn_yw_07",
+   "strength": "soft",
+   "reason": "高中文学鉴赏在初中诗歌散文鉴赏基础上深化"
+  },
+  {
+   "topicId": "cn_yw_12",
+   "prerequisiteId": "cn_yw_05",
+   "strength": "hard",
+   "reason": "思辨表达需要初中议论文阅读的观点材料分析能力"
+  },
+  {
+   "topicId": "cn_sx_02",
+   "prerequisiteId": "cn_sx_01",
+   "strength": "hard",
+   "reason": "四则运算以数的认识与数感为前提"
+  },
+  {
+   "topicId": "cn_sx_03",
+   "prerequisiteId": "cn_sx_02",
+   "strength": "hard",
+   "reason": "分数小数运算是整数运算的扩展"
+  },
+  {
+   "topicId": "cn_sx_04",
+   "prerequisiteId": "cn_sx_03",
+   "strength": "hard",
+   "reason": "用字母表示数需要对数量关系的概括能力"
+  },
+  {
+   "topicId": "cn_sx_05",
+   "prerequisiteId": "cn_sx_03",
+   "strength": "soft",
+   "reason": "比和比例与分数概念紧密相连"
+  },
+  {
+   "topicId": "cn_sx_07",
+   "prerequisiteId": "cn_sx_04",
+   "strength": "hard",
+   "reason": "一元一次方程是简易方程的系统化"
+  },
+  {
+   "topicId": "cn_sx_08",
+   "prerequisiteId": "cn_sx_07",
+   "strength": "soft",
+   "reason": "坐标系中的数对思想与方程的变量思想相通"
+  },
+  {
+   "topicId": "cn_sx_09",
+   "prerequisiteId": "cn_sx_06",
+   "strength": "soft",
+   "reason": "小学图形认识为初中几何推理提供直观基础"
+  },
+  {
+   "topicId": "cn_sx_10",
+   "prerequisiteId": "cn_sx_09",
+   "strength": "hard",
+   "reason": "全等相似以三角形基本性质与证明方法为前提"
+  },
+  {
+   "topicId": "cn_sx_11",
+   "prerequisiteId": "cn_sx_08",
+   "strength": "hard",
+   "reason": "函数图象必须依托平面直角坐标系"
+  },
+  {
+   "topicId": "cn_sx_12",
+   "prerequisiteId": "cn_sx_11",
+   "strength": "hard",
+   "reason": "二次函数在一次函数概念与图象方法上进阶"
+  },
+  {
+   "topicId": "cn_sx_13",
+   "prerequisiteId": "cn_sx_09",
+   "strength": "soft",
+   "reason": "圆的性质证明用到三角形与平行线的推理方法"
+  },
+  {
+   "topicId": "cn_sx_14",
+   "prerequisiteId": "cn_sx_02",
+   "strength": "soft",
+   "reason": "统计计算与概率计数需要扎实的运算能力"
+  },
+  {
+   "topicId": "cn_sx_15",
+   "prerequisiteId": "cn_sx_12",
+   "strength": "hard",
+   "reason": "高中函数与导数以初中函数观念为地基"
+  },
+  {
+   "topicId": "cn_en_02",
+   "prerequisiteId": "cn_en_01",
+   "strength": "hard",
+   "reason": "词汇句型学习以语音拼读能力为前提"
+  },
+  {
+   "topicId": "cn_en_03",
+   "prerequisiteId": "cn_en_02",
+   "strength": "hard",
+   "reason": "时态变化依托已掌握的核心句型"
+  },
+  {
+   "topicId": "cn_en_04",
+   "prerequisiteId": "cn_en_02",
+   "strength": "soft",
+   "reason": "阅读起步需要一定的词汇量积累"
+  },
+  {
+   "topicId": "cn_en_05",
+   "prerequisiteId": "cn_en_03",
+   "strength": "hard",
+   "reason": "初中时态体系在小学常见时态上扩展"
+  },
+  {
+   "topicId": "cn_en_06",
+   "prerequisiteId": "cn_en_05",
+   "strength": "hard",
+   "reason": "从句学习需要完整的时态与句子结构知识"
+  },
+  {
+   "topicId": "cn_en_07",
+   "prerequisiteId": "cn_en_04",
+   "strength": "soft",
+   "reason": "初中阅读策略在小学阅读习惯上发展"
+  },
+  {
+   "topicId": "cn_en_09",
+   "prerequisiteId": "cn_en_06",
+   "strength": "soft",
+   "reason": "书面表达需要驾驭从句写出复杂句"
+  },
+  {
+   "topicId": "cn_en_10",
+   "prerequisiteId": "cn_en_06",
+   "strength": "hard",
+   "reason": "长难句分析以从句结构知识为核心"
+  },
+  {
+   "topicId": "cn_en_11",
+   "prerequisiteId": "cn_en_10",
+   "strength": "hard",
+   "reason": "读后续写需要读懂长难句并模仿语言风格"
+  },
+  {
+   "topicId": "cn_kx_02",
+   "prerequisiteId": "cn_kx_01",
+   "strength": "soft",
+   "reason": "观察动植物需要基本的观察提问能力"
+  },
+  {
+   "topicId": "cn_kx_04",
+   "prerequisiteId": "cn_kx_03",
+   "strength": "soft",
+   "reason": "三态变化研究以物体特征的观察描述为基础"
+  },
+  {
+   "topicId": "cn_kx_05",
+   "prerequisiteId": "cn_kx_03",
+   "strength": "soft",
+   "reason": "声光热现象的解释用到材料与物体特征知识"
+  },
+  {
+   "topicId": "cn_kx_09",
+   "prerequisiteId": "cn_kx_01",
+   "strength": "hard",
+   "reason": "完整探究过程以最初的观察提问能力为起点"
+  },
+  {
+   "topicId": "cn_kx_07",
+   "prerequisiteId": "cn_kx_05",
+   "strength": "soft",
+   "reason": "电路学习承接能量与现象研究的经验"
+  },
+  {
+   "topicId": "cn_kx_08",
+   "prerequisiteId": "cn_kx_02",
+   "strength": "hard",
+   "reason": "食物链食物网以认识常见动植物为前提"
+  },
+  {
+   "topicId": "cn_kx_10",
+   "prerequisiteId": "cn_kx_09",
+   "strength": "hard",
+   "reason": "工程实践中的测试改进遵循科学探究的流程"
+  },
+  {
+   "topicId": "cn_wl_04",
+   "prerequisiteId": "cn_wl_01",
+   "strength": "soft",
+   "reason": "密度测量用到运动与测量的基本技能"
+  },
+  {
+   "topicId": "cn_wl_05",
+   "prerequisiteId": "cn_wl_01",
+   "strength": "hard",
+   "reason": "力与运动的分析以机械运动描述为基础"
+  },
+  {
+   "topicId": "cn_wl_06",
+   "prerequisiteId": "cn_wl_05",
+   "strength": "hard",
+   "reason": "压强浮力是力的概念在流体中的深化"
+  },
+  {
+   "topicId": "cn_wl_07",
+   "prerequisiteId": "cn_wl_05",
+   "strength": "soft",
+   "reason": "杠杆滑轮的分析依赖受力分析能力"
+  },
+  {
+   "topicId": "cn_wl_08",
+   "prerequisiteId": "cn_kx_07",
+   "strength": "soft",
+   "reason": "小学简单电路经验是电路定量研究的前概念"
+  },
+  {
+   "topicId": "cn_wl_09",
+   "prerequisiteId": "cn_wl_08",
+   "strength": "hard",
+   "reason": "电功率计算建立在欧姆定律之上"
+  },
+  {
+   "topicId": "cn_wl_10",
+   "prerequisiteId": "cn_wl_08",
+   "strength": "soft",
+   "reason": "电磁感应现象的理解需要电流磁效应知识"
+  },
+  {
+   "topicId": "cn_wl_11",
+   "prerequisiteId": "cn_wl_05",
+   "strength": "hard",
+   "reason": "高中动力学是初中力与运动的定量深化"
+  },
+  {
+   "topicId": "cn_wl_12",
+   "prerequisiteId": "cn_wl_11",
+   "strength": "hard",
+   "reason": "能量动量观点建立在牛顿定律体系之上"
+  },
+  {
+   "topicId": "cn_wl_14",
+   "prerequisiteId": "cn_wl_13",
+   "strength": "hard",
+   "reason": "电磁感应综合问题需要电场电路知识"
+  },
+  {
+   "topicId": "cn_hx_02",
+   "prerequisiteId": "cn_hx_01",
+   "strength": "hard",
+   "reason": "空气的探究用到基本实验操作与变化观"
+  },
+  {
+   "topicId": "cn_hx_04",
+   "prerequisiteId": "cn_hx_03",
+   "strength": "hard",
+   "reason": "化学方程式用微观粒子观点解释质量守恒"
+  },
+  {
+   "topicId": "cn_hx_08",
+   "prerequisiteId": "cn_hx_04",
+   "strength": "soft",
+   "reason": "酸碱盐的反应规律用方程式与离子观点表达"
+  },
+  {
+   "topicId": "cn_hx_09",
+   "prerequisiteId": "cn_hx_04",
+   "strength": "hard",
+   "reason": "反应原理定量研究以方程式与守恒思想为基础"
+  },
+  {
+   "topicId": "cn_hx_10",
+   "prerequisiteId": "cn_hx_03",
+   "strength": "soft",
+   "reason": "有机结构研究延续原子分子的微观视角"
+  },
+  {
+   "topicId": "cn_sw_02",
+   "prerequisiteId": "cn_sw_01",
+   "strength": "hard",
+   "reason": "细胞学习以生物基本特征的认识为前提"
+  },
+  {
+   "topicId": "cn_sw_03",
+   "prerequisiteId": "cn_sw_02",
+   "strength": "hard",
+   "reason": "结构层次从细胞出发逐级构建"
+  },
+  {
+   "topicId": "cn_sw_06",
+   "prerequisiteId": "cn_sw_05",
+   "strength": "soft",
+   "reason": "神经调节与循环呼吸系统协同维持生命活动"
+  },
+  {
+   "topicId": "cn_sw_07",
+   "prerequisiteId": "cn_sw_02",
+   "strength": "soft",
+   "reason": "遗传的物质基础追溯到细胞与细胞核"
+  },
+  {
+   "topicId": "cn_sw_09",
+   "prerequisiteId": "cn_kx_08",
+   "strength": "soft",
+   "reason": "初中生态系统是小学生态观念的系统化"
+  },
+  {
+   "topicId": "cn_sw_10",
+   "prerequisiteId": "cn_sw_02",
+   "strength": "hard",
+   "reason": "细胞代谢研究以细胞结构知识为前提"
+  },
+  {
+   "topicId": "cn_sw_11",
+   "prerequisiteId": "cn_sw_07",
+   "strength": "hard",
+   "reason": "高中遗传规律在初中遗传现象上定量化"
+  },
+  {
+   "topicId": "cn_ls_02",
+   "prerequisiteId": "cn_ls_01",
+   "strength": "hard",
+   "reason": "统一多民族国家的建立承接早期国家的演变"
+  },
+  {
+   "topicId": "cn_ls_05",
+   "prerequisiteId": "cn_ls_04",
+   "strength": "hard",
+   "reason": "近代危机源于明清由盛转衰的历史走向"
+  },
+  {
+   "topicId": "cn_ls_06",
+   "prerequisiteId": "cn_ls_05",
+   "strength": "hard",
+   "reason": "近代化探索是对民族危机层层加深的回应"
+  },
+  {
+   "topicId": "cn_ls_07",
+   "prerequisiteId": "cn_ls_06",
+   "strength": "hard",
+   "reason": "旧式探索的失败引出新的革命道路选择"
+  },
+  {
+   "topicId": "cn_ls_08",
+   "prerequisiteId": "cn_ls_07",
+   "strength": "hard",
+   "reason": "新中国成立是新民主主义革命胜利的结果"
+  },
+  {
+   "topicId": "cn_ls_10",
+   "prerequisiteId": "cn_ls_09",
+   "strength": "soft",
+   "reason": "近代资本主义兴起承接地中海贸易等传统"
+  },
+  {
+   "topicId": "cn_ls_11",
+   "prerequisiteId": "cn_ls_10",
+   "strength": "hard",
+   "reason": "世界大战是资本主义发展矛盾的总爆发"
+  },
+  {
+   "topicId": "cn_ls_12",
+   "prerequisiteId": "cn_ls_08",
+   "strength": "soft",
+   "reason": "高中纲要课以初中通史知识为时空框架"
+  },
+  {
+   "topicId": "cn_dl_02",
+   "prerequisiteId": "cn_dl_01",
+   "strength": "hard",
+   "reason": "大洲大洋的定位需要经纬网与地图技能"
+  },
+  {
+   "topicId": "cn_dl_03",
+   "prerequisiteId": "cn_dl_01",
+   "strength": "soft",
+   "reason": "气候分布规律借助地图与纬度位置理解"
+  },
+  {
+   "topicId": "cn_dl_05",
+   "prerequisiteId": "cn_dl_01",
+   "strength": "hard",
+   "reason": "中国疆域的学习从世界地理定位出发"
+  },
+  {
+   "topicId": "cn_dl_06",
+   "prerequisiteId": "cn_dl_05",
+   "strength": "hard",
+   "reason": "自然环境分析以中国疆域人口格局为背景"
+  },
+  {
+   "topicId": "cn_dl_09",
+   "prerequisiteId": "cn_dl_06",
+   "strength": "hard",
+   "reason": "区域差异比较以自然环境整体认知为基础"
+  },
+  {
+   "topicId": "cn_dl_10",
+   "prerequisiteId": "cn_dl_03",
+   "strength": "soft",
+   "reason": "高中气候成因分析以初中气候类型为经验"
+  },
+  {
+   "topicId": "cn_dl_11",
+   "prerequisiteId": "cn_dl_08",
+   "strength": "soft",
+   "reason": "高中区位理论在初中经济分布事实上理论化"
+  },
+  {
+   "topicId": "cn_zz_02",
+   "prerequisiteId": "cn_zz_01",
+   "strength": "hard",
+   "reason": "中国道路的选择放在科学社会主义发展脉络中理解"
+  },
+  {
+   "topicId": "cn_zz_04",
+   "prerequisiteId": "cn_zz_03",
+   "strength": "hard",
+   "reason": "市场经济体制的讨论以所有制与分配制度为前提"
+  },
+  {
+   "topicId": "cn_zz_06",
+   "prerequisiteId": "cn_zz_05",
+   "strength": "hard",
+   "reason": "政治制度体系以党的领导这一最本质特征为统领"
+  },
+  {
+   "topicId": "cn_zz_09",
+   "prerequisiteId": "cn_zz_08",
+   "strength": "hard",
+   "reason": "历史唯物主义是辩证唯物主义在社会历史领域的运用"
+  },
+  {
+   "topicId": "cn_xx_03",
+   "prerequisiteId": "cn_xx_01",
+   "strength": "soft",
+   "reason": "编程表达以基本的信息交流能力为情境"
+  },
+  {
+   "topicId": "cn_xx_06",
+   "prerequisiteId": "cn_xx_03",
+   "strength": "hard",
+   "reason": "Python代码编程承接图形化编程的算法结构"
+  },
+  {
+   "topicId": "cn_xx_07",
+   "prerequisiteId": "cn_xx_06",
+   "strength": "soft",
+   "reason": "体验AI系统需要基本的程序与数据概念"
+  },
+  {
+   "topicId": "cn_xx_10",
+   "prerequisiteId": "cn_xx_06",
+   "strength": "hard",
+   "reason": "算法与数据结构以程序设计能力为前提"
+  },
+  {
+   "topicId": "cn_ty_02",
+   "prerequisiteId": "cn_ty_01",
+   "strength": "hard",
+   "reason": "体能发展以掌握基本运动技能为基础"
+  },
+  {
+   "topicId": "cn_ty_03",
+   "prerequisiteId": "cn_ty_02",
+   "strength": "soft",
+   "reason": "田径专项以一般体能为身体准备"
+  },
+  {
+   "topicId": "cn_ty_04",
+   "prerequisiteId": "cn_ty_02",
+   "strength": "soft",
+   "reason": "球类运动对协调灵敏等体能有要求"
+  },
+  {
+   "topicId": "cn_ty_06",
+   "prerequisiteId": "cn_ty_02",
+   "strength": "soft",
+   "reason": "安全运动知识伴随锻炼习惯的养成"
+  },
+  {
+   "topicId": "cn_ty_07",
+   "prerequisiteId": "cn_ty_04",
+   "strength": "soft",
+   "reason": "专项技能在多项目体验后定向发展"
+  },
+  {
+   "topicId": "cn_ys_03",
+   "prerequisiteId": "cn_ys_02",
+   "strength": "soft",
+   "reason": "设计应用以造型表现能力为工具"
+  },
+  {
+   "topicId": "cn_ys_05",
+   "prerequisiteId": "cn_ys_01",
+   "strength": "soft",
+   "reason": "经典鉴赏需要基本的艺术感受力"
+  },
+  {
+   "topicId": "cn_ys_06",
+   "prerequisiteId": "cn_ys_05",
+   "strength": "hard",
+   "reason": "文化理解层面的艺术学习以鉴赏能力为前提"
+  },
+  {
+   "topicId": "cn_ld_02",
+   "prerequisiteId": "cn_ld_01",
+   "strength": "soft",
+   "reason": "烹饪劳动以基本自理能力和劳动习惯为前提"
+  },
+  {
+   "topicId": "cn_ld_03",
+   "prerequisiteId": "cn_ld_01",
+   "strength": "soft",
+   "reason": "器具使用建立在生活自理与安全意识之上"
+  },
+  {
+   "topicId": "cn_ld_07",
+   "prerequisiteId": "cn_ld_06",
+   "strength": "soft",
+   "reason": "服务社会的体验帮助思考职业与人生方向"
+  }
+ ]
+}
