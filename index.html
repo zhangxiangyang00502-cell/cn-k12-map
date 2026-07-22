@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>中国 K12 知识地图</title>
 <style>
   :root {
@@ -12,6 +12,9 @@
     --text: #e8eaf0;
     --text-dim: #9aa3b2;
     --accent: #4da3ff;
+    --green: #3fae6a;
+    --green-bright: #57d189;
+    --bad: #ff6a3d;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
@@ -23,28 +26,57 @@
   #toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 16px;
     border-bottom: 1px solid var(--panel-border); background: var(--panel); }
   #search { flex: 0 1 260px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--panel-border);
-    background: #0d0f13; color: var(--text); font-size: 13px; outline: none; }
+    background: #0d0f13; color: var(--text); font-size: 13px; outline: none; min-height: 32px; }
   #search:focus { border-color: var(--accent); }
   #chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--panel-border); background: #0d0f13;
-    color: var(--text-dim); font-size: 12px; cursor: pointer; user-select: none; display: flex; align-items: center; gap: 5px; }
-  .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+    color: var(--text-dim); font-size: 12px; cursor: pointer; user-select: none; display: flex; align-items: center; gap: 5px;
+    white-space: nowrap; }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; }
   .chip.on { color: var(--text); border-color: var(--chip-color, var(--accent)); background: #1a2230; }
   .chip.off { opacity: 0.45; }
   .toggle { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-dim); cursor: pointer; user-select: none; }
+  .tbtn { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--panel-border); background: #1a2230;
+    color: var(--text); font-size: 12.5px; cursor: pointer; min-height: 32px; white-space: nowrap; }
+  .tbtn:hover { border-color: var(--accent); }
+  #mastery-stats { font-size: 12.5px; color: var(--text-dim); padding: 4px 10px; border-radius: 999px;
+    border: 1px solid var(--panel-border); background: #0d0f13; white-space: nowrap; }
+  #mastery-stats b { font-weight: 700; }
+  #mastery-stats .s-yes { color: var(--green-bright); }
+  #mastery-stats .s-no { color: var(--bad); }
   #main { flex: 1; display: flex; min-height: 0; position: relative; }
   #canvas-wrap { flex: 1; position: relative; min-width: 0; }
-  canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+  canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
   canvas.dragging { cursor: grabbing; }
   #tooltip { position: absolute; pointer-events: none; background: rgba(20,24,32,0.95); border: 1px solid var(--panel-border);
     border-radius: 6px; padding: 5px 9px; font-size: 12px; max-width: 280px; display: none; z-index: 10; }
   #tooltip .tt-name { font-weight: 600; }
   #tooltip .tt-meta { color: var(--text-dim); font-size: 11px; margin-top: 2px; }
   #panel { width: 340px; flex: 0 0 340px; border-left: 1px solid var(--panel-border); background: var(--panel);
-    overflow-y: auto; padding: 16px; transition: margin-right .2s; }
+    overflow-y: auto; padding: 16px; transition: margin-right .2s; -webkit-overflow-scrolling: touch; }
   #panel.hidden { margin-right: -340px; }
   @media (max-width: 860px) {
     #panel { position: absolute; right: 0; top: 0; bottom: 0; z-index: 15; box-shadow: -8px 0 24px rgba(0,0,0,0.55); }
+  }
+  /* ---- 移动端底部抽屉 ---- */
+  #panel-handle { display: none; }
+  @media (max-width: 767px) {
+    #panel { position: absolute; left: 0; right: 0; top: auto; bottom: 0; width: auto; flex: none;
+      height: 92%; z-index: 25; border-left: none; border-top: 1px solid var(--panel-border);
+      border-radius: 14px 14px 0 0; box-shadow: 0 -8px 28px rgba(0,0,0,0.6);
+      padding: 0 16px 16px; transform: translateY(calc(100% - 38px)); transition: transform .25s ease; }
+    #panel.hidden { margin-right: 0; }
+    #panel.sheet-half { transform: translateY(50%); }
+    #panel.sheet-full { transform: translateY(0); }
+    #panel.dragging { transition: none; }
+    #panel-handle { display: flex; align-items: center; justify-content: center; height: 38px;
+      cursor: grab; flex: 0 0 38px; touch-action: none; margin: 0 -16px; }
+    #panel-handle .grip { width: 44px; height: 5px; border-radius: 3px; background: #3a4150; }
+    #chips { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; padding-bottom: 2px; }
+    #toolbar { gap: 6px; padding: 8px 10px; }
+    header { padding: 8px 12px 4px; }
+    header h1 { font-size: 16px; }
+    header .sub { font-size: 11px; }
   }
   #panel h2 { font-size: 16px; line-height: 1.4; margin-bottom: 6px; }
   #panel .badges { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
@@ -52,11 +84,33 @@
   .badge.skeleton { color: #e0b34a; border-color: #6b5420; }
   .badge.type { color: #7fc4ff; border-color: #28527c; }
   .badge.grade { color: #9fe6a0; border-color: #2f6b31; }
+  .badge.m-yes { color: var(--green-bright); border-color: #2f6b31; }
+  .badge.m-no { color: var(--bad); border-color: #7c3a28; }
   #panel .desc { font-size: 13px; line-height: 1.7; color: var(--text); margin: 10px 0; }
   #panel h3 { font-size: 13px; color: var(--text-dim); margin: 14px 0 6px; border-top: 1px solid var(--panel-border); padding-top: 12px; }
   #panel ul { padding-left: 18px; font-size: 12.5px; line-height: 1.8; }
-  #panel .assess { font-size: 12.5px; line-height: 1.7; background: #10202f; border-left: 3px solid var(--accent);
-    padding: 8px 10px; border-radius: 0 6px 6px 0; }
+  /* ---- 掌握度大按钮 ---- */
+  .mbtns { display: flex; gap: 10px; margin: 12px 0 4px; }
+  .mbtn { flex: 1; min-height: 46px; border-radius: 10px; font-size: 14.5px; font-weight: 600; cursor: pointer;
+    border: 1.5px solid var(--panel-border); background: #0d0f13; color: var(--text-dim); }
+  .mbtn.m-no { border-color: #7c3a28; }
+  .mbtn.m-no.active { background: #3a1d14; color: var(--bad); border-color: var(--bad); }
+  .mbtn.m-yes { border-color: #2f6b31; }
+  .mbtn.m-yes.active { background: #12291a; color: var(--green-bright); border-color: var(--green-bright); }
+  .mbtn-hint { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+  /* ---- 家长检验卡 ---- */
+  .assess-card { background: #10202f; border: 1px solid #1e3a52; border-radius: 10px; padding: 12px; margin-top: 6px; }
+  .assess-card .assess-q { font-size: 13px; line-height: 1.7; font-weight: 600; }
+  .assess-card .assess-ev { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
+  .assess-card .assess-ev ul { padding-left: 16px; line-height: 1.7; margin-top: 4px; }
+  .assess-card .assess-btns { display: flex; gap: 10px; margin-top: 10px; }
+  .assess-card .assess-btns button { flex: 1; min-height: 44px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid var(--panel-border); background: #0d0f13; color: var(--text); }
+  .assess-card .assess-btns .ok { border-color: #2f6b31; color: var(--green-bright); }
+  .assess-card .assess-btns .bad { border-color: #7c3a28; color: var(--bad); }
+  .assess-fb { font-size: 12.5px; margin-top: 8px; min-height: 18px; }
+  .assess-fb.ok { color: var(--green-bright); }
+  .assess-fb.bad { color: var(--bad); }
   .chain-item { font-size: 12.5px; padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; cursor: pointer;
     background: #0d0f13; border: 1px solid var(--panel-border); line-height: 1.5; }
   .chain-item:hover { border-color: var(--accent); }
@@ -65,10 +119,40 @@
   .chain-item.soft { border-left: 3px solid #4a90d9; }
   #panel .placeholder-note { font-size: 12px; color: #e0b34a; background: #241e10; padding: 8px 10px;
     border-radius: 6px; margin-top: 10px; }
-  #panel-close { float: right; background: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; }
+  #panel-close { float: right; background: none; border: none; color: var(--text-dim); font-size: 22px; cursor: pointer;
+    min-width: 44px; min-height: 44px; margin: -8px -10px 0 0; }
   #empty-hint { color: var(--text-dim); font-size: 13px; line-height: 2; }
+  /* ---- 诊断模式 ---- */
+  .diag-row { background: #0d0f13; border: 1px solid var(--panel-border); border-radius: 8px; padding: 9px 10px; margin-bottom: 8px; }
+  .diag-row .dr-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .diag-row .dr-name { font-size: 13.5px; font-weight: 600; line-height: 1.4; }
+  .diag-row .dr-grade { font-size: 11px; color: var(--text-dim); white-space: nowrap; }
+  .diag-row .dr-reason { font-size: 11.5px; color: var(--text-dim); line-height: 1.6; margin-top: 4px; }
+  .diag-row .dr-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .diag-row .dr-btns button { flex: 1; min-height: 44px; border-radius: 8px; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid var(--panel-border); background: #12151c; color: var(--text-dim); }
+  .diag-row .dr-btns .yes.active { background: #12291a; color: var(--green-bright); border-color: var(--green-bright); }
+  .diag-row .dr-btns .no.active { background: #3a1d14; color: var(--bad); border-color: var(--bad); }
+  .diag-conclusion { background: #1a1420; border: 1px solid #4a2f5c; border-radius: 10px; padding: 12px; margin-top: 12px;
+    font-size: 13px; line-height: 1.7; position: sticky; bottom: 0; }
+  .diag-conclusion b { color: #e0aaff; }
+  .diag-conclusion .jump { margin-top: 8px; width: 100%; min-height: 44px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid var(--accent); background: #122031; color: var(--accent); }
+  .diag-exit { width: 100%; min-height: 44px; border-radius: 8px; font-size: 13.5px; cursor: pointer;
+    border: 1px solid var(--panel-border); background: #12151c; color: var(--text-dim); margin-top: 10px; }
+  /* ---- 下一步推荐 ---- */
+  .next-item { background: #0d0f13; border: 1px solid var(--panel-border); border-radius: 8px; padding: 10px;
+    margin-bottom: 8px; cursor: pointer; }
+  .next-item:hover { border-color: var(--accent); }
+  .next-item .ni-name { font-size: 13.5px; font-weight: 600; }
+  .next-item .ni-meta { font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+  .next-item .ni-desc { font-size: 12px; color: var(--text-dim); line-height: 1.6; margin-top: 5px; }
+  .next-guide { font-size: 13px; line-height: 2; color: var(--text-dim); background: #12151c;
+    border: 1px dashed var(--panel-border); border-radius: 10px; padding: 16px; margin-top: 10px; text-align: center; }
   #legend { position: absolute; left: 12px; bottom: 12px; font-size: 11px; color: var(--text-dim);
-    background: rgba(20,24,32,0.85); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--panel-border); line-height: 1.8; }
+    background: rgba(20,24,32,0.85); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--panel-border); line-height: 1.8;
+    max-width: calc(100% - 24px); z-index: 8; }
+  #legend .lg-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
   #search-results { position: absolute; top: 6px; left: 16px; z-index: 20; background: var(--panel);
     border: 1px solid var(--panel-border); border-radius: 8px; max-height: 260px; overflow-y: auto; display: none; min-width: 280px; }
   .sr-item { padding: 7px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #1e222b; }
@@ -76,17 +160,48 @@
   .sr-item .m { color: var(--text-dim); font-size: 11px; }
   #loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     color: var(--text-dim); font-size: 14px; z-index: 30; background: var(--bg); }
+  /* ---- 首次引导 ---- */
+  #onboard { position: fixed; inset: 0; z-index: 60; background: rgba(8,10,14,0.72); display: none;
+    align-items: flex-end; justify-content: center; }
+  #onboard.show { display: flex; }
+  .ob-box { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 14px 14px 0 0;
+    width: 100%; max-width: 560px; padding: 20px 18px calc(18px + env(safe-area-inset-bottom, 0px)); }
+  @media (min-width: 768px) {
+    #onboard { align-items: center; }
+    .ob-box { border-radius: 14px; }
+  }
+  .ob-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .ob-sub { font-size: 12.5px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.6; }
+  .ob-roles { display: flex; gap: 10px; margin-bottom: 14px; }
+  .ob-roles button { flex: 1; min-height: 46px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;
+    border: 1.5px solid var(--panel-border); background: #0d0f13; color: var(--text-dim); }
+  .ob-roles button.active { border-color: var(--accent); color: var(--accent); background: #122031; }
+  .ob-grades { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  .ob-grades button { min-height: 44px; min-width: 0; border-radius: 8px; font-size: 14px; cursor: pointer;
+    border: 1px solid var(--panel-border); background: #0d0f13; color: var(--text); }
+  @media (max-width: 767px) { .ob-grades { grid-template-columns: repeat(4, 1fr); } }
+  .ob-grades button:hover { border-color: var(--accent); }
+  .ob-close { width: 100%; margin-top: 12px; min-height: 40px; border-radius: 8px; border: none;
+    background: none; color: var(--text-dim); font-size: 12.5px; cursor: pointer; }
+  /* ---- 轻提示 ---- */
+  #toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 70;
+    background: rgba(24,30,40,0.96); border: 1px solid var(--accent); color: var(--text);
+    padding: 10px 18px; border-radius: 999px; font-size: 13.5px; display: none; max-width: 88vw; text-align: center;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
 </style>
 </head>
 <body>
 <div id="app">
   <header>
     <h1>中国 K12 知识地图</h1>
-    <div class="sub">每个点是一个微知识点 · 颜色 = 学科 · 纵轴 = 年级（1 在下，12 在上）· 连线 = 先修关系 · 数据对齐 2022 版义务教育课程标准 · 「道德与法治」学科已完整填充（130 个知识点），其余学科为骨架占位</div>
+    <div class="sub">每个点是一个微知识点 · 颜色 = 学科 · 纵轴 = 年级（1 在下，12 在上）· 连线 = 先修关系 · 数据对齐 2022 版义务教育课程标准 · 「道德与法治」学科已完整填充（130 个知识点），其余学科为骨架占位（同样可标记掌握度）</div>
   </header>
   <div id="toolbar">
     <input id="search" type="text" placeholder="搜索知识点名称…" autocomplete="off">
     <div id="chips"></div>
+    <span id="mastery-stats"></span>
+    <button class="tbtn" id="btn-next">下一步学什么</button>
+    <button class="tbtn" id="btn-grade">我的年级</button>
     <label class="toggle"><input type="checkbox" id="cb-alledges"> 显示全部先修线（默认只显示道法内部）</label>
   </div>
   <div id="main">
@@ -94,12 +209,35 @@
       <canvas id="map"></canvas>
       <div id="tooltip"></div>
       <div id="search-results"></div>
-      <div id="legend">纵轴：年级（下 1 年级 → 上 12 年级）<br>实色圆点 = 完整知识点 · 虚线半透明 = 骨架占位<br>滚轮缩放 · 拖拽平移 · 点击节点查看详情</div>
+      <div id="legend">
+        <span class="lg-dot" style="background:var(--green)"></span>已掌握 &nbsp;
+        <span class="lg-dot" style="background:transparent;border:2px solid var(--bad);width:6px;height:6px"></span>还不会 &nbsp;
+        <span class="lg-dot" style="background:#8a8f9a"></span>未标记（学科原色）<br>
+        实色圆点 = 完整知识点 · 虚线半透明 = 骨架占位 · 纵轴：年级（下 1 → 上 12）<br>
+        滚轮/双指缩放 · 拖拽平移 · 点击节点查看详情
+      </div>
       <div id="loading">正在加载数据…</div>
     </div>
-    <div id="panel"><div id="empty-hint">点击地图上的任意节点，查看知识点的详细说明、掌握证据、课标对齐，以及它的「先修链」和「解锁链」。</div></div>
+    <div id="panel">
+      <div id="panel-handle"><div class="grip"></div></div>
+      <div id="panel-body"><div id="empty-hint">点击地图上的任意节点，查看详情。<br>用「已掌握 / 还不会」标记你的学习状态，再用「下一步学什么」获取推荐。</div></div>
+    </div>
   </div>
 </div>
+
+<div id="onboard">
+  <div class="ob-box">
+    <div class="ob-title">欢迎来到中国 K12 知识地图</div>
+    <div class="ob-sub">选一下身份和年级，我带你直接定位到对应的知识区域。</div>
+    <div class="ob-roles">
+      <button data-role="student">我是学生</button>
+      <button data-role="parent">我是家长</button>
+    </div>
+    <div class="ob-grades" id="ob-grades"></div>
+    <button class="ob-close" id="ob-close" style="display:none">先随便看看 ›</button>
+  </div>
+</div>
+<div id="toast"></div>
 
 <script>
 (async function () {
@@ -129,7 +267,6 @@
   const subjects = SUBJECT_ORDER.filter(s => topics.some(t => t.subject === s));
   const subjX = new Map(subjects.map((s, i) => [s, i * COL_W + COL_W / 2]));
 
-  // 同（学科, 年级）内按 domain 聚簇排列，行列微抖开
   const groups = new Map();
   for (const t of topics) {
     const gMid = (t.gradeRangeStart + t.gradeRangeEnd) / 2;
@@ -150,8 +287,8 @@
   }
 
   // ---------- 依赖图 ----------
-  const prereqsOf = new Map();   // id -> [{id, strength, reason}]
-  const unlocksOf = new Map();   // id -> [{id, strength, reason}]
+  const prereqsOf = new Map();
+  const unlocksOf = new Map();
   for (const d of deps) {
     if (!topicById.has(d.topicId) || !topicById.has(d.prerequisiteId)) continue;
     if (!prereqsOf.has(d.topicId)) prereqsOf.set(d.topicId, []);
@@ -160,7 +297,7 @@
     unlocksOf.get(d.prerequisiteId).push({ id: d.topicId, strength: d.strength, reason: d.reason });
   }
   function collectChain(startId, map) {
-    const seen = new Map();  // id -> {strength, reason, from}
+    const seen = new Map();
     const stack = [startId];
     while (stack.length) {
       const cur = stack.pop();
@@ -174,13 +311,43 @@
     return seen;
   }
 
+  // ---------- 掌握度（localStorage） ----------
+  const MASTERY_KEY = 'cnk12_mastery';
+  const PROFILE_KEY = 'cnk12_profile';
+  let mastery = {};
+  try { mastery = JSON.parse(localStorage.getItem(MASTERY_KEY) || '{}') || {}; } catch (e) { mastery = {}; }
+  let profile = null;
+  try { profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null'); } catch (e) { profile = null; }
+  function saveMastery() { try { localStorage.setItem(MASTERY_KEY, JSON.stringify(mastery)); } catch (e) {} }
+  function saveProfile() { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) {} }
+  // state: 'yes' | 'no' | null(取消)
+  function setMastery(id, state) {
+    if (state && mastery[id] === state) delete mastery[id];       // 同状态再点一次 = 取消
+    else if (state) mastery[id] = state;
+    else delete mastery[id];
+    saveMastery();
+    updateStats();
+    draw();
+  }
+  function updateStats() {
+    let yes = 0, no = 0, total = 0;
+    for (const t of topics) {
+      if (!visible(t)) continue;
+      total++;
+      if (mastery[t.id] === 'yes') yes++;
+      else if (mastery[t.id] === 'no') no++;
+    }
+    document.getElementById('mastery-stats').innerHTML =
+      `已掌握 <b class="s-yes">${yes}</b> / 还不会 <b class="s-no">${no}</b> / 共 ${total}（当前筛选范围）`;
+  }
+
   // ---------- Canvas ----------
   const wrap = document.getElementById('canvas-wrap');
   const canvas = document.getElementById('map');
   const ctx = canvas.getContext('2d');
   const tooltip = document.getElementById('tooltip');
   let W = 0, H = 0, dpr = 1;
-  let scale = 0.8, tx = 0, ty = 0;   // screen = world*scale + t ; y 翻转
+  let scale = 0.8, tx = 0, ty = 0;
   function worldToScreen(x, y) { return [x * scale + tx, H - (y * scale + ty)]; }
   function screenToWorld(sx, sy) { return [(sx - tx) / scale, (H - sy - ty) / scale]; }
 
@@ -189,11 +356,11 @@
     W = wrap.clientWidth; H = wrap.clientHeight;
     canvas.width = W * dpr; canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    applySheetState();
     draw();
   }
   window.addEventListener('resize', resize);
 
-  // 初始视野：包含所有点（带缩放下限，避免窗口窄时挤成一团），并居中
   function fitView() {
     const xs = topics.map(t => t._x), ys = topics.map(t => t._y);
     const minX = Math.min(...xs) - 80, maxX = Math.max(...xs) + 80;
@@ -202,21 +369,41 @@
     scale = Math.max(0.2, Math.min(1.0, scale));
     tx = (W - (minX + maxX) * scale) / 2;
     ty = (H - (minY + maxY) * scale) / 2;
+    // 窄屏（手机）：全图缩不下时，横向居中到已完整填充的「道德与法治」列
+    if (W < 768 && (maxX - minX) * scale > W) {
+      const dfX = subjX.get('道德与法治');
+      if (dfX != null) tx = W / 2 - dfX * scale;
+    }
+  }
+  // 平移缩放到指定年级区域
+  function focusGrade(g) {
+    const xs = topics.map(t => t._x);
+    let cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+    // 窄屏同样以道法列为横向中心，避免主内容落在屏幕外
+    if (W < 768 && subjX.get('道德与法治') != null) cx = subjX.get('道德与法治');
+    const cy = g * ROW_H;
+    scale = Math.min(1.1, Math.max(0.5, W / 2600, H / 900));
+    scale = Math.min(6, Math.max(0.12, scale));
+    tx = W / 2 - cx * scale;
+    ty = H / 2 - cy * scale;
+    draw();
   }
 
   // ---------- 状态 ----------
   const activeSubjects = new Set(subjects);
   let showAllEdges = false;
   let selectedId = null, hoverId = null;
-  let highlightSet = new Set(), highlightEdges = new Set(); // "a>b"
+  let highlightSet = new Set(), highlightEdges = new Set();
   let searchMatches = new Set();
+  let panelView = 'empty';   // 'empty' | 'detail' | 'diag' | 'next'
+  let diagRootId = null;
 
   function visible(t) { return activeSubjects.has(t.subject); }
+  function isMobile() { return window.innerWidth < 768; }
 
   // ---------- 绘制 ----------
   function draw() {
     ctx.clearRect(0, 0, W, H);
-    // 年级横线 + 标签
     ctx.font = '11px sans-serif';
     for (let g = 1; g <= 12; g++) {
       const [x0, sy] = worldToScreen(0, g * ROW_H);
@@ -225,14 +412,12 @@
       ctx.fillStyle = '#5a6373';
       ctx.fillText(g + ' 年级', 6, sy - 4);
     }
-    // 学段分隔标注
     const bandLabel = [[1, '小学'], [7, '初中'], [10, '高中']];
     for (const [g, name] of bandLabel) {
       const [, sy] = worldToScreen(0, g * ROW_H + 30);
       ctx.fillStyle = '#3d4452'; ctx.font = 'bold 13px sans-serif';
       ctx.fillText(name, W - 46, sy);
     }
-    // 学科列标题
     ctx.font = 'bold 13px sans-serif';
     for (const s of subjects) {
       if (!activeSubjects.has(s)) continue;
@@ -268,16 +453,32 @@
       ctx.stroke();
     }
 
-    // 节点
+    // 节点（掌握度着色：已掌握=绿色实心，还不会=橙红描边强调，未标记=学科原色）
     for (const t of topics) {
       if (!visible(t)) continue;
       const [sx, sy] = worldToScreen(t._x, t._y);
       if (sx < -30 || sx > W + 30 || sy < -30 || sy > H + 30) continue;
       const r = (t.id === selectedId ? 9 : t.id === hoverId ? 8 : 6.5) * Math.min(1.3, Math.max(0.6, scale));
       const skeleton = t.status === 'skeleton';
+      const m = mastery[t.id];
       ctx.beginPath();
       ctx.arc(sx, sy, r, 0, Math.PI * 2);
-      if (skeleton) {
+      if (m === 'yes') {
+        ctx.globalAlpha = skeleton ? 0.85 : 1;
+        ctx.fillStyle = '#3fae6a'; ctx.fill();
+        ctx.globalAlpha = 1;
+        if (skeleton) { ctx.setLineDash([3, 3]); }
+        ctx.strokeStyle = '#7fe0a4'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.setLineDash([]);
+      } else if (m === 'no') {
+        ctx.globalAlpha = skeleton ? 0.5 : 0.9;
+        ctx.fillStyle = t._color; ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.beginPath(); ctx.arc(sx, sy, r + 1.5, 0, Math.PI * 2);
+        if (skeleton) { ctx.setLineDash([3, 3]); }
+        ctx.strokeStyle = '#ff6a3d'; ctx.lineWidth = 2.6; ctx.stroke();
+        ctx.setLineDash([]);
+      } else if (skeleton) {
         ctx.globalAlpha = 0.45;
         ctx.fillStyle = t._color; ctx.fill();
         ctx.setLineDash([3, 3]);
@@ -289,27 +490,28 @@
         ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1; ctx.stroke();
       }
       if (highlightSet.has(t.id)) {
-        ctx.beginPath(); ctx.arc(sx, sy, r + 4, 0, Math.PI * 2);
+        ctx.beginPath(); ctx.arc(sx, sy, r + 4.5, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(255,214,90,0.9)'; ctx.lineWidth = 2; ctx.stroke();
       }
       if (searchMatches.has(t.id)) {
-        ctx.beginPath(); ctx.arc(sx, sy, r + 7, 0, Math.PI * 2);
+        ctx.beginPath(); ctx.arc(sx, sy, r + 8, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(77,163,255,0.8)'; ctx.lineWidth = 2;
         ctx.setLineDash([4, 3]); ctx.stroke(); ctx.setLineDash([]);
       }
     }
-    // 选中节点名
     if (selectedId) {
       const t = topicById.get(selectedId);
-      const [sx, sy] = worldToScreen(t._x, t._y);
-      ctx.font = 'bold 12px sans-serif';
-      ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-      ctx.fillText(t.name, sx, sy - 14);
-      ctx.textAlign = 'left';
+      if (t) {
+        const [sx, sy] = worldToScreen(t._x, t._y);
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+        ctx.fillText(t.name, sx, sy - 14);
+        ctx.textAlign = 'left';
+      }
     }
   }
 
-  // ---------- 交互：缩放/平移 ----------
+  // ---------- 指针交互（鼠标 + 触摸统一 Pointer Events） ----------
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
     const rect = canvas.getBoundingClientRect();
@@ -321,28 +523,68 @@
     draw();
   }, { passive: false });
 
-  let dragging = false, moved = 0, lastX = 0, lastY = 0;
+  const pointers = new Map();   // pointerId -> {x, y, t}
+  let panMoved = 0, panLast = null, downTime = 0, pinch = null;
+
+  function hitTest(sx, sy, isTouch) {
+    const [wx, wy] = screenToWorld(sx, sy);
+    // 触控热区放大：世界坐标判定半径至少 28/scale
+    let best = null, bestD = isTouch ? Math.max(28 / scale, 10) : 16 / scale + 8;
+    for (const t of topics) {
+      if (!visible(t)) continue;
+      const d = Math.hypot(t._x - wx, t._y - wy);
+      if (d < bestD) { bestD = d; best = t; }
+    }
+    return best;
+  }
+
   canvas.addEventListener('pointerdown', (e) => {
-    dragging = true; moved = 0; lastX = e.clientX; lastY = e.clientY;
-    canvas.classList.add('dragging'); canvas.setPointerCapture(e.pointerId);
+    canvas.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, t: Date.now() });
+    tooltip.style.display = 'none';
+    if (pointers.size === 1) {
+      panMoved = 0; panLast = { x: e.clientX, y: e.clientY }; downTime = Date.now();
+      pinch = null;
+      canvas.classList.add('dragging');
+    } else if (pointers.size === 2) {
+      const [p1, p2] = [...pointers.values()];
+      pinch = {
+        d: Math.hypot(p2.x - p1.x, p2.y - p1.y),
+        mx: (p1.x + p2.x) / 2, my: (p1.y + p2.y) / 2,
+        scale, tx, ty
+      };
+      panMoved = 999;   // 双指后不再算轻点
+    }
   });
+
   canvas.addEventListener('pointermove', (e) => {
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-    if (dragging) {
-      const dx = e.clientX - lastX, dy = e.clientY - lastY;
-      moved += Math.abs(dx) + Math.abs(dy);
-      tx += dx; ty -= dy; lastX = e.clientX; lastY = e.clientY;
+    if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, t: pointers.get(e.pointerId).t });
+
+    if (pointers.size === 2 && pinch) {
+      // 双指捏合缩放，以两指中心为锚点
+      const [p1, p2] = [...pointers.values()];
+      const d = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      const cx = (p1.x + p2.x) / 2 - rect.left, cy = (p1.y + p2.y) / 2 - rect.top;
+      const newScale = Math.min(6, Math.max(0.12, pinch.scale * (d / (pinch.d || 1))));
+      const [wx, wy] = screenToWorld(cx, cy);
+      scale = newScale;
+      tx = cx - wx * scale; ty = (H - cy) - wy * scale;
       draw();
-    } else {
-      // hover 检测
-      const [wx, wy] = screenToWorld(mx, my);
-      let best = null, bestD = 14 / scale + 8;
-      for (const t of topics) {
-        if (!visible(t)) continue;
-        const d = Math.hypot(t._x - wx, t._y - wy);
-        if (d < bestD) { bestD = d; best = t; }
-      }
+      return;
+    }
+    if (pointers.size === 1 && panLast) {
+      const dx = e.clientX - panLast.x, dy = e.clientY - panLast.y;
+      panMoved += Math.abs(dx) + Math.abs(dy);
+      tx += dx; ty -= dy;
+      panLast = { x: e.clientX, y: e.clientY };
+      draw();
+      return;
+    }
+    // hover（仅鼠标）
+    if (e.pointerType === 'mouse' && pointers.size === 0) {
+      const best = hitTest(mx, my, false);
       const newHover = best ? best.id : null;
       if (newHover !== hoverId) {
         hoverId = newHover;
@@ -360,24 +602,94 @@
       }
     }
   });
-  canvas.addEventListener('pointerup', (e) => {
-    dragging = false; canvas.classList.remove('dragging');
-    if (moved < 5) {  // 视为点击
-      const rect = canvas.getBoundingClientRect();
-      const [wx, wy] = screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
-      let best = null, bestD = 16 / scale + 8;
-      for (const t of topics) {
-        if (!visible(t)) continue;
-        const d = Math.hypot(t._x - wx, t._y - wy);
-        if (d < bestD) { bestD = d; best = t; }
+
+  function endPointer(e) {
+    const wasSingle = pointers.size === 1 && pointers.has(e.pointerId);
+    const isTouch = e.pointerType !== 'mouse';
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinch = null;
+    if (pointers.size === 0) {
+      canvas.classList.remove('dragging');
+      // 轻点判定：位移 <10px 且时长 <300ms
+      if (wasSingle && panMoved < 10 && (Date.now() - downTime) < 300) {
+        const rect = canvas.getBoundingClientRect();
+        const best = hitTest(e.clientX - rect.left, e.clientY - rect.top, isTouch);
+        if (best) selectTopic(best.id);
       }
-      if (best) selectTopic(best.id);
+      panLast = null;
     }
+  }
+  canvas.addEventListener('pointerup', endPointer);
+  canvas.addEventListener('pointercancel', endPointer);
+
+  // ---------- 面板骨架（bottom sheet） ----------
+  const panel = document.getElementById('panel');
+  const panelBody = document.getElementById('panel-body');
+  const handle = document.getElementById('panel-handle');
+  let sheetState = 'collapsed';   // collapsed | half | full
+
+  function applySheetState() {
+    if (!isMobile()) {
+      panel.style.transform = '';
+      panel.classList.remove('sheet-half', 'sheet-full', 'dragging');
+      return;
+    }
+    panel.style.transform = '';
+    panel.classList.toggle('sheet-half', sheetState === 'half');
+    panel.classList.toggle('sheet-full', sheetState === 'full');
+  }
+  function openPanelMobile() {
+    if (isMobile()) { sheetState = 'half'; applySheetState(); }
+    panel.classList.remove('hidden');
+  }
+  function closePanel() {
+    if (isMobile()) { sheetState = 'collapsed'; applySheetState(); }
+    else panel.classList.add('hidden');
+    selectedId = null; panelView = 'empty'; diagRootId = null;
+    highlightSet.clear(); highlightEdges.clear();
+    draw();
+  }
+  // 把手拖拽：上拉半屏→全屏，下拉收起
+  let hDrag = null;
+  handle.addEventListener('pointerdown', (e) => {
+    if (!isMobile()) return;
+    handle.setPointerCapture(e.pointerId);
+    const cur = panel.getBoundingClientRect();
+    hDrag = { startY: e.clientY, baseTop: cur.top, moved: 0 };
+    panel.classList.add('dragging');
+    e.preventDefault();
   });
+  handle.addEventListener('pointermove', (e) => {
+    if (!hDrag) return;
+    const wrapRect = wrap.getBoundingClientRect();
+    let top = hDrag.baseTop + (e.clientY - hDrag.startY);
+    top = Math.max(wrapRect.top, Math.min(wrapRect.bottom - 38, top));
+    hDrag.moved += Math.abs(e.movementY || 0);
+    panel.style.transform = `translateY(${top - wrapRect.top}px)`;
+  });
+  handle.addEventListener('pointerup', (e) => {
+    if (!hDrag) return;
+    panel.classList.remove('dragging');
+    const wrapRect = wrap.getBoundingClientRect();
+    const top = panel.getBoundingClientRect().top - wrapRect.top;
+    panel.style.transform = '';
+    if (hDrag.moved < 6) {
+      // 轻点把手：在 半屏 ↔ 全屏 间切换（收起态则半屏弹出）
+      sheetState = sheetState === 'collapsed' ? 'half' : (sheetState === 'half' ? 'full' : 'half');
+    } else {
+      // 吸附到最近档位
+      const snaps = [['full', 0], ['half', wrapRect.height * 0.5], ['collapsed', wrapRect.height - 38]];
+      snaps.sort((a, b) => Math.abs(a[1] - top) - Math.abs(b[1] - top));
+      sheetState = snaps[0][0];
+    }
+    hDrag = null;
+    applySheetState();
+  });
+  handle.addEventListener('pointercancel', () => { hDrag = null; panel.classList.remove('dragging'); applySheetState(); });
 
   // ---------- 详情面板 ----------
-  const panel = document.getElementById('panel');
   const TYPE_CN = { CONCEPTUAL: '概念理解', PROCEDURAL: '方法技能', REPRESENTATIONAL: '表征方式', LANGUAGE: '语言表达', META: '元认知' };
+  function gradeTxtOf(t) { return t.gradeRangeStart === t.gradeRangeEnd ? t.gradeRangeStart + ' 年级' : t.gradeRangeStart + '–' + t.gradeRangeEnd + ' 年级'; }
   function chainHtml(chain, title) {
     if (!chain.size) return '';
     const items = [...chain.entries()].map(([id, e]) => {
@@ -389,9 +701,223 @@
     }).join('');
     return `<h3>${title}（${chain.size}）</h3>${items}`;
   }
+
+  function renderPanel(keepScroll) {
+    const st = keepScroll ? panelBody.scrollTop : 0;
+    if (panelView === 'detail' && selectedId) renderDetail();
+    else if (panelView === 'diag' && diagRootId) renderDiag();
+    else if (panelView === 'next') renderNext();
+    if (keepScroll) panelBody.scrollTop = st;
+  }
+
+  function renderDetail() {
+    const t = topicById.get(selectedId);
+    if (!t) return;
+    const pre = collectChain(selectedId, prereqsOf);
+    const unlock = collectChain(selectedId, unlocksOf);
+    const cluster = clusterByKey.get(t.subject + '|' + t.domain);
+    const m = mastery[selectedId];
+    const stdHtml = (t.standards || []).map(k => {
+      const s = stdByKey.get(k);
+      return s ? `<div style="margin-bottom:6px"><b style="font-size:12px">${s.title}</b><div style="font-size:12px;color:var(--text-dim);line-height:1.6">${s.summary}</div></div>` : '';
+    }).join('');
+    const mBadge = m === 'yes' ? '<span class="badge m-yes">已掌握 ✓</span>'
+                 : m === 'no' ? '<span class="badge m-no">还不会</span>' : '';
+    // 家长检验卡：检验问题 + 怎么算答对 + 答对了/没答对
+    const assessCard = t.assessmentPrompt ? `
+      <h3>家长检验卡</h3>
+      <div class="assess-card">
+        <div class="assess-q">检验问题：${t.assessmentPrompt}</div>
+        ${(t.evidence && t.evidence.length) ? `<div class="assess-ev"><b>怎么算答对：</b><ul>${t.evidence.map(e => `<li>${e}</li>`).join('')}</ul></div>` : ''}
+        <div class="assess-btns">
+          <button class="ok" id="assess-ok">答对了</button>
+          <button class="bad" id="assess-bad">没答对</button>
+        </div>
+        <div class="assess-fb" id="assess-fb">${m === 'yes' ? '<span class="assess-fb ok">已标记为已掌握 ✓</span>' : m === 'no' ? '<span class="assess-fb bad">已标记为还不会</span>' : ''}</div>
+      </div>` : '';
+    panelBody.innerHTML = `
+      <button id="panel-close" title="关闭">×</button>
+      <h2 style="color:${t._color}">${t.name}</h2>
+      <div class="badges">
+        <span class="badge" style="color:${t._color};border-color:${t._color}">${t.subject} · ${t.domain}</span>
+        <span class="badge type">${TYPE_CN[t.type] || t.type}</span>
+        <span class="badge grade">${gradeTxtOf(t)}</span>
+        ${t.status === 'skeleton' ? '<span class="badge skeleton">骨架占位</span>' : '<span class="badge" style="color:#9fe6a0;border-color:#2f6b31">已完整填充</span>'}
+        ${mBadge}
+      </div>
+      <div class="mbtns">
+        <button class="mbtn m-no ${m === 'no' ? 'active' : ''}" id="mb-no">✗ 还不会</button>
+        <button class="mbtn m-yes ${m === 'yes' ? 'active' : ''}" id="mb-yes">✓ 已掌握</button>
+      </div>
+      <div class="mbtn-hint">再点一次同一按钮可取消标记</div>
+      <button class="tbtn" id="btn-diag" style="width:100%;min-height:44px">这题/这个知识点我不会，帮我找原因</button>
+      <div class="desc">${t.description}</div>
+      ${t.status === 'skeleton' ? '<div class="placeholder-note">⚠ 骨架占位节点：内容待按该学科课标逐步填充，当前仅展示知识结构位置（仍可标记掌握度）。</div>' : ''}
+      ${(t.evidence && t.evidence.length && !t.assessmentPrompt) ? `<h3>掌握证据（能做到这些就算学会）</h3><ul>${t.evidence.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
+      ${assessCard}
+      ${stdHtml ? `<h3>课标对齐（2022 年版义务教育课程标准）</h3>${stdHtml}` : ''}
+      ${cluster ? `<h3>本单元概述</h3><div class="desc" style="font-size:12.5px;color:var(--text-dim)">${cluster.summary}</div>` : ''}
+      ${chainHtml(pre, '↑ 先学这些（先修链）')}
+      ${chainHtml(unlock, '↓ 学会后能解锁（后续知识点）')}
+      <div style="height:20px"></div>`;
+    bindDetailEvents();
+  }
+
+  function bindDetailEvents() {
+    panelBody.querySelector('#panel-close').onclick = closePanel;
+    panelBody.querySelector('#mb-yes').onclick = () => { setMastery(selectedId, 'yes'); renderPanel(true); };
+    panelBody.querySelector('#mb-no').onclick = () => { setMastery(selectedId, 'no'); renderPanel(true); };
+    panelBody.querySelector('#btn-diag').onclick = () => { panelView = 'diag'; diagRootId = selectedId; renderPanel(); };
+    const okBtn = panelBody.querySelector('#assess-ok');
+    if (okBtn) {
+      okBtn.onclick = () => {
+        if (mastery[selectedId] === 'yes') { delete mastery[selectedId]; saveMastery(); updateStats(); draw(); }
+        else setMastery(selectedId, 'yes');
+        renderPanel(true);
+        toast(mastery[selectedId] === 'yes' ? '已标记为已掌握 ✓' : '已取消标记');
+      };
+      panelBody.querySelector('#assess-bad').onclick = () => {
+        if (mastery[selectedId] === 'no') { delete mastery[selectedId]; saveMastery(); updateStats(); draw(); }
+        else setMastery(selectedId, 'no');
+        renderPanel(true);
+        toast(mastery[selectedId] === 'no' ? '已标记为还不会，可以试试「帮我找原因」' : '已取消标记');
+      };
+    }
+    panelBody.querySelectorAll('.chain-item').forEach(el => el.onclick = () => {
+      selectTopic(el.dataset.id); ensureVisible(topicById.get(el.dataset.id));
+    });
+  }
+
+  // ---------- 错因回溯（诊断模式） ----------
+  function renderDiag() {
+    const root = topicById.get(diagRootId);
+    if (!root) return;
+    const chain = collectChain(diagRootId, prereqsOf);
+    // 先修链按年级从高到低（离当前知识点最近的先排前面）
+    const list = [...chain.entries()].sort((a, b) => {
+      const ta = topicById.get(a[0]), tb = topicById.get(b[0]);
+      return tb.gradeRangeStart - ta.gradeRangeStart;
+    });
+    const rows = list.map(([id, e]) => {
+      const t = topicById.get(id);
+      const m = mastery[id];
+      return `<div class="diag-row" data-id="${id}">
+        <div class="dr-head">
+          <span class="dr-name" style="color:${t._color}">${t.name}</span>
+          <span class="dr-grade">${gradeTxtOf(t)}</span>
+        </div>
+        <div class="dr-reason">为什么相关：${e.reason}</div>
+        <div class="dr-btns">
+          <button class="no ${m === 'no' ? 'active' : ''}" data-id="${id}" data-v="no">不会</button>
+          <button class="yes ${m === 'yes' ? 'active' : ''}" data-id="${id}" data-v="yes">会</button>
+        </div>
+      </div>`;
+    }).join('');
+    panelBody.innerHTML = `
+      <button id="panel-close" title="关闭">×</button>
+      <h2 style="color:${root._color}">错因回溯：${root.name}</h2>
+      <div class="desc" style="color:var(--text-dim);font-size:12.5px">学不会往往是因为前面的基础有缺口。下面是「${root.name}」的完整先修链，逐个自评「会 / 不会」，我帮你找到最根上的缺口。（自评会直接写入掌握度标记）</div>
+      ${rows || '<div class="desc">这个知识点没有先修节点，它就是最基础的起点。</div>'}
+      <div id="diag-conclusion-slot"></div>
+      <button class="diag-exit" id="diag-exit">‹ 退出诊断，返回详情</button>
+      <div style="height:20px"></div>`;
+    panelBody.querySelector('#panel-close').onclick = closePanel;
+    panelBody.querySelector('#diag-exit').onclick = () => { panelView = 'detail'; selectedId = diagRootId; renderPanel(); };
+    panelBody.querySelectorAll('.dr-btns button').forEach(btn => {
+      btn.onclick = () => {
+        const id = btn.dataset.id, v = btn.dataset.v;
+        setMastery(id, v);   // 同状态再点 = 取消
+        const row = panelBody.querySelector(`.diag-row[data-id="${id}"]`);
+        if (row) {
+          const m = mastery[id];
+          row.querySelector('.yes').classList.toggle('active', m === 'yes');
+          row.querySelector('.no').classList.toggle('active', m === 'no');
+        }
+        renderDiagConclusion();
+      };
+    });
+    renderDiagConclusion();
+  }
+  function renderDiagConclusion() {
+    const slot = panelBody.querySelector('#diag-conclusion-slot');
+    if (!slot) return;
+    const chain = collectChain(diagRootId, prereqsOf);
+    // 最深的（年级最低）且标记"不会"的节点
+    let deepest = null;
+    let anyNo = false, total = 0, answered = 0;
+    for (const id of chain.keys()) {
+      total++;
+      const m = mastery[id];
+      if (m) answered++;
+      if (m === 'no') {
+        anyNo = true;
+        const t = topicById.get(id);
+        if (!deepest || t.gradeRangeStart < topicById.get(deepest).gradeRangeStart) deepest = id;
+      }
+    }
+    if (deepest) {
+      const t = topicById.get(deepest);
+      slot.innerHTML = `<div class="diag-conclusion">
+        建议从这里开始补：<b>${t.name}</b>（${gradeTxtOf(t)}）—— 它是你不会的链条里最根上的缺口。把它补上，再回来重学「${topicById.get(diagRootId).name}」会顺很多。
+        <button class="jump" id="diag-jump">跳转查看 ›</button>
+      </div>`;
+      slot.querySelector('#diag-jump').onclick = () => {
+        selectTopic(deepest); ensureVisible(t);
+      };
+    } else if (total > 0 && answered === total && !anyNo) {
+      slot.innerHTML = `<div class="diag-conclusion">整条先修链你都标记了「会」——基础没问题，可以直接攻克这个知识点本身，多练几道题试试。</div>`;
+    } else if (answered > 0) {
+      slot.innerHTML = `<div class="diag-conclusion" style="border-color:var(--panel-border);background:#12151c;color:var(--text-dim)">已自评 ${answered}/${total} 个先修节点，继续把剩下的评完，结论会更准。</div>`;
+    } else {
+      slot.innerHTML = '';
+    }
+  }
+
+  // ---------- 下一步学什么 ----------
+  function renderNext() {
+    const hasAnyMark = Object.keys(mastery).length > 0;
+    let bodyHtml;
+    if (!hasAnyMark) {
+      bodyHtml = `<div class="next-guide">先在地图上标记几个你会的和不会的，<br>我才能告诉你接下来学什么。</div>`;
+    } else {
+      const recs = [];
+      for (const t of topics) {
+        if (t.status !== 'complete') continue;
+        if (mastery[t.id] === 'yes') continue;
+        const hard = (prereqsOf.get(t.id) || []).filter(e => e.strength === 'hard');
+        if (hard.every(e => mastery[e.id] === 'yes')) recs.push(t);
+      }
+      recs.sort((a, b) => a.gradeRangeStart - b.gradeRangeStart || a.subject.localeCompare(b.subject, 'zh'));
+      const top = recs.slice(0, 8);
+      bodyHtml = top.length
+        ? `<div class="desc" style="color:var(--text-dim);font-size:12.5px;margin-top:4px">以下条件全部满足：所有硬先修已掌握 + 你还没标记已掌握。按年级从低到高排列：</div>` +
+          top.map(t => `<div class="next-item" data-id="${t.id}">
+            <div class="ni-name" style="color:${t._color}">${t.name}</div>
+            <div class="ni-meta">${t.subject} · ${gradeTxtOf(t)}</div>
+            <div class="ni-desc">${t.description.slice(0, 60)}${t.description.length > 60 ? '…' : ''}</div>
+          </div>`).join('')
+        : `<div class="next-guide">暂时没有可推荐的知识点——<br>可能你标记「已掌握」的先修还不够，多标记几个试试。</div>`;
+    }
+    panelBody.innerHTML = `
+      <button id="panel-close" title="关闭">×</button>
+      <h2>下一步学什么</h2>
+      ${bodyHtml}
+      <div style="height:20px"></div>`;
+    panelBody.querySelector('#panel-close').onclick = closePanel;
+    panelBody.querySelectorAll('.next-item').forEach(el => el.onclick = () => {
+      selectTopic(el.dataset.id); ensureVisible(topicById.get(el.dataset.id));
+    });
+  }
+  document.getElementById('btn-next').onclick = () => {
+    panelView = 'next';
+    openPanelMobile();
+    renderPanel();
+  };
+
   function selectTopic(id) {
     selectedId = id;
-    const t = topicById.get(id);
+    panelView = 'detail';
+    diagRootId = null;
     const pre = collectChain(id, prereqsOf);
     const unlock = collectChain(id, unlocksOf);
     highlightSet = new Set([...pre.keys(), ...unlock.keys()]);
@@ -404,36 +930,12 @@
           highlightEdges.add(d.prerequisiteId + '>' + d.topicId);
       }
     }
-    const cluster = clusterByKey.get(t.subject + '|' + t.domain);
-    const gradeTxt = t.gradeRangeStart === t.gradeRangeEnd ? t.gradeRangeStart + ' 年级' : t.gradeRangeStart + '–' + t.gradeRangeEnd + ' 年级';
-    const stdHtml = (t.standards || []).map(k => {
-      const s = stdByKey.get(k);
-      return s ? `<div style="margin-bottom:6px"><b style="font-size:12px">${s.title}</b><div style="font-size:12px;color:var(--text-dim);line-height:1.6">${s.summary}</div></div>` : '';
-    }).join('');
-    panel.innerHTML = `
-      <button id="panel-close" title="关闭">×</button>
-      <h2 style="color:${t._color}">${t.name}</h2>
-      <div class="badges">
-        <span class="badge" style="color:${t._color};border-color:${t._color}">${t.subject} · ${t.domain}</span>
-        <span class="badge type">${TYPE_CN[t.type] || t.type}</span>
-        <span class="badge grade">${gradeTxt}</span>
-        ${t.status === 'skeleton' ? '<span class="badge skeleton">骨架占位</span>' : '<span class="badge" style="color:#9fe6a0;border-color:#2f6b31">已完整填充</span>'}
-      </div>
-      <div class="desc">${t.description}</div>
-      ${t.status === 'skeleton' ? '<div class="placeholder-note">⚠ 骨架占位节点：内容待按该学科课标逐步填充，当前仅展示知识结构位置。</div>' : ''}
-      ${(t.evidence && t.evidence.length) ? `<h3>掌握证据（能做到这些就算学会）</h3><ul>${t.evidence.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
-      ${t.assessmentPrompt ? `<h3>家长可以这样检验</h3><div class="assess">${t.assessmentPrompt}</div>` : ''}
-      ${stdHtml ? `<h3>课标对齐（2022 年版义务教育课程标准）</h3>${stdHtml}` : ''}
-      ${cluster ? `<h3>本单元概述</h3><div class="desc" style="font-size:12.5px;color:var(--text-dim)">${cluster.summary}</div>` : ''}
-      ${chainHtml(pre, '↑ 先学这些（先修链）')}
-      ${chainHtml(unlock, '↓ 学会后能解锁（后续知识点）')}
-      <div style="height:20px"></div>`;
-    panel.classList.remove('hidden');
-    panel.querySelector('#panel-close').onclick = () => { panel.classList.add('hidden'); selectedId = null; highlightSet.clear(); highlightEdges.clear(); draw(); };
-    panel.querySelectorAll('.chain-item').forEach(el => el.onclick = () => { selectTopic(el.dataset.id); ensureVisible(topicById.get(el.dataset.id)); });
+    openPanelMobile();
+    renderPanel();
     draw();
   }
   function ensureVisible(t) {
+    if (!t) return;
     const [sx, sy] = worldToScreen(t._x, t._y);
     const m = 80;
     if (sx < m || sx > W - m || sy < m || sy > H - m) {
@@ -476,16 +978,71 @@
     chip.onclick = () => {
       if (activeSubjects.has(s)) { activeSubjects.delete(s); chip.classList.add('off'); chip.classList.remove('on'); }
       else { activeSubjects.add(s); chip.classList.remove('off'); chip.classList.add('on'); }
+      updateStats();
       draw();
     };
     chipsBox.appendChild(chip);
   }
   document.getElementById('cb-alledges').onchange = (e) => { showAllEdges = e.target.checked; draw(); };
 
+  // ---------- 首次使用引导 ----------
+  const onboard = document.getElementById('onboard');
+  const obGrades = document.getElementById('ob-grades');
+  const obClose = document.getElementById('ob-close');
+  let obRole = null;
+  for (let g = 1; g <= 12; g++) {
+    const b = document.createElement('button');
+    b.textContent = g + ' 年级';
+    b.dataset.grade = g;
+    b.onclick = () => {
+      profile = { role: obRole || 'student', grade: g };
+      saveProfile();
+      onboard.classList.remove('show');
+      focusGrade(g);
+      updateGradeBtn();
+      toast('已定位到 ' + g + ' 年级区域，点任意红点开始标记');
+    };
+    obGrades.appendChild(b);
+  }
+  onboard.querySelectorAll('.ob-roles button').forEach(b => {
+    b.onclick = () => {
+      obRole = b.dataset.role;
+      onboard.querySelectorAll('.ob-roles button').forEach(x => x.classList.toggle('active', x === b));
+    };
+  });
+  obClose.onclick = () => onboard.classList.remove('show');
+  function updateGradeBtn() {
+    document.getElementById('btn-grade').textContent =
+      profile && profile.grade ? '我的年级：' + profile.grade + ' 年级' : '我的年级';
+  }
+  document.getElementById('btn-grade').onclick = () => {
+    obRole = profile ? profile.role : null;
+    onboard.querySelectorAll('.ob-roles button').forEach(x => x.classList.toggle('active', x.dataset.role === obRole));
+    obClose.style.display = 'block';
+    onboard.classList.add('show');
+  };
+  if (!profile) {
+    obClose.style.display = 'block';
+    onboard.classList.add('show');
+  }
+  updateGradeBtn();
+
+  // ---------- 轻提示 ----------
+  let toastTimer = null;
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.style.display = 'none'; }, 2600);
+  }
+
   // ---------- 启动 ----------
-  if (window.innerWidth < 860) panel.classList.add('hidden');
+  if (window.innerWidth < 860 && !isMobile()) panel.classList.add('hidden');
+  if (isMobile()) { sheetState = 'collapsed'; panel.classList.remove('hidden'); }
   resize();
   fitView();
+  updateStats();
   draw();
 })();
 </script>
