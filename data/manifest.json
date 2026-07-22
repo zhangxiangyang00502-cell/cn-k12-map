@@ -3,42 +3,13 @@
   "version": "0.1.0",
   "generatedAt": "2026-07-22",
   "totals": {
-    "topics": 279,
-    "completeTopics": 130,
-    "skeletonTopics": 149,
-    "dependencies": 270,
+    "topics": 430,
+    "completeTopics": 293,
+    "skeletonTopics": 137,
+    "dependencies": 440,
     "subjects": 15
   },
   "bySubject": {
-    "道德与法治": {
-      "topics": 130,
-      "complete": 130,
-      "skeleton": 0,
-      "gradeCoverage": [
-        7,
-        8,
-        9
-      ]
-    },
-    "语文": {
-      "topics": 12,
-      "complete": 0,
-      "skeleton": 12,
-      "gradeCoverage": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12
-      ]
-    },
     "数学": {
       "topics": 15,
       "complete": 0,
@@ -219,6 +190,35 @@
       "topics": 7,
       "complete": 0,
       "skeleton": 7,
+      "gradeCoverage": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "道德与法治": {
+      "topics": 143,
+      "complete": 143,
+      "skeleton": 0,
+      "gradeCoverage": [
+        7,
+        8,
+        9
+      ]
+    },
+    "语文": {
+      "topics": 150,
+      "complete": 150,
+      "skeleton": 0,
       "gradeCoverage": [
         1,
         2,
