@@ -1,2 +1,5 @@
+data/raw_smartedu/
+data/quiz_smartedu.json
+data/quiz_df_official.json
+*.log
 node_modules/
-.DS_Store
