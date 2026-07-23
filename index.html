@@ -188,6 +188,31 @@
     border-top: 1px dashed #16304a; padding-top: 6px; color: var(--text-dim); }
   .drill-ans b { color: var(--green-bright); }
   .drill-item.open .drill-ans { display: block; }
+  /* 补给包 */
+  .pack-card { background: #101d2e; border: 1px solid #1e3a52; border-radius: 10px; padding: 12px; margin-top: 4px; }
+  .pack-guide { background: #0b1523; border: 1px solid #16304a; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
+  .pg-tag { font-size: 11px; color: #e0b34a; font-weight: 700; margin-bottom: 4px; }
+  .pg-sec { font-size: 12.5px; line-height: 1.7; margin-top: 8px; }
+  .pg-sec:first-of-type { margin-top: 2px; }
+  .pg-sec b { color: #9fc7ea; display: block; margin-bottom: 2px; }
+  .pack-src { font-size: 11px; color: var(--text-dim); margin-top: 10px; border-top: 1px dashed #1e3a52; padding-top: 8px; }
+  .pack-output { background: #0b1523; border: 1px solid #2f6b31; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
+  .po-text { font-size: 12.5px; line-height: 1.7; font-weight: 600; }
+  .po-done { width: 100%; min-height: 40px; margin-top: 8px; border-color: var(--green-bright); color: var(--green-bright); }
+  .po-done.done { background: #12291a; }
+  /* 回忆卡翻面 */
+  .flip-card { perspective: 800px; cursor: pointer; margin-bottom: 6px; }
+  .flip-inner { position: relative; transform-style: preserve-3d; transition: transform .45s; }
+  .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+  .flip-face { backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    background: #0b1523; border: 1px solid #16304a; border-radius: 8px; padding: 12px;
+    display: flex; flex-direction: column; min-height: 110px; }
+  .flip-front { position: relative; }
+  .flip-back { position: absolute; inset: 0; transform: rotateY(180deg); border-color: #2f6b31; overflow: auto; }
+  .ff-tag { font-size: 11px; font-weight: 700; color: #5FDCD0; margin-bottom: 6px; }
+  .flip-back .ff-tag { color: var(--green-bright); }
+  .ff-text { font-size: 13px; line-height: 1.7; flex: 1; }
+  .ff-hint { font-size: 11px; color: var(--text-dim); text-align: right; margin-top: 6px; }
   .chain-item { font-size: 12.5px; padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; cursor: pointer;
     background: #0d1017; border: 1px solid var(--panel-border); line-height: 1.5; }
   .chain-item:hover { border-color: var(--accent); }
@@ -672,6 +697,23 @@
       }
     }
   } catch (e) {}
+  // 补给包（R6：导学卡/变式训练/回忆卡/产出任务）：packs_yw + packs_df 两文件合并；缺失时优雅降级为空
+  const packByTopic = new Map();
+  for (const url of ['data/packs_yw.json', 'data/packs_df.json']) {
+    try {
+      const r = await fetch(url);
+      if (r.ok) {
+        const d = await r.json();
+        const packs = d && d.packs;
+        if (packs && typeof packs === 'object' && !Array.isArray(packs)) {
+          for (const k of Object.keys(packs)) {
+            const v = packs[k];
+            if (v && typeof v === 'object' && !Array.isArray(v)) packByTopic.set(k, v);
+          }
+        }
+      }
+    } catch (e) {}
+  }
   document.getElementById('loading').remove();
 
   const topics = topicsData.topics;
@@ -1548,9 +1590,9 @@
   }
 
   // coaching 卡：ask 问句 + pattern 规律 + variants 课外变式 + drills 同类训练（答案默认折叠，给思路不给答案）
-  function renderCoachCard(coach) {
+  function renderCoachCard(coach, skipDrills) {
     const vars = Array.isArray(coach.variants) ? coach.variants : [];
-    const drills = Array.isArray(coach.drills) ? coach.drills : [];
+    const drills = skipDrills ? [] : (Array.isArray(coach.drills) ? coach.drills : []);
     if (!coach.ask && !coach.pattern && !vars.length && !drills.length) return '';
     const varsHtml = vars.length ? `
       <div class="ask-sec">课外变式 · 换个语境还是这条规律（${vars.length}）</div>
@@ -1594,7 +1636,9 @@
                  : m === 'mid' ? `<span class="badge m-mid">在进步 ${Math.round(mVal * 100)}%</span>`
                  : m === 'no' ? `<span class="badge m-no">还不会 ${Math.round(mVal * 100)}%</span>` : '';
     // coaching 卡（ask/pattern/variants/drills 来自 data/coaching.json；无数据时不渲染此卡）
-    const askHtml = coach ? renderCoachCard(coach) : '';
+    // 会员且有补给包时 drills 并入补给包区（合并去重），此处不再重复渲染
+    const askHtml = coach ? renderCoachCard(coach, packByTopic.has(selectedId) && isMember()) : '';
+    const packHtml = renderPackSection(selectedId);
     // 家长检验卡
     const assessInner = t.assessmentPrompt ? `
       <div class="assess-card">
@@ -1636,6 +1680,7 @@
       <button class="tbtn" id="btn-diag" style="width:100%;min-height:44px">这个知识点不会，帮我找原因</button>
       ${assessCardTop}
       ${askHtml}
+      ${packHtml}
       <div class="desc">${t.description}</div>
       ${t.status === 'skeleton' ? '<div class="placeholder-note">⚠ 骨架占位节点：内容待按该学科课标逐步填充，当前仅展示知识结构位置（仍可标记掌握度）。</div>' : ''}
       ${(t.evidence && t.evidence.length && !t.assessmentPrompt) ? `<h3>掌握证据（能做到这些就算学会）</h3><ul>${t.evidence.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
@@ -1669,6 +1714,16 @@
     if (br) br.onclick = () => startNodeQuiz(selectedId, 'map');
     const ru = panelBody.querySelector('#res-unlock');
     if (ru) ru.onclick = () => requireMember(() => renderPanel(true));
+    const pu = panelBody.querySelector('#pack-unlock');
+    if (pu) pu.onclick = () => requireMember(() => renderPanel(true));
+    const pod = panelBody.querySelector('#pack-output-done');
+    if (pod) pod.onclick = () => {
+      togglePackDone(selectedId);
+      const done = isPackDone(selectedId);
+      pod.classList.toggle('done', done);
+      pod.textContent = done ? '已完成 ✓（再点撤销）' : '完成了';
+      toast(done ? '产出任务已打卡 ✓' : '已撤销打卡');
+    };
     const at = panelBody.querySelector('#assess-toggle');
     if (at) at.onclick = () => {
       const w = panelBody.querySelector('#assess-wrap');
@@ -1893,6 +1948,90 @@
     return (resByTopic.get(id) || []).find(it => it.type === 'course' && it.url)
         || (resByTopic.get(id) || []).find(it => it.type === 'video' && it.url)
         || null;
+  }
+
+  // ---------- 补给包（导学卡/变式训练/回忆卡/产出任务；会员专享） ----------
+  const PACK_DONE_KEY = 'cnk12_pack_output';
+  let packDone = {};
+  try { packDone = JSON.parse(localStorage.getItem(PACK_DONE_KEY) || '{}') || {}; } catch (e) { packDone = {}; }
+  function isPackDone(id) { return !!packDone[id]; }
+  function togglePackDone(id) {
+    if (packDone[id]) delete packDone[id]; else packDone[id] = Date.now();
+    try { localStorage.setItem(PACK_DONE_KEY, JSON.stringify(packDone)); } catch (e) {}
+  }
+  // 导学卡（why 孩子为什么错 → rule 规律 → example 例子）
+  function packGuideHtml(pack) {
+    const g = pack.guide || {};
+    if (!g.why && !g.rule && !g.example) return '';
+    return `<div class="pack-guide">
+      <div class="pg-tag">导学卡</div>
+      ${g.why ? `<div class="pg-sec"><b>孩子为什么错</b><div>${esc(g.why)}</div></div>` : ''}
+      ${g.rule ? `<div class="pg-sec"><b>规律</b><div>${esc(g.rule)}</div></div>` : ''}
+      ${g.example ? `<div class="pg-sec"><b>例子</b><div>${esc(g.example)}</div></div>` : ''}
+    </div>`;
+  }
+  // 回忆卡（正面问题，点击翻面显示答案）
+  function packRecallHtml(pack) {
+    const rc = pack.recall || {};
+    if (!rc.front && !rc.back) return '';
+    return `<div class="flip-card" onclick="this.classList.toggle('flipped')" role="button" aria-label="回忆卡，点击翻面">
+      <div class="flip-inner">
+        <div class="flip-face flip-front"><div class="ff-tag">回忆卡 · 问题</div><div class="ff-text">${esc(rc.front)}</div><div class="ff-hint">先自己想，点卡片翻面 ›</div></div>
+        <div class="flip-face flip-back"><div class="ff-tag">答案</div><div class="ff-text">${esc(rc.back)}</div><div class="ff-hint">再点翻回 ›</div></div>
+      </div>
+    </div>`;
+  }
+  // 变式训练：与 coaching.drills 合并、按题干去重（答案折叠复用 drill-item）
+  function packDrills(id) {
+    const coachDrills = (coaching[id] && Array.isArray(coaching[id].drills)) ? coaching[id].drills : [];
+    const pack = packByTopic.get(id);
+    const seen = new Set(coachDrills.map(d => String(d.q || '').trim()));
+    const extra = (pack && Array.isArray(pack.drills) ? pack.drills : [])
+      .filter(d => d && d.q && !seen.has(String(d.q).trim()));
+    return coachDrills.concat(extra);
+  }
+  function packDrillsHtml(id) {
+    const drills = packDrills(id);
+    if (!drills.length) return '';
+    return `<div class="ask-sec">变式训练（${drills.length}）· 先看思路提示，做完再点开核对</div>
+      ${drills.map(d => `<div class="drill-item">
+        <div class="d-q">${esc(d.q)}</div>
+        ${d.hint ? `<div class="d-hint"><b>思路：</b>${esc(d.hint)}</div>` : ''}
+        <button class="drill-ans-btn" type="button">查看答案（先自己做完再对）</button>
+        <div class="drill-ans"><b>参考答案：</b>${esc(d.answer)}</div>
+      </div>`).join('')}`;
+  }
+  function packOutputHtml(id) {
+    const pack = packByTopic.get(id);
+    if (!pack || !pack.output) return '';
+    const done = isPackDone(id);
+    return `<div class="ask-sec">产出任务 · 用出来才算真会</div>
+      <div class="pack-output">
+        <div class="po-text">${esc(pack.output)}</div>
+        <button class="tbtn po-done ${done ? 'done' : ''}" id="pack-output-done">${done ? '已完成 ✓（再点撤销）' : '完成了'}</button>
+      </div>`;
+  }
+  // 图谱节点详情的补给包区：有 pack 才显示；非会员只见标题与锁定卡
+  function renderPackSection(id) {
+    const pack = packByTopic.get(id);
+    if (!pack) return '';
+    const t = topicById.get(id);
+    if (!isMember()) {
+      return `<h3>补给包</h3>
+        <div class="res-locked" id="pack-locked">
+          <div class="res-locked-t">会员专享 · 「${esc(t ? t.name : id)}」补给包</div>
+          <div class="res-locked-s">导学卡 + 变式训练 + 回忆卡 + 产出任务，专攻这一个薄弱点</div>
+          <button class="tbtn" id="pack-unlock" style="min-height:44px">开通会员解锁 ›</button>
+        </div>`;
+    }
+    return `<h3>补给包</h3>
+      <div class="pack-card" id="pack-card">
+        ${packGuideHtml(pack)}
+        ${packDrillsHtml(id)}
+        ${pack.recall ? '<div class="ask-sec">回忆卡 · 先自己想，点卡片翻面核对</div>' + packRecallHtml(pack) : ''}
+        ${packOutputHtml(id)}
+        ${pack.source_note ? `<div class="pack-src">${esc(pack.source_note)}</div>` : ''}
+      </div>`;
   }
 
   // ---------- 答题引擎（全屏层，诊断 tab 与图谱共用） ----------
@@ -2352,12 +2491,33 @@
         <div class="td-actions"><button class="tbtn" id="td-locate">去图谱 ›</button></div>
       </div>`;
 
-    const learnHtml = (weak && course) ? `
-      <div class="card">
-        <h3><span class="td-tag learn">学</span>配套课程</h3>
-        <div class="c-sub">${esc(course.title)}${course.note ? ` · ${esc(course.note)}` : ''}</div>
-        <div class="td-actions"><button class="tbtn" id="td-course">看课${isMember() ? '' : '（会员）'} ›</button></div>
-      </div>` : '';
+    // 学区：有补给包优先展示（导学卡+回忆卡内联，会员专享），没有才降级到课程链接
+    const weakPack = weak ? packByTopic.get(weak.id) : null;
+    let learnHtml = '';
+    if (weak && weakPack) {
+      learnHtml = isMember() ? `
+        <div class="card">
+          <h3><span class="td-tag learn">学</span>补给包 · ${esc(weak.name)}</h3>
+          ${packGuideHtml(weakPack)}
+          ${weakPack.recall ? '<div class="c-sub" style="margin:4px 0 6px">回忆卡 · 先自己想，点卡片翻面核对</div>' + packRecallHtml(weakPack) : ''}
+          <div class="td-actions"><button class="tbtn" id="td-pack-more">完整补给包（变式训练 + 产出任务） ›</button></div>
+        </div>` : `
+        <div class="card">
+          <h3><span class="td-tag learn">学</span>补给包 · ${esc(weak.name)}</h3>
+          <div class="res-locked">
+            <div class="res-locked-t">会员专享 · 这个薄弱点有现成补给包</div>
+            <div class="res-locked-s">导学卡 + 变式训练 + 回忆卡 + 产出任务，专攻「${esc(weak.name)}」</div>
+            <button class="tbtn" id="td-pack-unlock" style="min-height:44px">开通会员解锁 ›</button>
+          </div>
+        </div>`;
+    } else if (weak && course) {
+      learnHtml = `
+        <div class="card">
+          <h3><span class="td-tag learn">学</span>配套课程</h3>
+          <div class="c-sub">${esc(course.title)}${course.note ? ` · ${esc(course.note)}` : ''}</div>
+          <div class="td-actions"><button class="tbtn" id="td-course">看课${isMember() ? '' : '（会员）'} ›</button></div>
+        </div>`;
+    }
 
     todayBody.innerHTML = `
       <div class="coach-line">${coachLine(weak)}</div>
@@ -2425,6 +2585,10 @@
     if (locBtn) locBtn.onclick = () => { switchTab('map'); if (weak) selectTopic(weak.id); };
     const cBtn = todayBody.querySelector('#td-course');
     if (cBtn && weak && course) cBtn.onclick = () => requireMember(() => openCourse(weak.id, course.url, course.title));
+    const pmBtn = todayBody.querySelector('#td-pack-more');
+    if (pmBtn && weak) pmBtn.onclick = () => { switchTab('map'); selectTopic(weak.id); };
+    const puBtn = todayBody.querySelector('#td-pack-unlock');
+    if (puBtn) puBtn.onclick = () => requireMember(() => renderTodayTab());
   }
 
   function renderDiagTab() {
@@ -2831,7 +2995,7 @@
     meBody.querySelector('#me-gomap').onclick = () => switchTab('map');
     meBody.querySelector('#me-clear').onclick = () => {
       if (!confirm('确定清除本机上的全部学习数据（标记、清单、会员、档案）吗？此操作不可撤销。')) return;
-      for (const k of ['cnk12_mastery', 'cnk12_mastery_meta', 'cnk12_profile', 'cnk12_member', 'cnk12_plan', 'cnk12_plan2', 'cnk12_lastdiag', 'cnk12_watch', 'cnk12_panel_w']) {
+      for (const k of ['cnk12_mastery', 'cnk12_mastery_meta', 'cnk12_profile', 'cnk12_member', 'cnk12_plan', 'cnk12_plan2', 'cnk12_lastdiag', 'cnk12_watch', 'cnk12_panel_w', 'cnk12_pack_output']) {
         try { localStorage.removeItem(k); } catch (e) {}
       }
       location.reload();
@@ -3121,6 +3285,7 @@
     plan: () => plan2,
     coaching: () => coaching,
     pack: (id) => resPackByTopic.get(id),
+    supplyPack: (id) => packByTopic.get(id),
     visibleSubjects: () => [...activeSubjects],
     mobileSubject: () => mobileSubject,
     viewSize: () => [W, H],
