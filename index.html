@@ -125,17 +125,25 @@
       max-width: 94vw; }
   }
   #panel-handle { display: none; }
+  /* 移动端抽屉遮罩：固定全屏半透明，点击关闭抽屉 */
+  #drawer-mask { display: none; }
   @media (max-width: 767px) {
-    #panel { position: absolute; left: 0; right: 0; top: auto; bottom: 0; width: auto; flex: none;
-      height: 92%; z-index: 25; border-left: none; border-top: 1px solid var(--panel-border);
-      border-radius: 14px 14px 0 0; box-shadow: 0 -8px 28px rgba(0,0,0,0.6);
-      padding: 0 16px 16px; transform: translateY(calc(100% - 38px)); transition: transform .25s ease; }
+    #drawer-mask { display: block; position: fixed; inset: 0; z-index: 38;
+      background: rgba(4, 6, 12, 0.55); backdrop-filter: blur(1.5px); -webkit-backdrop-filter: blur(1.5px);
+      opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+    #drawer-mask.show { opacity: 1; pointer-events: auto; }
+    #panel { position: fixed; left: 0; right: 0; top: auto; bottom: 0; width: auto; flex: none; max-width: none;
+      height: 55vh; height: 55dvh; z-index: 40; border-left: none; border-top: 1px solid var(--panel-border);
+      border-radius: 16px 16px 0 0; box-shadow: 0 -10px 32px rgba(0,0,0,0.65);
+      padding: 0 calc(16px + env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) calc(16px + env(safe-area-inset-left, 0px));
+      transform: translateY(105%); transition: transform .2s ease;
+      display: flex; flex-direction: column; overflow: hidden; }
     #panel.hidden { margin-right: 0; }
-    #panel.sheet-half { transform: translateY(42%); }
-    #panel.sheet-full { transform: translateY(0); }
+    #panel.sheet-open { transform: translateY(0); }
     #panel.dragging { transition: none; }
-    #panel-handle { display: flex; align-items: center; justify-content: center; height: 38px;
-      cursor: grab; flex: 0 0 38px; touch-action: none; margin: 0 -16px; }
+    #panel-body { flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    #panel-handle { display: flex; align-items: center; justify-content: center; height: 34px; flex: 0 0 34px;
+      cursor: grab; touch-action: none; margin: 0 -16px; }
     #panel-handle .grip { width: 44px; height: 5px; border-radius: 3px; background: #3a4150; }
   }
   #panel h2 { font-size: 16px; line-height: 1.4; margin-bottom: 6px; }
@@ -418,10 +426,6 @@
   }
   .ob-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
   .ob-sub { font-size: 12.5px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.6; }
-  .ob-roles { display: flex; gap: 10px; margin-bottom: 14px; }
-  .ob-roles button { flex: 1; min-height: 46px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;
-    border: 1.5px solid var(--panel-border); background: #0d1017; color: var(--text-dim); }
-  .ob-roles button.active { border-color: var(--accent); color: var(--accent); background: #122031; }
   .ob-grades { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
   .ob-grades button { min-height: 44px; min-width: 0; border-radius: 8px; font-size: 14px; cursor: pointer;
     border: 1px solid var(--panel-border); background: #0d1017; color: var(--text); }
@@ -499,6 +503,7 @@
           <div id="loading">正在加载数据…</div>
         </div>
         <div id="panel-resizer" title="拖拽调整面板宽度"></div>
+        <div id="drawer-mask"></div>
         <div id="panel">
           <div id="panel-handle"><div class="grip"></div></div>
           <div id="panel-body"><div id="empty-hint">点击图谱上的任意节点，查看它的先修链与详情。<br>先用「诊断」找出孩子的薄弱点，再来这里追溯根源。</div></div>
@@ -830,7 +835,7 @@
   }
   function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); }
 
-  // ---- 离屏背景：#0A0C14 深空径向渐变 + 静态星云/星点（resize 时重渲染一次） ----
+  // ---- 离屏背景：深空近纯色 + 收敛星云 + 细星点 + 边缘暗角（resize 时重渲染一次） ----
   const bgCanvas = document.createElement('canvas');
   function renderBackground() {
     bgCanvas.width = Math.max(1, Math.round(W * dpr));
@@ -838,7 +843,7 @@
     const b = bgCanvas.getContext('2d');
     b.setTransform(dpr, 0, 0, dpr, 0, 0);
     const g = b.createRadialGradient(W * 0.5, H * 0.42, 0, W * 0.5, H * 0.42, Math.hypot(W, H) * 0.75);
-    g.addColorStop(0, '#141828'); g.addColorStop(0.55, '#0e1120'); g.addColorStop(1, '#0A0C14');
+    g.addColorStop(0, '#10142a'); g.addColorStop(0.55, '#0b0e1c'); g.addColorStop(1, '#070912');
     b.fillStyle = g; b.fillRect(0, 0, W, H);
     let seed = 20240612;
     const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
@@ -847,27 +852,33 @@
       const nx = rnd() * W, ny = rnd() * H, nr = 140 + rnd() * 280;
       const ng = b.createRadialGradient(nx, ny, 0, nx, ny, nr);
       const c = nebCols[i % nebCols.length];
-      ng.addColorStop(0, hexA(c, 0.05)); ng.addColorStop(1, hexA(c, 0));
+      ng.addColorStop(0, hexA(c, 0.035)); ng.addColorStop(1, hexA(c, 0));
       b.fillStyle = ng; b.beginPath(); b.arc(nx, ny, nr, 0, Math.PI * 2); b.fill();
     }
-    for (let i = 0; i < 170; i++) {
-      const x = rnd() * W, y = rnd() * H, r = 0.4 + rnd() * 1.2, a = 0.03 + rnd() * 0.09;
+    for (let i = 0; i < 210; i++) {
+      const x = rnd() * W, y = rnd() * H, r = 0.3 + rnd() * 0.9, a = 0.02 + rnd() * 0.07;
       b.fillStyle = `rgba(210,220,240,${a.toFixed(3)})`;
       b.beginPath(); b.arc(x, y, r, 0, Math.PI * 2); b.fill();
     }
+    // 边缘暗角：视线向中心图谱聚拢
+    const vg = b.createRadialGradient(W * 0.5, H * 0.5, Math.min(W, H) * 0.38, W * 0.5, H * 0.5, Math.hypot(W, H) * 0.62);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.34)');
+    b.fillStyle = vg; b.fillRect(0, 0, W, H);
   }
 
-  // ---- 节点光晕精灵 ----
+  // ---- 节点精灵：亮色实心核 + 收窄的精致光晕（对标 Marble 的干净节点） ----
   const SPR_SIZE = 128, SPR_CORE = 24, SPR_K = SPR_SIZE / (SPR_CORE * 2);
   function makeSprite(color) {
     const c = document.createElement('canvas');
     c.width = c.height = SPR_SIZE;
     const g2 = c.getContext('2d');
     const g = g2.createRadialGradient(64, 64, 0, 64, 64, 64);
-    g.addColorStop(0, 'rgba(255,255,255,0.92)');
-    g.addColorStop(0.14, color);
-    g.addColorStop(SPR_CORE / 64, color);
-    g.addColorStop(0.52, hexA(color, 0.28));
+    g.addColorStop(0, 'rgba(255,255,255,0.95)');
+    g.addColorStop(0.10, color);
+    g.addColorStop(SPR_CORE / 64, color);            // 实心色盘到核边缘，保持锐利
+    g.addColorStop(0.42, hexA(color, 0.35));         // 光晕快速衰减，不再糊成一团
+    g.addColorStop(0.56, hexA(color, 0.06));
+    g.addColorStop(0.68, hexA(color, 0));
     g.addColorStop(1, hexA(color, 0));
     g2.fillStyle = g; g2.fillRect(0, 0, SPR_SIZE, SPR_SIZE);
     return c;
@@ -1094,7 +1105,7 @@
         ctx.setLineDash([7, 5]); ctx.lineDashOffset = dashOff;
         ctx.stroke(); ctx.setLineDash([]);
       } else {
-        const alpha = d.strength === 'hard' ? 0.09 : 0.05;
+        const alpha = d.strength === 'hard' ? 0.06 : 0.035;
         const eg = ctx.createLinearGradient(x1, y1, x2, y2);
         eg.addColorStop(0, hexA(a._color, alpha));
         eg.addColorStop(1, hexA(b._color, alpha));
@@ -1196,6 +1207,9 @@
   const pointers = new Map();
   let panMoved = 0, panLast = null, downTime = 0, pinch = null;
   let velSamples = [];
+
+  // 阻断触摸后的兼容鼠标事件（ghost click），避免抽屉刚打开就被同一坐标落的假点击误关
+  canvas.addEventListener('touchstart', (e) => { e.preventDefault(); }, { passive: false });
 
   function hitTest(sx, sy, isTouch) {
     const [wx, wy] = screenToWorld(sx, sy);
@@ -1317,32 +1331,27 @@
   canvas.addEventListener('pointerup', endPointer);
   canvas.addEventListener('pointercancel', endPointer);
 
-  // ---------- 面板骨架（bottom sheet） ----------
+  // ---------- 面板骨架（桌面右栏 / 移动端固定底部抽屉） ----------
   const panel = document.getElementById('panel');
   const panelBody = document.getElementById('panel-body');
   const handle = document.getElementById('panel-handle');
-  let sheetState = 'collapsed';
+  const drawerMask = document.getElementById('drawer-mask');
+  let sheetState = 'collapsed';   // 移动端语义：'open'（55vh 固定抽屉）| 'collapsed'（隐藏）
 
   const EMPTY_HINT_HTML = '<div id="empty-hint">点击图谱上的任意节点，查看它的先修链与详情。<br>先用「诊断」找出孩子的薄弱点，再来这里追溯根源。</div>';
-  const SHEET_HALF_RATIO = 0.42;
-  function sheetStops() {
-    const h = panel.offsetHeight;
-    return [['full', 0], ['half', h * SHEET_HALF_RATIO], ['collapsed', h - 38]];
-  }
   function applySheetState() {
     if (!isMobile()) {
       panel.style.transform = '';
-      panel.classList.remove('sheet-half', 'sheet-full', 'dragging');
+      panel.classList.remove('sheet-open', 'dragging');
+      drawerMask.classList.remove('show');
       return;
     }
-    panel.style.transform = sheetState === 'full' ? 'translateY(0)'
-      : sheetState === 'half' ? `translateY(${SHEET_HALF_RATIO * 100}%)`
-      : 'translateY(calc(100% - 38px))';
-    panel.classList.toggle('sheet-half', sheetState === 'half');
-    panel.classList.toggle('sheet-full', sheetState === 'full');
+    panel.classList.toggle('sheet-open', sheetState === 'open');
+    drawerMask.classList.toggle('show', sheetState === 'open');
+    if (sheetState !== 'open') panel.style.transform = '';
   }
-  function openPanelMobile(state) {
-    if (isMobile()) { sheetState = state || 'half'; applySheetState(); }
+  function openPanelMobile() {
+    if (isMobile()) { sheetState = 'open'; applySheetState(); }
     panel.classList.remove('hidden');
   }
   function closePanel() {
@@ -1353,45 +1362,34 @@
     panelBody.innerHTML = EMPTY_HINT_HTML;
     requestDraw();
   }
+  drawerMask.addEventListener('click', () => { if (isMobile() && sheetState === 'open') closePanel(); });
+  // 抓手条：点按关闭；下滑超过阈值或快速甩动关闭，否则回弹
   let hDrag = null;
   handle.addEventListener('pointerdown', (e) => {
-    if (!isMobile()) return;
+    if (!isMobile() || sheetState !== 'open' || e.pointerType === 'mouse') return;   // 鼠标事件一律忽略，防 ghost click
     try { handle.setPointerCapture(e.pointerId); } catch (err) {}
-    hDrag = { startY: e.clientY, baseTop: panel.getBoundingClientRect().top, moved: 0 };
+    hDrag = { startY: e.clientY, dy: 0, moved: 0 };
     panel.classList.add('dragging');
     e.preventDefault();
   });
   handle.addEventListener('pointermove', (e) => {
     if (!hDrag) return;
-    const wrapRect = wrap.getBoundingClientRect();
-    let top = hDrag.baseTop + (e.clientY - hDrag.startY);
-    top = Math.max(wrapRect.top, Math.min(wrapRect.bottom - 38, top));
+    const dy = Math.max(0, e.clientY - hDrag.startY);   // 只允许向下拖
+    hDrag.dy = dy;
     hDrag.moved += Math.abs(e.movementY || 0);
-    const naturalTop = wrapRect.bottom - panel.offsetHeight;
-    panel.style.transform = `translateY(${top - naturalTop}px)`;
+    panel.style.transform = dy > 0 ? `translateY(${dy}px)` : '';
   });
-  handle.addEventListener('pointerup', (e) => {
+  function endHandleDrag(e) {
     if (!hDrag) return;
     panel.classList.remove('dragging');
-    const h = panel.offsetHeight;
-    const naturalTop = wrap.getBoundingClientRect().bottom - h;
-    const curY = panel.getBoundingClientRect().top - naturalTop;
-    if (hDrag.moved < 6) {
-      sheetState = sheetState === 'collapsed' ? 'half' : (sheetState === 'half' ? 'full' : 'half');
-    } else {
-      const stops = sheetStops();
-      let best = sheetState, bestD = Infinity;
-      for (const [name, y] of stops) {
-        let d = Math.abs(curY - y);
-        if (name === sheetState) d = Math.max(0, d - 24);
-        if (d < bestD) { bestD = d; best = name; }
-      }
-      sheetState = best;
-    }
+    const dy = hDrag.dy, moved = hDrag.moved;
+    const v = e && typeof e.movementY === 'number' ? e.movementY : 0;
     hDrag = null;
-    applySheetState();
-  });
-  handle.addEventListener('pointercancel', () => { hDrag = null; panel.classList.remove('dragging'); applySheetState(); });
+    if (moved < 6 || dy > panel.offsetHeight * 0.35 || (dy > 40 && v > 12)) closePanel();
+    else { panel.style.transform = ''; }
+  }
+  handle.addEventListener('pointerup', endHandleDrag);
+  handle.addEventListener('pointercancel', () => { hDrag = null; panel.classList.remove('dragging'); panel.style.transform = ''; });
 
   // ---------- 详情面板（点选节点 → 追溯视图） ----------
   const TYPE_CN = { CONCEPTUAL: '概念理解', PROCEDURAL: '方法技能', REPRESENTATIONAL: '表征方式', LANGUAGE: '语言表达', META: '元认知' };
@@ -1473,13 +1471,8 @@
         </div>
         <div class="assess-fb" id="assess-fb">${m === 'yes' ? '<span class="assess-fb ok">已标记为已掌握 ✓</span>' : m === 'no' ? '<span class="assess-fb bad">已标记为还不会</span>' : ''}</div>
       </div>` : '';
-    const isParent = profile && profile.role === 'parent';
-    const assessCardTop = (t.assessmentPrompt && isParent) ? `<h3>家长检验卡</h3>${assessInner}` : '';
-    const assessCard = (t.assessmentPrompt && !isParent) ? `
-      <div class="assess-wrap" id="assess-wrap">
-        <button class="assess-toggle" id="assess-toggle">家长检验卡 ▸ 点击展开</button>
-        ${assessInner}
-      </div>` : '';
+    // 家长检验卡（默认家长视角，始终展开前置）
+    const assessCardTop = t.assessmentPrompt ? `<h3>家长检验卡</h3>${assessInner}` : '';
     const quizBtnHtml = quizByTopic.has(selectedId)
       ? `<button class="tbtn quiz-entry" id="btn-quiz">测一测 · ${quizByTopic.get(selectedId).length} 道题确证掌握度${isMember() ? '' : '（会员）'}</button>` : '';
     const resHtml = resourceSectionHtml(selectedId);
@@ -1511,7 +1504,6 @@
       <div class="desc">${t.description}</div>
       ${t.status === 'skeleton' ? '<div class="placeholder-note">⚠ 骨架占位节点：内容待按该学科课标逐步填充，当前仅展示知识结构位置（仍可标记掌握度）。</div>' : ''}
       ${(t.evidence && t.evidence.length && !t.assessmentPrompt) ? `<h3>掌握证据（能做到这些就算学会）</h3><ul>${t.evidence.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
-      ${assessCard}
       ${stdHtml ? `<h3>课标对齐（2022 年版义务教育课程标准）</h3>${stdHtml}` : ''}
       ${cluster ? `<h3>本单元概述</h3><div class="desc" style="font-size:12.5px;color:var(--text-dim)">${cluster.summary}</div>` : ''}
       ${resHtml}
@@ -1936,7 +1928,7 @@
         switchTab('map');
         selectedId = tid; diagRootId = tid; panelView = 'diag';
         applyHighlight(tid);
-        openPanelMobile('full');
+        openPanelMobile();
         renderPanel();
         startFocus(topicById.get(tid));
       };
@@ -2367,13 +2359,11 @@
       if (mastery[id] === 'yes') yes++;
       else if (mastery[id] === 'no') no++;
     }
-    const roleTxt = profile && profile.role === 'parent' ? '家长' : profile && profile.role === 'student' ? '学生' : '未设置';
     const gradeTxt = profile && profile.grade ? profile.grade + ' 年级' : '未设置';
     const subjTxt = profile && profile.subject ? profile.subject : '未设置';
     meBody.innerHTML = `
       <div class="card">
         <h3>学习档案</h3>
-        <div class="me-row"><span class="k">身份</span><span class="v">${roleTxt}</span></div>
         <div class="me-row"><span class="k">年级</span><span class="v">${gradeTxt}</span></div>
         <div class="me-row"><span class="k">关注学科</span><span class="v">${esc(subjTxt)}</span></div>
         <div class="me-row"><span class="k"></span><button class="tbtn" id="me-profile">修改档案</button></div>
@@ -2541,17 +2531,17 @@
     lg.classList.toggle('open');
   };
 
-  // ---------- 首次使用引导（分步：角色 → 年级 → 学科 → 进入） ----------
+  // ---------- 首次使用引导（分步：年级 → 学科 → 进入；默认家长视角） ----------
   const onboard = document.getElementById('onboard');
   const obBox = document.getElementById('ob-box');
   const OB_SUBJECTS = ['道德与法治', '语文'];
-  let obState = { step: 1, role: null, grade: null, subject: null };
+  let obState = { step: 1, grade: null, subject: null };
   function skipOnboard() {
     if (!profile) { profile = { skipped: true }; saveProfile(); }
     onboard.classList.remove('show');
   }
   function applyOnboard() {
-    profile = { role: obState.role || 'parent', grade: obState.grade, subject: obState.subject };
+    profile = { role: 'parent', grade: obState.grade, subject: obState.subject };
     saveProfile();
     onboard.classList.remove('show');
     switchTab('diag');
@@ -2561,35 +2551,19 @@
     const s = obState;
     if (s.step === 1) {
       obBox.innerHTML = `
-        <div class="ob-step-tag">第 1 步 / 共 3 步</div>
-        <div class="ob-title">先认识一下：你是？</div>
-        <div class="ob-sub">家长和学生看到的侧重点不一样（家长默认展开「检验卡」，方便考考孩子）。</div>
-        <div class="ob-roles">
-          <button data-role="student">我是学生</button>
-          <button data-role="parent">我是家长</button>
-        </div>
-        <button class="ob-close" id="ob-skip">先随便看看 ›</button>`;
-      obBox.querySelectorAll('.ob-roles button').forEach(b => b.onclick = () => {
-        obState.role = b.dataset.role; obState.step = 2; renderOnboard();
-      });
-      obBox.querySelector('#ob-skip').onclick = skipOnboard;
-    } else if (s.step === 2) {
-      obBox.innerHTML = `
-        <div class="ob-step-tag">第 2 步 / 共 3 步</div>
+        <div class="ob-step-tag">第 1 步 / 共 2 步</div>
         <div class="ob-title">孩子现在上几年级？</div>
         <div class="ob-sub">选完诊断会按对应年级抽题。</div>
         <div class="ob-grades">${[1,2,3,4,5,6,7,8,9].map(g =>
           `<button data-grade="${g}">${g} 年级</button>`).join('')}</div>
-        <button class="ob-back" id="ob-back">‹ 上一步</button>
         <button class="ob-close" id="ob-skip">先随便看看 ›</button>`;
       obBox.querySelectorAll('.ob-grades button').forEach(b => b.onclick = () => {
-        obState.grade = +b.dataset.grade; obState.step = 3; renderOnboard();
+        obState.grade = +b.dataset.grade; obState.step = 2; renderOnboard();
       });
-      obBox.querySelector('#ob-back').onclick = () => { obState.step = 1; renderOnboard(); };
       obBox.querySelector('#ob-skip').onclick = skipOnboard;
-    } else if (s.step === 3) {
+    } else if (s.step === 2) {
       obBox.innerHTML = `
-        <div class="ob-step-tag">第 3 步 / 共 3 步</div>
+        <div class="ob-step-tag">第 2 步 / 共 2 步</div>
         <div class="ob-title">想先看哪门学科？</div>
         <div class="ob-sub">这两门已按 2024 版新教材完整填充，其他学科正在建设中。</div>
         <div class="ob-subjects">${OB_SUBJECTS.map(sub =>
@@ -2597,29 +2571,27 @@
         <button class="ob-back" id="ob-back">‹ 上一步</button>
         <button class="ob-close" id="ob-skip">先随便看看 ›</button>`;
       obBox.querySelectorAll('.ob-subjects button').forEach(b => b.onclick = () => {
-        obState.subject = b.dataset.subject; obState.step = 4; renderOnboard();
+        obState.subject = b.dataset.subject; obState.step = 3; renderOnboard();
       });
-      obBox.querySelector('#ob-back').onclick = () => { obState.step = 2; renderOnboard(); };
+      obBox.querySelector('#ob-back').onclick = () => { obState.step = 1; renderOnboard(); };
       obBox.querySelector('#ob-skip').onclick = skipOnboard;
     } else {
       obBox.innerHTML = `
         <div class="ob-step-tag">都选好了</div>
         <div class="ob-title">准备就绪</div>
         <div class="ob-summary">
-          身份：<b>${s.role === 'parent' ? '家长' : '学生'}</b><br>
           年级：<b>${s.grade} 年级</b><br>
           学科：<b>${esc(s.subject)}</b>
         </div>
         <button class="ob-close ob-enter" id="ob-enter">开始第一次诊断 ✓</button>
         <button class="ob-back" id="ob-back">‹ 上一步</button>`;
       obBox.querySelector('#ob-enter').onclick = applyOnboard;
-      obBox.querySelector('#ob-back').onclick = () => { obState.step = 3; renderOnboard(); };
+      obBox.querySelector('#ob-back').onclick = () => { obState.step = 2; renderOnboard(); };
     }
   }
   function openOnboard() {
     obState = {
       step: 1,
-      role: profile ? profile.role : null,
       grade: profile ? profile.grade : null,
       subject: profile ? profile.subject : null,
     };
