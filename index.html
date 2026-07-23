@@ -156,6 +156,7 @@
   .badge.type { color: #5FDCD0; border-color: #1F5B54; }
   .badge.grade { color: #9fe6a0; border-color: #2f6b31; }
   .badge.m-yes { color: var(--green-bright); border-color: #2f6b31; }
+  .badge.m-mid { color: #e0b34a; border-color: #6b5420; }
   .badge.m-no { color: var(--bad); border-color: #7c3a28; }
   #panel-close { float: right; background: none; border: none; color: var(--text-dim); font-size: 22px; cursor: pointer;
     min-width: 44px; min-height: 44px; margin: -8px -10px 0 0; }
@@ -346,6 +347,22 @@
   .qd-btn:disabled { opacity: 0.45; cursor: default; }
   .qd-btn:not(:disabled):hover { border-color: var(--accent); }
   .qd-soon { font-size: 10.5px; color: var(--text-dim); font-weight: 400; }
+  /* 今日 tab（教练任务页） */
+  .coach-line { font-size: 15px; line-height: 1.8; font-weight: 600;
+    background: linear-gradient(135deg, #12202f, #0d1520); border: 1px solid #1e3a52;
+    border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+  .td-tag { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 6px;
+    padding: 1px 7px; margin-right: 6px; vertical-align: 1px; }
+  .td-tag.recall { color: #e0b34a; border: 1px solid #6b5420; }
+  .td-tag.drill { color: #5FDCD0; border: 1px solid #1F5B54; }
+  .td-tag.learn { color: var(--green-bright); border: 1px solid #2f6b31; }
+  .td-mastery { font-size: 11.5px; color: var(--text-dim); font-weight: 400; margin-left: 4px; }
+  .td-empty { text-align: center; padding: 30px 14px; }
+  .td-empty .big-cta { max-width: 320px; margin: 16px auto 0; display: block; }
+  .td-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .td-actions .tbtn { flex: 1; min-height: 42px; }
+  .td-recall-item { border-top: 1px dashed var(--panel-border); padding-top: 8px; margin-top: 8px; }
+  .td-recall-item:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
   .lastdiag { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .lastdiag .ld-t { font-size: 13px; line-height: 1.6; }
   .lastdiag .ld-t b { color: var(--accent); }
@@ -392,10 +409,10 @@
   #quiz-body h2 { font-size: 17px; line-height: 1.4; margin-bottom: 6px; }
   #quiz-body h3 { font-size: 13px; color: var(--text-dim); margin: 14px 0 6px; border-top: 1px solid var(--panel-border); padding-top: 12px; }
   .quiz-meta { font-size: 12px; color: var(--text-dim); margin: 6px 0 10px; line-height: 1.6; }
-  .quiz-q { font-size: 14.5px; line-height: 1.7; font-weight: 600; margin-bottom: 12px; }
+  .quiz-q { font-size: 17px; line-height: 1.8; font-weight: 600; margin-bottom: 14px; }
   .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
   .quiz-opt { text-align: left; min-height: 46px; border-radius: 10px; border: 1.5px solid var(--panel-border);
-    background: #0d1017; color: var(--text); font-size: 13.5px; line-height: 1.6; padding: 10px 12px; cursor: pointer; }
+    background: #0d1017; color: var(--text); font-size: 15px; line-height: 1.8; padding: 10px 12px; cursor: pointer; }
   .quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
   .quiz-opt:disabled { cursor: default; opacity: 0.85; }
   .quiz-opt.correct { border-color: var(--green-bright); background: #12291a; color: var(--green-bright); opacity: 1; }
@@ -405,6 +422,11 @@
   .quiz-fb { font-size: 14px; font-weight: 700; margin-top: 12px; line-height: 1.6; }
   .quiz-fb.ok { color: var(--green-bright); }
   .quiz-fb.bad { color: var(--bad); }
+  /* 错因 chips */
+  .err-row { font-size: 12px; color: var(--text-dim); margin-top: 8px; line-height: 2; }
+  .err-chip { display: inline-block; min-height: 28px; padding: 2px 10px; margin: 0 4px 4px 0; border-radius: 14px;
+    border: 1px solid var(--panel-border); background: #0d1017; color: var(--text-dim); font-size: 12px; cursor: pointer; }
+  .err-chip.on { border-color: var(--accent); color: var(--accent); }
   .quiz-explain { font-size: 12.5px; color: var(--text-dim); line-height: 1.7; background: #12151c;
     border: 1px solid var(--panel-border); border-radius: 8px; padding: 10px 12px; margin-top: 8px; }
   .quiz-next { width: 100%; min-height: 46px; margin-top: 12px; border-color: var(--accent); color: var(--accent);
@@ -521,7 +543,10 @@
   </header>
 
   <div id="views">
-    <!-- 诊断 tab（主入口） -->
+    <!-- 今日 tab（默认主入口：教练视角任务） -->
+    <section id="view-today" class="view scroll-view"><div class="scroll-inner" id="today-body"></div></section>
+
+    <!-- 诊断 tab -->
     <section id="view-diag" class="view scroll-view"><div class="scroll-inner" id="diag-body"></div></section>
 
     <!-- 计划 tab -->
@@ -566,6 +591,10 @@
   </div>
 
   <nav id="tabbar">
+    <button class="tab-btn" data-tab="today">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/></svg>
+      今日
+    </button>
     <button class="tab-btn" data-tab="diag">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
       诊断
@@ -681,33 +710,42 @@
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
 
-  // ---------- 布局 ----------
+  // ---------- 布局：每学科一座螺旋塔（y=年级，黄金角盘旋上升，半径随高度收窄成塔） ----------
   const SUBJECT_ORDER = ['道德与法治','语文','数学','英语','科学','物理','化学','生物','历史','地理','思想政治','信息科技','体育与健康','艺术','劳动'];
   const COLORS = {
     '道德与法治':'#e0564b','语文':'#e8913a','数学':'#3a8ee8','英语':'#9a6ae8','科学':'#4cc38a',
     '物理':'#38b6d9','化学':'#d94f9e','生物':'#7bc043','历史':'#c98a4b','地理':'#4aa06a',
     '思想政治':'#d94f4f','信息科技':'#5a6ee0','体育与健康':'#e0c23a','艺术':'#e06ab0','劳动':'#8a8f6a'
   };
-  const COL_W = 300, ROW_H = 78, GRADE_BASE = 0;
+  const ROW_H = 78, GRADE_BASE = 0;
+  const GOLDEN = Math.PI * (3 - Math.sqrt(5));   // 黄金角 ≈ 137.508°，螺旋不重叠
+  const TOWER_R = 150;                            // 塔底半径（世界单位）
+  const COL_W = 420;                              // 塔间距（桌面多塔并排）
   const subjects = SUBJECT_ORDER.filter(s => topics.some(t => t.subject === s));
   const subjX = new Map(subjects.map((s, i) => [s, i * COL_W + COL_W / 2]));
 
-  const groups = new Map();
+  const bySubjLayout = new Map();
   for (const t of topics) {
-    const gMid = (t.gradeRangeStart + t.gradeRangeEnd) / 2;
-    const key = t.subject + '|' + Math.round(gMid);
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(t);
+    if (!bySubjLayout.has(t.subject)) bySubjLayout.set(t.subject, []);
+    bySubjLayout.get(t.subject).push(t);
   }
-  for (const [key, list] of groups) {
-    list.sort((a, b) => a.domain.localeCompare(b.domain, 'zh') || a.name.localeCompare(b.name, 'zh'));
-    const SPIRAL_C = Math.min(24, 118 / Math.sqrt(Math.max(list.length - 1, 1)));
+  for (const [subj, list] of bySubjLayout) {
+    list.sort((a, b) => {
+      const ga = (a.gradeRangeStart + a.gradeRangeEnd) / 2, gb = (b.gradeRangeStart + b.gradeRangeEnd) / 2;
+      return ga - gb || a.domain.localeCompare(b.domain, 'zh') || a.name.localeCompare(b.name, 'zh');
+    });
+    const cx = subjX.get(subj);
+    const phase = ((hashStr(subj) % 100) / 100) * Math.PI * 2;
     list.forEach((t, i) => {
       const gMid = (t.gradeRangeStart + t.gradeRangeEnd) / 2;
-      const th = i * 2.4, rr = SPIRAL_C * Math.sqrt(i);
-      const dx = rr * Math.cos(th), dy = rr * Math.sin(th);
-      t._x = subjX.get(t.subject) + dx;
-      t._y = GRADE_BASE + gMid * ROW_H + Math.max(-12, Math.min(12, dy * 0.18));
+      const rand01 = (hashStr(t.id) % 1000) / 1000;
+      const th = i * GOLDEN + phase;                          // 黄金角递增 → 螺旋
+      const taper = 1 - 0.30 * ((gMid - 1) / 11);             // 塔形：年级越高越收窄
+      const r = TOWER_R * taper * (0.82 + 0.36 * rand01);     // 少量错落，不死板
+      t._cx = cx;                                             // 塔心 x（自转轴）
+      t._lx = r * Math.cos(th);                               // 相对塔心的局部坐标
+      t._lz = r * Math.sin(th);
+      t._wy = GRADE_BASE + gMid * ROW_H + (rand01 - 0.5) * 16;
       t._color = COLORS[t.subject] || '#999';
       t._gMid = gMid;
     });
@@ -739,8 +777,8 @@
     return seen;
   }
 
-  // ---------- x 向力导向松弛（加载时一次算好） ----------
-  (function relaxLayout() {
+  // ---------- 节点半径 = 连接度 ----------
+  (function sizeByDegree() {
     const deg = new Map();
     for (const d of deps) {
       if (!topicById.has(d.topicId) || !topicById.has(d.prerequisiteId)) continue;
@@ -752,53 +790,65 @@
       t._deg = dg;
       t._r = 6 * (dg < 3 ? 1 : Math.min(2, 1.3 + (dg - 3) * 0.175));
     }
-    const ITER = 60, K_ATT = 0.015, MIN_D = 30;
-    const bySubj = new Map();
-    for (const t of topics) {
-      if (!bySubj.has(t.subject)) bySubj.set(t.subject, []);
-      bySubj.get(t.subject).push(t);
-    }
-    for (let it = 0; it < ITER; it++) {
-      for (const d of deps) {
-        const a = topicById.get(d.prerequisiteId), b = topicById.get(d.topicId);
-        if (!a || !b || a.subject !== b.subject) continue;
-        const dx = (b._x - a._x) * K_ATT;
-        a._x += dx; b._x -= dx;
-      }
-      for (const list of bySubj.values()) {
-        list.sort((p, q) => p._x - q._x);
-        for (let i = 0; i < list.length; i++) {
-          for (let j = i + 1; j < list.length; j++) {
-            const a = list[i], b = list[j];
-            if (b._x - a._x > MIN_D) break;
-            if (Math.abs(a._y - b._y) > MIN_D) continue;
-            const dist = Math.max(1e-3, Math.hypot(b._x - a._x, b._y - a._y));
-            if (dist >= MIN_D) continue;
-            const push = (MIN_D - dist) * 0.5;
-            a._x -= push; b._x += push;
-          }
-        }
-      }
-      for (const t of topics) {
-        const cx = subjX.get(t.subject);
-        t._x = Math.max(cx - 138, Math.min(cx + 138, t._x));
-      }
-    }
   })();
 
-  // ---------- 掌握度（localStorage） ----------
+  // ---------- 掌握度（0-1 连续值 + 错因归因；旧两态数据自动迁移） ----------
   const MASTERY_KEY = 'cnk12_mastery';
+  const MASTERY_META_KEY = 'cnk12_mastery_meta';
   const PROFILE_KEY = 'cnk12_profile';
+  const ERR_CN = { concept: '概念性', transfer: '迁移性', careless: '粗心' };
   let mastery = {};
   try { mastery = JSON.parse(localStorage.getItem(MASTERY_KEY) || '{}') || {}; } catch (e) { mastery = {}; }
+  // 旧版两态迁移：yes → 0.8，no → 0.1
+  let migrated = false;
+  for (const k of Object.keys(mastery)) {
+    if (mastery[k] === 'yes') { mastery[k] = 0.8; migrated = true; }
+    else if (mastery[k] === 'no') { mastery[k] = 0.1; migrated = true; }
+  }
+  let masteryMeta = {};   // { id: { ts, err, wrongs } }
+  try { masteryMeta = JSON.parse(localStorage.getItem(MASTERY_META_KEY) || '{}') || {}; } catch (e) { masteryMeta = {}; }
   let profile = null;
   try { profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null'); } catch (e) { profile = null; }
   function saveMastery() { try { localStorage.setItem(MASTERY_KEY, JSON.stringify(mastery)); } catch (e) {} }
+  function saveMasteryMeta() { try { localStorage.setItem(MASTERY_META_KEY, JSON.stringify(masteryMeta)); } catch (e) {} }
+  if (migrated) saveMastery();
   function saveProfile() { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) {} }
+  function mv(id) { const v = mastery[id]; return (typeof v === 'number' && isFinite(v)) ? v : null; }
+  // 三档显示：≥0.67 已掌握 / 0.34-0.66 在进步 / <0.34 还不会
+  function mState(id) { const v = mv(id); return v === null ? null : v >= 0.67 ? 'yes' : v >= 0.34 ? 'mid' : 'no'; }
+  // 答题驱动：答对 +0.34 封顶 1，答错 -0.5 封底 0
+  function applyAnswer(id, correct, err) {
+    if (id == null || !topicById.has(id)) return;
+    const cur = mv(id);
+    const v = cur === null ? (correct ? 0.34 : 0)
+      : correct ? Math.min(1, cur + 0.34) : Math.max(0, cur - 0.5);
+    mastery[id] = Math.round(v * 100) / 100;
+    const meta = masteryMeta[id] || {};
+    meta.ts = Date.now();
+    if (!correct) { meta.err = err || meta.err || 'transfer'; meta.wrongs = (meta.wrongs || 0) + 1; }
+    masteryMeta[id] = meta;
+    saveMastery(); saveMasteryMeta();
+    updateStats();
+    requestDraw();
+  }
+  function setErr(id, err) {
+    if (!ERR_CN[err]) return;
+    const meta = masteryMeta[id] || {};
+    meta.err = err;
+    masteryMeta[id] = meta;
+    saveMasteryMeta();
+  }
+  function touchMeta(id) {
+    const meta = masteryMeta[id] || {};
+    meta.ts = Date.now();
+    masteryMeta[id] = meta;
+    saveMasteryMeta();
+  }
+  // 手动标记：'yes' → 0.8，'no' → 0.1；再点一次同档取消
   function setMastery(id, state) {
     if (id == null || !topicById.has(id)) return;
-    if (state && mastery[id] === state) delete mastery[id];
-    else if (state) mastery[id] = state;
+    if (state && mState(id) === state) delete mastery[id];
+    else if (state) { mastery[id] = state === 'yes' ? 0.8 : 0.1; touchMeta(id); }
     else delete mastery[id];
     saveMastery();
     updateStats();
@@ -809,22 +859,16 @@
     for (const t of topics) {
       if (!visible(t)) continue;
       total++;
-      if (mastery[t.id] === 'yes') yes++;
-      else if (mastery[t.id] === 'no') no++;
+      const s = mState(t.id);
+      if (s === 'yes') yes++;
+      else if (s === 'no') no++;
     }
     const el = document.getElementById('mastery-stats');
     if (el) el.innerHTML = `已掌握 <b class="s-yes">${yes}</b> / 还不会 <b class="s-no">${no}</b> / 共 ${total}`;
   }
-  function forceMastery(id, state) {
-    if (id == null || !topicById.has(id)) return;
-    mastery[id] = state;
-    saveMastery();
-    updateStats();
-    requestDraw();
-  }
 
   // ---------- Tab 管理 ----------
-  const TAB_NAMES = { diag: '诊断', plan: '计划', map: '图谱', me: '我的' };
+  const TAB_NAMES = { today: '今日', diag: '诊断', plan: '计划', map: '图谱', me: '我的' };
   let currentTab = null;
   let mapVisible = false;
   function switchTab(name) {
@@ -843,7 +887,8 @@
       mapVisible = false;
       if (rafId != null) { cancelAnimationFrame(rafId); rafId = null; }
       lastTick = 0;
-      if (name === 'diag') renderDiagTab();
+      if (name === 'today') renderTodayTab();
+      else if (name === 'diag') renderDiagTab();
       else if (name === 'plan') renderPlanTab();
       else if (name === 'me') renderMeTab();
     }
@@ -862,21 +907,36 @@
   let hoverPause = false, touchPause = false;
   let focusTween = null;               // 聚焦补间 {t0,dur,from:{tx,ty,scale},to:{...}}
 
-  // 世界 → 屏幕：先仿射，再绕屏幕中心旋转 rotAngle（屏幕中心像素不动）
-  function worldToScreen(x, y) {
-    const sx = x * scale + tx, sy = H - (y * scale + ty);
-    if (!rotAngle) return [sx, sy];
-    const cx = W / 2, cy = H / 2, c = Math.cos(rotAngle), s = Math.sin(rotAngle);
-    const dx = sx - cx, dy = sy - cy;
-    return [cx + dx * c - dy * s, cy + dx * s + dy * c];
+  // 世界 → 屏幕：螺旋塔绕自身 Y 轴（高度轴）自转 + 透视投影，再仿射到屏幕
+  const FOCAL = 760;                           // 透视焦距（世界单位），越小纵深越强
+  function curRot() { return isMobile() ? 0 : rotAngle; }   // 移动端不自转（规则保留）
+  function projectPoint(x, y, z) {             // 全局世界点（绕原点转，用于年级线/塔心）
+    const a = curRot();
+    const c = Math.cos(a), s = Math.sin(a);
+    const xr = x * c + z * s;
+    const zr = -x * s + z * c;                 // zr > 0 = 远离相机
+    const persp = FOCAL / (FOCAL + zr);
+    return [xr * persp, y * persp, persp, zr];
+  }
+  function projectTopic(t) {                   // 节点绕自己塔心转
+    const a = curRot();
+    const c = Math.cos(a), s = Math.sin(a);
+    const xr = t._cx + (t._lx * c + t._lz * s);
+    const zr = -t._lx * s + t._lz * c;
+    const persp = FOCAL / (FOCAL + zr);
+    return [xr * persp, t._wy * persp, persp, zr];
+  }
+  function worldToScreen(px, py) {             // 投影后的 2D 世界坐标 → 屏幕
+    return [px * scale + tx, H - (py * scale + ty)];
   }
   function screenToWorld(sx, sy) {
-    if (rotAngle) {
-      const cx = W / 2, cy = H / 2, c = Math.cos(-rotAngle), s = Math.sin(-rotAngle);
-      const dx = sx - cx, dy = sy - cy;
-      sx = cx + dx * c - dy * s; sy = cy + dx * s + dy * c;
-    }
     return [(sx - tx) / scale, (H - sy - ty) / scale];
+  }
+  function topicScreen(t) {                    // 节点屏幕坐标 + 透视系数（缓存供绘制/命中）
+    const [px, py, persp, zr] = projectTopic(t);
+    const [sx, sy] = worldToScreen(px, py);
+    t._sx = sx; t._sy = sy; t._psr = persp; t._zr = zr;
+    return [sx, sy];
   }
 
   function hexA(hex, a) {
@@ -942,7 +1002,7 @@
   let lastTick = 0;
   let enterT0 = -1, enterDone = false;
   let inertia = null;
-  function rotActive() { return mapVisible && !isMobile() && !hoverPause && !touchPause && !focusTween && !inertia; }
+  function rotActive() { return mapVisible && !isMobile() && !hoverPause && !touchPause && !focusTween && !inertia && selectedId == null; }
   function animActive() {
     return mapVisible && (!enterDone || !!inertia || !!focusTween || selectedId != null
       || highlightEdges.size > 0 || rotActive());
@@ -981,15 +1041,16 @@
     scale = focusTween.from.scale + (focusTween.to.scale - focusTween.from.scale) * e;
     if (p >= 1) focusTween = null;
   }
-  // 点选节点 → 相机聚焦补间
+  // 点选节点 → 相机聚焦补间（按投影后的 2D 世界坐标）
   function startFocus(t) {
     if (!t) return;
+    const [px, py] = projectTopic(t);
     const targetScale = Math.min(2.4, Math.max(1.15, scale));
     const syTarget = isMobile() ? H * 0.32 : H / 2;
     focusTween = {
       t0: performance.now(), dur: 620,
       from: { tx, ty, scale },
-      to: { tx: W / 2 - t._x * targetScale, ty: (H - syTarget) - t._y * targetScale, scale: targetScale }
+      to: { tx: W / 2 - px * targetScale, ty: (H - syTarget) - py * targetScale, scale: targetScale }
     };
     requestDraw();
   }
@@ -1013,53 +1074,54 @@
   }
   window.addEventListener('resize', () => { if (mapVisible) resize(); });
 
+  function projectedBounds(list) {   // 投影后 2D 世界坐标的包围盒
+    let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+    for (const t of list) {
+      const [px, py] = projectTopic(t);
+      if (px < minX) minX = px;
+      if (px > maxX) maxX = px;
+      if (py < minY) minY = py;
+      if (py > maxY) maxY = py;
+    }
+    return { minX, maxX, minY, maxY };
+  }
   function fitView() {
-    const xs = topics.map(t => t._x), ys = topics.map(t => t._y);
-    const minX = Math.min(...xs) - 80, maxX = Math.max(...xs) + 80;
-    const minY = 0.3 * ROW_H, maxY = Math.max(...ys) + 90;
+    const b = projectedBounds(topics);
+    const minX = b.minX - 90, maxX = b.maxX + 90;
+    const minY = 0.3 * ROW_H, maxY = b.maxY + 90;
     scale = Math.min(W / (maxX - minX), H / (maxY - minY));
     scale = Math.max(0.2, Math.min(1.0, scale));
     tx = (W - (minX + maxX) * scale) / 2;
     ty = (H - (minY + maxY) * scale) / 2;
-    if (W < 768 && (maxX - minX) * scale > W) {
-      const dfX = subjX.get('道德与法治');
-      if (dfX != null) tx = W / 2 - dfX * scale;
-    }
   }
   function focusGradeMobile(g, subject) {
     const want = subject && subjX.get(subject) != null ? subject : '道德与法治';
-    const cx = subjX.get(want) != null ? subjX.get(want)
-      : (Math.min(...topics.map(t => t._x)) + Math.max(...topics.map(t => t._x))) / 2;
+    const cx = subjX.get(want) != null ? subjX.get(want) : 0;
+    const [px, py] = projectPoint(cx, g * ROW_H, 0);
     scale = 0.9;
-    const cy = g * ROW_H;
-    tx = W / 2 - cx * scale;
-    ty = H * 0.42 - cy * scale;
+    tx = W / 2 - px * scale;
+    ty = H * 0.42 - py * scale;
   }
   function focusGradeSubject(g, subject) {
     if (isMobile()) { focusGradeMobile(g, subject); return; }
-    let cx = subject && subjX.get(subject) != null ? subjX.get(subject) : null;
-    if (cx == null) {
-      const xs = topics.map(t => t._x);
-      cx = (Math.min(...xs) + Math.max(...xs)) / 2;
-      if (W < 768 && subjX.get('道德与法治') != null) cx = subjX.get('道德与法治');
-    }
-    const cy = g * ROW_H;
+    const cx = subject && subjX.get(subject) != null ? subjX.get(subject) : 0;
+    const [px, py] = projectPoint(cx, g * ROW_H, 0);
     scale = Math.min(1.1, Math.max(0.5, W / 2600, H / 900));
     scale = Math.min(6, Math.max(0.12, scale));
-    tx = W / 2 - cx * scale;
-    ty = H / 2 - cy * scale;
+    tx = W / 2 - px * scale;
+    ty = H / 2 - py * scale;
   }
 
-  // 移动端单学科 fit-to-view：学科列宽适配视口宽度，不横向溢出；内容矮于视口则垂直居中，否则顶端对齐
+  // 移动端单学科 fit-to-view：螺旋塔适配视口宽度，不横向溢出；内容矮于视口则垂直居中，否则顶端对齐
   function fitSubjectMobile(subject) {
     const list = topics.filter(t => t.subject === subject);
     if (!list.length || !W || !H) return;
-    const xs = list.map(t => t._x), ys = list.map(t => t._y);
-    const minX = Math.min(...xs) - 74, maxX = Math.max(...xs) + 74;
+    const b = projectedBounds(list);
+    const minX = b.minX - 74, maxX = b.maxX + 74;
     scale = W / (maxX - minX);
     scale = Math.min(2.2, Math.max(0.5, scale));
     tx = W / 2 - ((minX + maxX) / 2) * scale;
-    const minY = Math.min(...ys) - 40, maxY = Math.max(...ys) + 40;
+    const minY = b.minY - 40, maxY = b.maxY + 40;
     if ((maxY - minY) * scale <= H) {
       ty = H / 2 - ((minY + maxY) / 2) * scale;
     } else {
@@ -1086,12 +1148,13 @@
     now = now || performance.now();
     ctx.clearRect(0, 0, W, H);
     ctx.drawImage(bgCanvas, 0, 0, W, H);
-    // 年级网格线：移动端画屏幕水平线 + 左缘悬浮标签；桌面端画随世界旋转的线
+    // 年级网格线：移动端画屏幕水平线 + 左缘悬浮标签；桌面端画随塔自转的投影线
     ctx.font = '11px sans-serif';
     const gradeAnchorX = isMobile() && mobileSubject && subjX.get(mobileSubject) != null ? subjX.get(mobileSubject) : 0;
     for (let g = 1; g <= 12; g++) {
       if (isMobile()) {
-        const [, sy] = worldToScreen(gradeAnchorX, g * ROW_H);
+        const [pgx, pgy] = projectPoint(gradeAnchorX, g * ROW_H, 0);
+        const [, sy] = worldToScreen(pgx, pgy);
         if (sy < -20 || sy > H + 20) continue;
         ctx.strokeStyle = g % 3 === 1 ? 'rgba(80,92,120,0.20)' : 'rgba(80,92,120,0.10)';
         ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
@@ -1102,23 +1165,27 @@
         ctx.fillStyle = '#8a94a8';
         ctx.fillText(label, 9, sy - 4);
       } else {
-        const [x0, y0] = worldToScreen(-600, g * ROW_H);
-        const [x1, y1] = worldToScreen(5200, g * ROW_H);
+        const [p0x, p0y] = projectPoint(-1400, g * ROW_H, 0);
+        const [x0, y0] = worldToScreen(p0x, p0y);
+        const [p1x, p1y] = projectPoint(7200, g * ROW_H, 0);
+        const [x1, y1] = worldToScreen(p1x, p1y);
         ctx.strokeStyle = g % 3 === 1 ? 'rgba(80,92,120,0.16)' : 'rgba(80,92,120,0.08)';
         ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
-        const [lx, ly] = worldToScreen(-70, g * ROW_H);
+        const [plx, ply] = projectPoint(-90, g * ROW_H, 0);
+        const [lx, ly] = worldToScreen(plx, ply);
         ctx.fillStyle = '#5a6373';
         ctx.textAlign = 'right';
         ctx.fillText(g + ' 年级', lx, ly - 4);
         ctx.textAlign = 'left';
       }
     }
-    // 学科列标题：桌面端画在世界顶部；移动端由 chips 承担，不画
+    // 学科塔标题：桌面端画在塔顶；移动端由 chips 承担，不画
     if (!isMobile()) {
       ctx.font = 'bold 13px sans-serif';
       for (const s of subjects) {
         if (!activeSubjects.has(s)) continue;
-        const [sx, sy] = worldToScreen(subjX.get(s), 12 * ROW_H + 70);
+        const [psx, psy] = projectPoint(subjX.get(s), 12 * ROW_H + 70, 0);
+        const [sx, sy] = worldToScreen(psx, psy);
         ctx.fillStyle = COLORS[s];
         ctx.textAlign = 'center';
         ctx.fillText(s, sx, sy);
@@ -1141,8 +1208,8 @@
       if (!a || !b || !visible(a) || !visible(b)) continue;
       const inHL = highlightEdges.has(d.prerequisiteId + '>' + d.topicId);
       if (selectedId && !inHL) continue;   // 选中态：无关心整条隐去
-      const [x1, y1] = worldToScreen(a._x, a._y);
-      const [x2, y2] = worldToScreen(b._x, b._y);
+      const [x1, y1] = topicScreen(a);
+      const [x2, y2] = topicScreen(b);
       if ((x1 < -50 && x2 < -50) || (x1 > W + 50 && x2 > W + 50)) continue;
       if ((y1 < -50 && y2 < -50) || (y1 > H + 50 && y2 > H + 50)) continue;
       const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
@@ -1164,14 +1231,20 @@
       }
     }
 
-    // 节点
+    // 节点：远的先画（画家算法），透视缩放半径 + 远端压暗
     const pulse = 1 + 0.14 * Math.sin(now / 280);
+    const drawList = [];
     for (const t of topics) {
       if (!visible(t)) continue;
-      const [sx, sy] = worldToScreen(t._x, t._y);
-      if (sx < -40 || sx > W + 40 || sy < -40 || sy > H + 40) continue;
+      topicScreen(t);
+      if (t._sx < -60 || t._sx > W + 60 || t._sy < -60 || t._sy > H + 60) continue;
+      drawList.push(t);
+    }
+    drawList.sort((a, b) => b._zr - a._zr);
+    for (const t of drawList) {
+      const sx = t._sx, sy = t._sy;
       const skeleton = t.status === 'skeleton';
-      const m = mastery[t.id];
+      const ms = mState(t.id);
       let ea = 1;
       if (!enterDone) {
         const delay = ((t._gMid - 1) / 11) * 560 + (hashStr(t.id) % 80);
@@ -1181,24 +1254,31 @@
       }
       // 选中态：无关节点降至 4% 透明度
       if (selectedId && !highlightSet.has(t.id) && t.id !== selectedId) ea *= 0.04;
-      let r = (t._r || 6) * Math.min(1.3, Math.max(0.6, scale));
+      // 纵深：远端节点压暗
+      ea *= Math.max(0.35, Math.min(1.08, (t._psr - 0.80) / 0.45));
+      let r = (t._r || 6) * t._psr * Math.min(1.3, Math.max(0.6, scale));
       if (t.id === selectedId) r *= 1.35 * pulse;
       else if (t.id === hoverId) r *= 1.18;
       if (!enterDone) r *= 0.3 + 0.7 * Math.min(1, ea * 2);
       const S = r * 2 * SPR_K;
-      const nodeAlpha = ea * (skeleton ? 0.55 : 1);
+      const nodeAlpha = Math.min(1, ea * (skeleton ? 0.55 : 1));
       ctx.globalAlpha = nodeAlpha;
-      ctx.drawImage(m === 'yes' ? spriteYes : sprites.get(t.subject), sx - S / 2, sy - S / 2, S, S);
+      ctx.drawImage(ms === 'yes' ? spriteYes : sprites.get(t.subject), sx - S / 2, sy - S / 2, S, S);
       ctx.beginPath();
-      if (m === 'yes') {
+      if (ms === 'yes') {
         ctx.arc(sx, sy, r, 0, Math.PI * 2);
         if (skeleton) ctx.setLineDash([3, 3]);
         ctx.strokeStyle = '#7fe0a4'; ctx.lineWidth = 1.5; ctx.stroke();
         ctx.setLineDash([]);
-      } else if (m === 'no') {
+      } else if (ms === 'no') {
         ctx.arc(sx, sy, r + 1.5, 0, Math.PI * 2);
         if (skeleton) ctx.setLineDash([3, 3]);
         ctx.strokeStyle = '#ff6a3d'; ctx.lineWidth = 2.6; ctx.stroke();
+        ctx.setLineDash([]);
+      } else if (ms === 'mid') {
+        ctx.arc(sx, sy, r + 0.8, 0, Math.PI * 2);
+        if (skeleton) ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = '#e0b34a'; ctx.lineWidth = 2; ctx.stroke();
         ctx.setLineDash([]);
       } else if (skeleton) {
         ctx.arc(sx, sy, r, 0, Math.PI * 2);
@@ -1223,8 +1303,9 @@
     if (selectedId) {
       const t = topicById.get(selectedId);
       if (t) {
-        const [sx, sy] = worldToScreen(t._x, t._y);
-        const r = (t._r || 6) * Math.min(1.3, Math.max(0.6, scale)) * 1.35 * pulse;
+        const [px, py, psr] = projectTopic(t);
+        const [sx, sy] = worldToScreen(px, py);
+        const r = (t._r || 6) * psr * Math.min(1.3, Math.max(0.6, scale)) * 1.35 * pulse;
         ctx.font = 'bold 12px sans-serif';
         ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
         ctx.fillText(t.name, sx, sy - r - 7);
@@ -1261,13 +1342,15 @@
   // 阻断触摸后的兼容鼠标事件（ghost click），避免抽屉刚打开就被同一坐标落的假点击误关
   canvas.addEventListener('touchstart', (e) => { e.preventDefault(); }, { passive: false });
 
-  function hitTest(sx, sy, isTouch) {
-    const [wx, wy] = screenToWorld(sx, sy);
-    let best = null, bestD = isTouch ? Math.max(28 / scale, 10) : 16 / scale + 8;
+  function hitTest(sx, sy, isTouch) {   // 屏幕空间命中（投影缓存，透视下也准）
+    let best = null, bestScore = Infinity;
     for (const t of topics) {
       if (!visible(t)) continue;
-      const d = Math.hypot(t._x - wx, t._y - wy);
-      if (d < bestD) { bestD = d; best = t; }
+      if (t._sx == null) topicScreen(t);
+      const rS = (t._r || 6) * (t._psr || 1) * Math.min(1.3, Math.max(0.6, scale));
+      const lim = Math.max(isTouch ? 28 : 14, rS + 6);
+      const d = Math.hypot(t._sx - sx, t._sy - sy);
+      if (d < lim && d < bestScore) { bestScore = d; best = t; }
     }
     return best;
   }
@@ -1501,13 +1584,15 @@
     const directUnlock = unlocksOf.get(selectedId) || [];            // 解锁什么
     const coach = coaching[selectedId] || null;
     const cluster = clusterByKey.get(t.subject + '|' + t.domain);
-    const m = mastery[selectedId];
+    const m = mState(selectedId);
+    const mVal = mv(selectedId);
     const stdHtml = (t.standards || []).map(k => {
       const s = stdByKey.get(k);
       return s ? `<div style="margin-bottom:6px"><b style="font-size:12px">${s.title}</b><div style="font-size:12px;color:var(--text-dim);line-height:1.6">${s.summary}</div></div>` : '';
     }).join('');
-    const mBadge = m === 'yes' ? '<span class="badge m-yes">已掌握 ✓</span>'
-                 : m === 'no' ? '<span class="badge m-no">还不会</span>' : '';
+    const mBadge = m === 'yes' ? `<span class="badge m-yes">已掌握 ✓ ${Math.round(mVal * 100)}%</span>`
+                 : m === 'mid' ? `<span class="badge m-mid">在进步 ${Math.round(mVal * 100)}%</span>`
+                 : m === 'no' ? `<span class="badge m-no">还不会 ${Math.round(mVal * 100)}%</span>` : '';
     // coaching 卡（ask/pattern/variants/drills 来自 data/coaching.json；无数据时不渲染此卡）
     const askHtml = coach ? renderCoachCard(coach) : '';
     // 家长检验卡
@@ -1519,7 +1604,7 @@
           <button class="ok" id="assess-ok">答对了</button>
           <button class="bad" id="assess-bad">没答对</button>
         </div>
-        <div class="assess-fb" id="assess-fb">${m === 'yes' ? '<span class="assess-fb ok">已标记为已掌握 ✓</span>' : m === 'no' ? '<span class="assess-fb bad">已标记为还不会</span>' : ''}</div>
+        <div class="assess-fb" id="assess-fb">${m === 'yes' ? '<span class="assess-fb ok">已标记为已掌握 ✓</span>' : m === 'no' ? '<span class="assess-fb bad">已标记为还不会</span>' : m === 'mid' ? '<span class="assess-fb">在进步中，继续巩固</span>' : ''}</div>
       </div>` : '';
     // 家长检验卡（默认家长视角，始终展开前置）
     const assessCardTop = t.assessmentPrompt ? `<h3>家长检验卡</h3>${assessInner}` : '';
@@ -1593,16 +1678,14 @@
     const okBtn = panelBody.querySelector('#assess-ok');
     if (okBtn) {
       okBtn.onclick = () => {
-        if (mastery[selectedId] === 'yes') { delete mastery[selectedId]; saveMastery(); updateStats(); requestDraw(); }
-        else setMastery(selectedId, 'yes');
+        setMastery(selectedId, 'yes');
         renderPanel(true);
-        toast(mastery[selectedId] === 'yes' ? '已标记为已掌握 ✓' : '已取消标记');
+        toast(mState(selectedId) === 'yes' ? '已标记为已掌握 ✓' : '已取消标记');
       };
       panelBody.querySelector('#assess-bad').onclick = () => {
-        if (mastery[selectedId] === 'no') { delete mastery[selectedId]; saveMastery(); updateStats(); requestDraw(); }
-        else setMastery(selectedId, 'no');
+        setMastery(selectedId, 'no');
         renderPanel(true);
-        toast(mastery[selectedId] === 'no' ? '已标记为还不会，可以试试「帮我找原因」' : '已取消标记');
+        toast(mState(selectedId) === 'no' ? '已标记为还不会，可以试试「帮我找原因」' : '已取消标记');
       };
     }
     panelBody.querySelectorAll('.chain-item').forEach(el => el.onclick = () => selectTopic(el.dataset.id));
@@ -1627,7 +1710,7 @@
     });
     const rows = list.map(([id, e]) => {
       const t = topicById.get(id);
-      const m = mastery[id];
+      const m = mState(id);
       return `<div class="diag-row" data-id="${id}">
         <div class="dr-head">
           <span class="dr-name" style="color:${t._color}">${esc(t.name)}</span>
@@ -1656,7 +1739,7 @@
         setMastery(id, v);
         const row = panelBody.querySelector(`.diag-row[data-id="${id}"]`);
         if (row) {
-          const m2 = mastery[id];
+          const m2 = mState(id);
           row.querySelector('.yes').classList.toggle('active', m2 === 'yes');
           row.querySelector('.no').classList.toggle('active', m2 === 'no');
         }
@@ -1673,7 +1756,7 @@
     let anyNo = false, total = 0, answered = 0;
     for (const id of chain.keys()) {
       total++;
-      const m = mastery[id];
+      const m = mState(id);
       if (m) answered++;
       if (m === 'no') {
         anyNo = true;
@@ -1859,6 +1942,7 @@
     hideQuizScreen();
     if (mode === 'node') {
       if (returnTo === 'plan') { switchTab('plan'); }
+      else if (returnTo === 'today') { switchTab('today'); }
       else if (returnTo === 'course') { /* 课程层仍在下方，无需切换 */ }
       else { switchTab('map'); selectTopic(topicId); }
     }
@@ -1903,6 +1987,8 @@
       <div class="quiz-q">${esc(item.q)}</div>
       <div class="quiz-opts">${optsHtml}</div>
       ${answered ? `<div class="quiz-fb ${ok ? 'ok' : 'bad'}">${ok ? '✓ 回答正确' : '✗ 回答错误'}</div>
+        ${!ok ? `<div class="err-row" id="qerr">错因：${['concept', 'transfer', 'careless'].map(k =>
+          `<button class="err-chip ${((ans.err || 'transfer') === k) ? 'on' : ''}" data-err="${k}">${ERR_CN[k]}</button>`).join('')}</div>` : ''}
         <div class="quiz-explain">${esc(item.explain)}</div>` : ''}
       <div class="quiz-nav">
         ${quiz.idx > 0 ? '<button class="tbtn quiz-prev" id="quiz-prev">‹ 上一题</button>' : '<span></span>'}
@@ -1933,6 +2019,10 @@
         }
       }, 550);
     });
+    quizBody.querySelectorAll('#qerr .err-chip').forEach(c => c.onclick = () => {
+      quiz.answers[quiz.idx].err = c.dataset.err;
+      quizBody.querySelectorAll('#qerr .err-chip').forEach(x => x.classList.toggle('on', x === c));
+    });
     const pv = quizBody.querySelector('#quiz-prev');
     if (pv) pv.onclick = () => { clearTimeout(quizTimer); quiz.idx--; renderQuiz(); };
     const nx = quizBody.querySelector('#quiz-next');
@@ -1950,24 +2040,28 @@
       const allOk = total > 0 && okCount === total;
       if (!quiz.scored) {
         quiz.scored = true;
-        forceMastery(quiz.topicId, allOk ? 'yes' : 'no');   // 交卷自动写入掌握度
+        for (const r of results) applyAnswer(quiz.topicId, r.ok, r.err);   // 逐题记连续值掌握度
       }
       const wrong = results.filter(r => !r.ok);
-      const wrongHtml = wrong.map(r => {
+      const wrongHtml = wrong.map((r, wi) => {
         const ansTxt = r.item.type === 'choice' ? esc(r.item.options.find(o => o.correct).text) : (r.item.answer ? '对' : '错');
         return `<div class="quiz-wr">
           <div class="wr-q">${esc(r.item.q)}</div>
           <div>你的答案：${esc(r.answerText)} · <span class="wr-a">正确答案：${ansTxt}</span></div>
           <div class="wr-e">${esc(r.item.explain)}</div>
+          <div class="err-row" data-i="${quiz.items.indexOf(r.item)}">错因：${['concept', 'transfer', 'careless'].map(k =>
+            `<button class="err-chip ${((r.err || 'transfer') === k) ? 'on' : ''}" data-err="${k}">${ERR_CN[k]}</button>`).join('')}</div>
         </div>`;
       }).join('');
+      const mNow = mv(quiz.topicId);
       const course = courseOf(quiz.topicId);
       quizBody.innerHTML = `
         <h2 style="color:${t._color}">测一测结果：${esc(t.name)}</h2>
         <div class="quiz-score" style="color:${allOk ? 'var(--green-bright)' : 'var(--bad)'}">${okCount} / ${total}</div>
+        <div class="quiz-meta">当前掌握度 ${Math.round((mNow || 0) * 100)}%（${mState(quiz.topicId) === 'yes' ? '已掌握' : mState(quiz.topicId) === 'mid' ? '在进步' : '还不会'}）· 答对 +34%，答错 -50%，练到 67% 以上算真掌握</div>
         ${allOk
-          ? `<div class="quiz-fb ok">全部答对，已自动标记为已掌握 ✓</div>`
-          : `<div class="quiz-fb bad">有 ${wrong.length} 道题答错，已自动标记为「还不会」</div>
+          ? `<div class="quiz-fb ok">全部答对，掌握度已提升 ✓</div>`
+          : `<div class="quiz-fb bad">有 ${wrong.length} 道题答错，掌握度已扣减；标一下错因，复习更有针对性</div>
              <h3>错题回顾</h3>${wrongHtml}
              <button class="tbtn quiz-entry" id="qr-diag">帮我找原因 ›</button>
              ${course ? `<button class="tbtn quiz-entry" id="qr-course">看配套课程 ›</button>` : ''}`}
@@ -1995,6 +2089,16 @@
         hideQuizScreen();
         openCourse(tid, course.url, course.title);
       });
+      // 结果页错因一键标注（默认迁移性，可改）
+      quizBody.querySelectorAll('.err-row').forEach(row => {
+        const ai = +row.dataset.i;
+        row.querySelectorAll('.err-chip').forEach(chip => chip.onclick = () => {
+          row.querySelectorAll('.err-chip').forEach(c => c.classList.remove('on'));
+          chip.classList.add('on');
+          if (quiz.answers[ai]) quiz.answers[ai].err = chip.dataset.err;
+          setErr(quiz.topicId, chip.dataset.err);
+        });
+      });
       return;
     }
     // ---- 快速诊断结果：按知识点分组，交卷自动写入掌握度 ----
@@ -2009,9 +2113,8 @@
     const badIds = [...byTopic.entries()].filter(([, e]) => e.ok < e.total).map(([id]) => id);
     if (!quiz.scored) {
       quiz.scored = true;
-      for (const id of okIds) forceMastery(id, 'yes');
-      for (const id of badIds) forceMastery(id, 'no');
-      toast(`结果已自动写入图谱：${okIds.length} 个已掌握 / ${badIds.length} 个还不会`);
+      for (const r of results) applyAnswer(r.item.topicId, r.ok, r.err);   // 逐题记连续值掌握度
+      toast(`结果已自动写入图谱：${okIds.length} 个已掌握 / ${badIds.length} 个待加强`);
     }
     // 记录最近一次诊断（复测入口用）
     try {
@@ -2021,10 +2124,11 @@
     } catch (e) {}
     const itemHtml = (id) => {
       const t = topicById.get(id);
-      const m = mastery[id];
+      const m = mState(id);
+      const v = mv(id);
       return `<div class="next-item" data-id="${id}">
         <div class="ni-name" style="color:${t._color}">${esc(t.name)}</div>
-        <div class="ni-meta">${gradeTxtOf(t)} · 当前标记：${m === 'yes' ? '已掌握 ✓' : m === 'no' ? '还不会' : '未标记'}</div>
+        <div class="ni-meta">${gradeTxtOf(t)} · 当前掌握度：${m === 'yes' ? `已掌握 ✓ ${Math.round(v * 100)}%` : m === 'mid' ? `在进步 ${Math.round(v * 100)}%` : m === 'no' ? `还不会 ${Math.round(v * 100)}%` : '未标记'}</div>
       </div>`;
     };
     quizBody.innerHTML = `
@@ -2168,6 +2272,161 @@
     diagBody.querySelector('#say-back').onclick = () => { diagFlow = { step: 'subject' }; renderDiagTab(); };
     setTimeout(() => input.focus(), 50);
   }
+  // ---------- 今日 tab（教练视角：忆 → 测练 → 学） ----------
+  const todayBody = document.getElementById('today-body');
+  const ERR_COACH = { concept: '概念还没吃透', transfer: '换个问法就容易错', careless: '会但容易粗心' };
+  function weakestNode() {
+    let best = null, bestV = Infinity;
+    for (const t of topics) {
+      const v = mv(t.id);
+      if (v === null || v >= 0.67) continue;
+      if (v < bestV) { bestV = v; best = t; }
+    }
+    return best;
+  }
+  function recallQueue() {
+    const now = Date.now(), weak = [], stale = [];
+    for (const t of topics) {
+      const v = mv(t.id);
+      if (v === null || !quizByTopic.has(t.id)) continue;
+      if (v < 0.34) weak.push(t);                       // 还没消化，优先回忆
+      else if (v >= 0.67) {
+        const meta = masteryMeta[t.id];
+        if (meta && meta.ts && now - meta.ts > 86400000) stale.push(t);   // 超 1 天没碰，防遗忘
+      }
+    }
+    weak.sort((a, b) => mv(a.id) - mv(b.id));
+    stale.sort((a, b) => (masteryMeta[a.id].ts || 0) - (masteryMeta[b.id].ts || 0));
+    return weak.concat(stale).slice(0, 2);
+  }
+  function coachLine(weak) {
+    if (!weak) return '目前没有薄弱点，去图谱里挑一个新知识点，往前推进一步。';
+    const meta = masteryMeta[weak.id] || {};
+    const reason = ERR_COACH[meta.err] || ERR_COACH.transfer;
+    return `「${esc(weak.name)}」${reason}。今天先回忆旧题，再练新题——先回忆，后看答案。`;
+  }
+  function renderTodayTab() {
+    const anyMastery = topics.some(t => mv(t.id) !== null);
+    if (!anyMastery) {
+      todayBody.innerHTML = `
+        <div class="card td-empty">
+          <h3>先摸清起点，再谈今天学什么</h3>
+          <div class="c-sub">做一组快速诊断（约 5 分钟），系统会标出孩子的薄弱点。<br>之后每天打开这里，就是一份现成的「忆 → 练 → 学」任务单。</div>
+          <button class="big-cta" id="td-godiag">开始第一次诊断 ›</button>
+        </div>`;
+      todayBody.querySelector('#td-godiag').onclick = () => switchTab('diag');
+      return;
+    }
+    const weak = weakestNode();
+    const queue = recallQueue();
+    const weakMeta = weak ? (masteryMeta[weak.id] || {}) : {};
+    const coach = weak ? (coaching[weak.id] || null) : null;
+    const drills = coach && Array.isArray(coach.drills) ? coach.drills : [];
+    const course = weak ? courseOf(weak.id) : null;
+
+    const recallHtml = queue.length ? `
+      <div class="card">
+        <h3><span class="td-tag recall">忆</span>先回忆旧题（${queue.length}）</h3>
+        <div class="c-sub">凭记忆作答，做完才给答案和解析——想不起来本身就是信号。</div>
+        ${queue.map(t => `<div class="td-recall-item" data-tid="${t.id}"></div>`).join('')}
+      </div>` : '';
+
+    const drillHtml = weak ? `
+      <div class="card">
+        <h3><span class="td-tag drill">练</span>当前最弱：${esc(weak.name)}<span class="td-mastery">掌握度 ${Math.round(mv(weak.id) * 100)}%${weakMeta.err ? ` · 上次错因：${ERR_CN[weakMeta.err]}` : ''}</span></h3>
+        ${coach && coach.pattern ? `<div class="c-sub" style="margin-bottom:8px">规律：${esc(coach.pattern)}</div>` : ''}
+        ${drills.length ? drills.map(d => `<div class="drill-item">
+          <div class="d-q">${esc(d.q)}</div>
+          ${d.hint ? `<div class="d-hint"><b>思路：</b>${esc(d.hint)}</div>` : ''}
+          <button class="drill-ans-btn" type="button">查看答案（先自己做完再对）</button>
+          <div class="drill-ans"><b>参考答案：</b>${esc(d.answer)}</div>
+        </div>`).join('') : '<div class="c-sub">该节点的变式训练在建设中，先测一测定位问题。</div>'}
+        <div class="td-actions">
+          ${quizByTopic.has(weak.id) ? `<button class="tbtn" id="td-quiz">测一测 · ${quizByTopic.get(weak.id).length} 道题</button>` : ''}
+          <button class="tbtn" id="td-locate">图谱定位 ›</button>
+        </div>
+      </div>` : `
+      <div class="card">
+        <h3><span class="td-tag drill">练</span>没有待攻克的薄弱点</h3>
+        <div class="c-sub">所有测过的知识点都达标了。去图谱找一个没学过的节点，往前推进一步。</div>
+        <div class="td-actions"><button class="tbtn" id="td-locate">去图谱 ›</button></div>
+      </div>`;
+
+    const learnHtml = (weak && course) ? `
+      <div class="card">
+        <h3><span class="td-tag learn">学</span>配套课程</h3>
+        <div class="c-sub">${esc(course.title)}${course.note ? ` · ${esc(course.note)}` : ''}</div>
+        <div class="td-actions"><button class="tbtn" id="td-course">看课${isMember() ? '' : '（会员）'} ›</button></div>
+      </div>` : '';
+
+    todayBody.innerHTML = `
+      <div class="coach-line">${coachLine(weak)}</div>
+      ${recallHtml}
+      ${drillHtml}
+      ${learnHtml}`;
+
+    // 忆：内联旧题回忆——先作答，提交后才揭示对错与解析
+    todayBody.querySelectorAll('.td-recall-item').forEach(slot => {
+      const tid = slot.dataset.tid;
+      const t = topicById.get(tid);
+      const qs = quizByTopic.get(tid);
+      const item = buildQuizItems([qs[Math.floor(Math.random() * qs.length)]])[0];
+      const optsHtml = item.type === 'choice'
+        ? item.options.map((o, i) => `<button class="quiz-opt" data-i="${i}">${esc(o.text)}</button>`).join('')
+        : `<div class="quiz-judge"><button class="quiz-opt judge" data-v="1">✓ 对</button><button class="quiz-opt judge" data-v="0">✗ 错</button></div>`;
+      slot.innerHTML = `
+        <div class="quiz-meta" style="margin-top:6px">回忆 · <span style="color:${t._color}">${esc(t.name)}</span></div>
+        <div class="quiz-q">${esc(item.q)}</div>
+        <div class="quiz-opts">${optsHtml}</div>
+        <div class="td-fb"></div>`;
+      const fb = slot.querySelector('.td-fb');
+      slot.querySelectorAll('.quiz-opt').forEach(btn => btn.onclick = () => {
+        if (slot.dataset.done) return;
+        slot.dataset.done = '1';
+        let ok2;
+        if (item.type === 'choice') {
+          const i = +btn.dataset.i;
+          ok2 = item.options[i].correct;
+          slot.querySelectorAll('.quiz-opt').forEach((b, bi) => {
+            if (item.options[bi].correct) b.classList.add('correct');
+            else if (bi === i) b.classList.add('wrong');
+            b.disabled = true;
+          });
+        } else {
+          const v = btn.dataset.v === '1';
+          ok2 = (v === item.answer);
+          slot.querySelectorAll('.quiz-opt').forEach(b => {
+            const bv = b.dataset.v === '1';
+            if (bv === item.answer) b.classList.add('correct');
+            else if (bv === v) b.classList.add('wrong');
+            b.disabled = true;
+          });
+        }
+        applyAnswer(tid, ok2, 'transfer');
+        fb.innerHTML = `<div class="quiz-fb ${ok2 ? 'ok' : 'bad'}">${ok2 ? '✓ 还记得，掌握度已更新' : '✗ 记错了——这正说明该复习'}</div>
+          ${!ok2 ? `<div class="err-row">错因：${['concept', 'transfer', 'careless'].map(k =>
+            `<button class="err-chip ${k === 'transfer' ? 'on' : ''}" data-err="${k}">${ERR_CN[k]}</button>`).join('')}</div>` : ''}
+          <div class="quiz-explain">${esc(item.explain)}</div>`;
+        fb.querySelectorAll('.err-chip').forEach(c => c.onclick = () => {
+          setErr(tid, c.dataset.err);
+          fb.querySelectorAll('.err-chip').forEach(x => x.classList.toggle('on', x === c));
+        });
+      });
+    });
+
+    todayBody.querySelectorAll('.drill-ans-btn').forEach(btn => btn.onclick = () => {
+      const item = btn.closest('.drill-item');
+      const open = item.classList.toggle('open');
+      btn.textContent = open ? '收起答案' : '查看答案（先自己做完再对）';
+    });
+    const qBtn = todayBody.querySelector('#td-quiz');
+    if (qBtn && weak) qBtn.onclick = () => startNodeQuiz(weak.id, 'today');
+    const locBtn = todayBody.querySelector('#td-locate');
+    if (locBtn) locBtn.onclick = () => { switchTab('map'); if (weak) selectTopic(weak.id); };
+    const cBtn = todayBody.querySelector('#td-course');
+    if (cBtn && weak && course) cBtn.onclick = () => requireMember(() => openCourse(weak.id, course.url, course.title));
+  }
+
   function renderDiagTab() {
     const ld = lastDiag();
     const planN = plan2 && plan2.items ? plan2.items.filter(it => !it.done).length : 0;
@@ -2246,12 +2505,12 @@
 
   // 拓扑排序：前置没掌握的排前面（Kahn，同层按年级从低到高）
   function buildPlanIds() {
-    const weak = Object.keys(mastery).filter(id => mastery[id] === 'no' && topicById.has(id));
+    const weak = Object.keys(mastery).filter(id => topicById.has(id) && mState(id) === 'no');
     if (!weak.length) return [];
     const inPlan = new Set(weak);
     for (const id of weak) {
       const chain = collectChain(id, prereqsOf);
-      for (const pid of chain.keys()) if (mastery[pid] !== 'yes') inPlan.add(pid);
+      for (const pid of chain.keys()) if (mState(pid) !== 'yes') inPlan.add(pid);
     }
     const indeg = new Map(), adj = new Map();
     for (const id of inPlan) indeg.set(id, 0);
@@ -2370,7 +2629,7 @@
       it.done = !it.done;
       savePlan2();
       updatePlanBadge();
-      if (it.done) toast(mastery[it.id] === 'yes' ? '打卡 ✓' : '已打卡。验收别忘：' + it.criteria);
+      if (it.done) toast(mState(it.id) === 'yes' ? '打卡 ✓' : '已打卡。验收别忘：' + it.criteria);
       renderPlanTab();
     }));
     planBody.querySelectorAll('.todo-course').forEach(el => el.onclick = () => requireMember(() => {   // 付费墙：看课
@@ -2528,8 +2787,9 @@
     let yes = 0, no = 0;
     for (const id of Object.keys(mastery)) {
       if (!topicById.has(id)) continue;
-      if (mastery[id] === 'yes') yes++;
-      else if (mastery[id] === 'no') no++;
+      const s = mState(id);
+      if (s === 'yes') yes++;
+      else if (s === 'no') no++;
     }
     const gradeTxt = profile && profile.grade ? profile.grade + ' 年级' : '未设置';
     const subjTxt = profile && profile.subject ? profile.subject : '未设置';
@@ -2571,7 +2831,7 @@
     meBody.querySelector('#me-gomap').onclick = () => switchTab('map');
     meBody.querySelector('#me-clear').onclick = () => {
       if (!confirm('确定清除本机上的全部学习数据（标记、清单、会员、档案）吗？此操作不可撤销。')) return;
-      for (const k of ['cnk12_mastery', 'cnk12_profile', 'cnk12_member', 'cnk12_plan', 'cnk12_plan2', 'cnk12_lastdiag', 'cnk12_watch', 'cnk12_panel_w']) {
+      for (const k of ['cnk12_mastery', 'cnk12_mastery_meta', 'cnk12_profile', 'cnk12_member', 'cnk12_plan', 'cnk12_plan2', 'cnk12_lastdiag', 'cnk12_watch', 'cnk12_panel_w']) {
         try { localStorage.removeItem(k); } catch (e) {}
       }
       location.reload();
@@ -2588,9 +2848,9 @@
       const recs = [];
       for (const t of topics) {
         if (t.status !== 'complete') continue;
-        if (mastery[t.id] === 'yes') continue;
+        if (mState(t.id) === 'yes') continue;
         const hard = (prereqsOf.get(t.id) || []).filter(e => e.strength === 'hard');
-        if (hard.every(e => mastery[e.id] === 'yes')) recs.push(t);
+        if (hard.every(e => mState(e.id) === 'yes')) recs.push(t);
       }
       recs.sort((a, b) => a.gradeRangeStart - b.gradeRangeStart || a.subject.localeCompare(b.subject, 'zh'));
       const top = recs.slice(0, 8);
@@ -2841,7 +3101,7 @@
   }
   updateStats();
   updatePlanBadge();
-  switchTab('diag');   // 主入口 = 诊断
+  switchTab('today');   // 主入口 = 今日（教练任务页）
   if (!profile) openOnboard();
 
   // 自动化验收辅助
@@ -2849,9 +3109,9 @@
     posOf: (id) => {   // 返回视口坐标（含 canvas 在页面中的偏移，便于自动化点按）
       const t = topicById.get(id);
       if (!t) return null;
-      const [x, y] = worldToScreen(t._x, t._y);
+      topicScreen(t);
       const r = canvas.getBoundingClientRect();
-      return [x + r.left, y + r.top];
+      return [t._sx + r.left, t._sy + r.top];
     },
     quiz: () => quiz,
     isMember,
