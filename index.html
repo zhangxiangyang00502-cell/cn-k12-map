@@ -66,17 +66,24 @@
       border-radius: 14px 14px 0 0; box-shadow: 0 -8px 28px rgba(0,0,0,0.6);
       padding: 0 16px 16px; transform: translateY(calc(100% - 38px)); transition: transform .25s ease; }
     #panel.hidden { margin-right: 0; }
-    #panel.sheet-half { transform: translateY(50%); }
+    #panel.sheet-half { transform: translateY(42%); }
     #panel.sheet-full { transform: translateY(0); }
     #panel.dragging { transition: none; }
     #panel-handle { display: flex; align-items: center; justify-content: center; height: 38px;
       cursor: grab; flex: 0 0 38px; touch-action: none; margin: 0 -16px; }
     #panel-handle .grip { width: 44px; height: 5px; border-radius: 3px; background: #3a4150; }
-    #chips { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; padding-bottom: 2px; }
-    #toolbar { gap: 6px; padding: 8px 10px; }
-    header { padding: 8px 12px 4px; }
-    header h1 { font-size: 16px; }
-    header .sub { font-size: 11px; }
+    #chips { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; padding-bottom: 2px;
+      -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%); }
+    #toolbar { gap: 5px; padding: 6px 8px; }
+    #toolbar .tbtn { min-height: 30px; padding: 5px 9px; font-size: 12px; }
+    #toolbar .toggle { font-size: 11px; }
+    #toolbar .hide-m { display: none; }
+    #search { min-height: 30px; flex: 1 1 140px; font-size: 12px; }
+    #mastery-stats { font-size: 11.5px; padding: 3px 8px; }
+    header { padding: 6px 10px 3px; }
+    header h1 { font-size: 15px; }
+    header .sub { font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   }
   #panel h2 { font-size: 16px; line-height: 1.4; margin-bottom: 6px; }
   #panel .badges { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
@@ -111,6 +118,15 @@
   .assess-fb { font-size: 12.5px; margin-top: 8px; min-height: 18px; }
   .assess-fb.ok { color: var(--green-bright); }
   .assess-fb.bad { color: var(--bad); }
+  /* 学生视角：家长检验卡默认折叠 */
+  .assess-wrap { margin-top: 6px; }
+  .assess-toggle { width: 100%; text-align: left; background: #10202f; border: 1px solid #1e3a52; border-radius: 10px;
+    padding: 10px 12px; color: #7fc4ff; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 44px; }
+  .assess-wrap.open .assess-toggle { border-radius: 10px 10px 0 0; border-bottom: none; }
+  .assess-wrap .assess-card { display: none; border-radius: 0 0 10px 10px; margin-top: 0; border-top: none; }
+  .assess-wrap.open .assess-card { display: block; }
+  /* 诊断清单顶部留白，避免首行按钮贴折叠线 */
+  .diag-list { padding-top: 8px; }
   .chain-item { font-size: 12.5px; padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; cursor: pointer;
     background: #0d0f13; border: 1px solid var(--panel-border); line-height: 1.5; }
   .chain-item:hover { border-color: var(--accent); }
@@ -202,7 +218,7 @@
     <span id="mastery-stats"></span>
     <button class="tbtn" id="btn-next">下一步学什么</button>
     <button class="tbtn" id="btn-grade">我的年级</button>
-    <label class="toggle"><input type="checkbox" id="cb-alledges"> 显示全部先修线（默认只显示道法内部）</label>
+    <label class="toggle"><input type="checkbox" id="cb-alledges"> 显示全部先修线<span class="hide-m">（默认只显示道法内部）</span></label>
   </div>
   <div id="main">
     <div id="canvas-wrap">
@@ -274,15 +290,18 @@
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(t);
   }
+  // 同（学科,年级）组内按黄金角螺旋（θ=i×2.4, r=c√i）散布成簇；y 保持年级硬约束（仅 ±12 微抖动避免全重叠）
   for (const [key, list] of groups) {
     list.sort((a, b) => a.domain.localeCompare(b.domain, 'zh') || a.name.localeCompare(b.name, 'zh'));
-    const PER_ROW = 5, DX = 52, DY = 15;
+    const SPIRAL_C = Math.min(24, 118 / Math.sqrt(Math.max(list.length - 1, 1)));
     list.forEach((t, i) => {
       const gMid = (t.gradeRangeStart + t.gradeRangeEnd) / 2;
-      const col = i % PER_ROW, row = Math.floor(i / PER_ROW);
-      t._x = subjX.get(t.subject) + (col - (Math.min(PER_ROW, list.length) - 1) / 2) * DX + ((row % 2) ? 9 : -9);
-      t._y = GRADE_BASE + gMid * ROW_H - row * DY;
+      const th = i * 2.4, rr = SPIRAL_C * Math.sqrt(i);
+      const dx = rr * Math.cos(th), dy = rr * Math.sin(th);
+      t._x = subjX.get(t.subject) + dx;
+      t._y = GRADE_BASE + gMid * ROW_H + Math.max(-12, Math.min(12, dy * 0.18));
       t._color = COLORS[t.subject] || '#999';
+      t._gMid = gMid;
     });
   }
 
@@ -311,6 +330,57 @@
     return seen;
   }
 
+  // ---------- 轻量 x 向力导向松弛（静态：加载时一次算好，y 不动） ----------
+  (function relaxLayout() {
+    const deg = new Map();
+    for (const d of deps) {
+      if (!topicById.has(d.topicId) || !topicById.has(d.prerequisiteId)) continue;
+      deg.set(d.topicId, (deg.get(d.topicId) || 0) + 1);
+      deg.set(d.prerequisiteId, (deg.get(d.prerequisiteId) || 0) + 1);
+    }
+    for (const t of topics) {
+      const dg = deg.get(t.id) || 0;
+      t._deg = dg;
+      // 枢纽节点（先修边多）半径放大 1.3–2 倍
+      t._r = 6 * (dg < 3 ? 1 : Math.min(2, 1.3 + (dg - 3) * 0.175));
+    }
+    const ITER = 60, K_ATT = 0.015, MIN_D = 30;
+    const bySubj = new Map();
+    for (const t of topics) {
+      if (!bySubj.has(t.subject)) bySubj.set(t.subject, []);
+      bySubj.get(t.subject).push(t);
+    }
+    for (let it = 0; it < ITER; it++) {
+      // 1) 同学科先修边 x 向吸引 → 先修链呈自然链状
+      for (const d of deps) {
+        const a = topicById.get(d.prerequisiteId), b = topicById.get(d.topicId);
+        if (!a || !b || a.subject !== b.subject) continue;
+        const dx = (b._x - a._x) * K_ATT;
+        a._x += dx; b._x -= dx;
+      }
+      // 2) x 向碰撞松弛（同学科内按 x 排序做近邻检测，y 不动）
+      for (const list of bySubj.values()) {
+        list.sort((p, q) => p._x - q._x);
+        for (let i = 0; i < list.length; i++) {
+          for (let j = i + 1; j < list.length; j++) {
+            const a = list[i], b = list[j];
+            if (b._x - a._x > MIN_D) break;
+            if (Math.abs(a._y - b._y) > MIN_D) continue;
+            const dist = Math.max(1e-3, Math.hypot(b._x - a._x, b._y - a._y));
+            if (dist >= MIN_D) continue;
+            const push = (MIN_D - dist) * 0.5;
+            a._x -= push; b._x += push;
+          }
+        }
+      }
+      // 3) 列边界钳制：学科列之间不混在一起
+      for (const t of topics) {
+        const cx = subjX.get(t.subject);
+        t._x = Math.max(cx - 138, Math.min(cx + 138, t._x));
+      }
+    }
+  })();
+
   // ---------- 掌握度（localStorage） ----------
   const MASTERY_KEY = 'cnk12_mastery';
   const PROFILE_KEY = 'cnk12_profile';
@@ -322,12 +392,13 @@
   function saveProfile() { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) {} }
   // state: 'yes' | 'no' | null(取消)
   function setMastery(id, state) {
+    if (id == null || !topicById.has(id)) return;   // 脏数据拒绝写入
     if (state && mastery[id] === state) delete mastery[id];       // 同状态再点一次 = 取消
     else if (state) mastery[id] = state;
     else delete mastery[id];
     saveMastery();
     updateStats();
-    draw();
+    requestDraw();
   }
   function updateStats() {
     let yes = 0, no = 0, total = 0;
@@ -351,13 +422,89 @@
   function worldToScreen(x, y) { return [x * scale + tx, H - (y * scale + ty)]; }
   function screenToWorld(sx, sy) { return [(sx - tx) / scale, (H - sy - ty) / scale]; }
 
+  function hexA(hex, a) {
+    const n = parseInt(hex.slice(1), 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+  }
+  function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); }
+
+  // ---- 离屏背景：深色径向渐变（中心略亮）+ 静态星云/微光粒子（resize 时重渲染一次，不每帧算） ----
+  const bgCanvas = document.createElement('canvas');
+  function renderBackground() {
+    bgCanvas.width = Math.max(1, Math.round(W * dpr));
+    bgCanvas.height = Math.max(1, Math.round(H * dpr));
+    const b = bgCanvas.getContext('2d');
+    b.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const g = b.createRadialGradient(W * 0.5, H * 0.42, 0, W * 0.5, H * 0.42, Math.hypot(W, H) * 0.75);
+    g.addColorStop(0, '#181d29'); g.addColorStop(0.55, '#11141c'); g.addColorStop(1, '#0a0c11');
+    b.fillStyle = g; b.fillRect(0, 0, W, H);
+    let seed = 20240612;
+    const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+    const nebCols = ['#4da3ff', '#9a6ae8', '#4cc38a', '#e0564b', '#38b6d9', '#e8913a'];
+    for (let i = 0; i < 6; i++) {
+      const nx = rnd() * W, ny = rnd() * H, nr = 140 + rnd() * 280;
+      const ng = b.createRadialGradient(nx, ny, 0, nx, ny, nr);
+      const c = nebCols[i % nebCols.length];
+      ng.addColorStop(0, hexA(c, 0.05)); ng.addColorStop(1, hexA(c, 0));
+      b.fillStyle = ng; b.beginPath(); b.arc(nx, ny, nr, 0, Math.PI * 2); b.fill();
+    }
+    for (let i = 0; i < 170; i++) {
+      const x = rnd() * W, y = rnd() * H, r = 0.4 + rnd() * 1.2, a = 0.03 + rnd() * 0.09;
+      b.fillStyle = `rgba(210,220,240,${a.toFixed(3)})`;
+      b.beginPath(); b.arc(x, y, r, 0, Math.PI * 2); b.fill();
+    }
+  }
+
+  // ---- 节点光晕精灵：每学科色 + 掌握绿 各预渲染一张（内芯亮 → 学科色 → 透明） ----
+  const SPR_SIZE = 128, SPR_CORE = 24, SPR_K = SPR_SIZE / (SPR_CORE * 2);   // 光晕外径 ≈ 2.67r
+  function makeSprite(color) {
+    const c = document.createElement('canvas');
+    c.width = c.height = SPR_SIZE;
+    const g2 = c.getContext('2d');
+    const g = g2.createRadialGradient(64, 64, 0, 64, 64, 64);
+    g.addColorStop(0, 'rgba(255,255,255,0.92)');
+    g.addColorStop(0.14, color);
+    g.addColorStop(SPR_CORE / 64, color);
+    g.addColorStop(0.52, hexA(color, 0.28));
+    g.addColorStop(1, hexA(color, 0));
+    g2.fillStyle = g; g2.fillRect(0, 0, SPR_SIZE, SPR_SIZE);
+    return c;
+  }
+  const sprites = new Map();
+  for (const s of subjects) sprites.set(s, makeSprite(COLORS[s] || '#999'));
+  const spriteYes = makeSprite('#3fae6a');
+
+  // ---------- 渲染循环：标脏 + rAF 合帧；脉冲/流动线/入场/惯性共用同一循环，静止时停帧 ----------
+  let rafId = null;
+  let enterT0 = -1, enterDone = false;   // 入场 stagger 动画（只播一次）
+  let inertia = null;                    // 平移惯性
+  function animActive() { return !enterDone || !!inertia || selectedId != null || highlightEdges.size > 0; }
+  function requestDraw() { if (rafId == null) rafId = requestAnimationFrame(tick); }
+  function tick(now) {
+    rafId = null;
+    window.__cnkFrames = (window.__cnkFrames || 0) + 1;   // 帧计数（停帧自检用）
+    stepInertia(now);
+    draw(now);
+    if (animActive()) requestDraw();
+  }
+  function stepInertia(now) {
+    if (!inertia) return;
+    const dt = Math.min(50, now - inertia.last);
+    inertia.last = now;
+    tx += inertia.vx * dt; ty += inertia.vy * dt;
+    const decay = Math.exp(-dt / 160);
+    inertia.vx *= decay; inertia.vy *= decay;
+    if (now - inertia.t0 > inertia.dur || Math.hypot(inertia.vx, inertia.vy) < 0.02) inertia = null;
+  }
+
   function resize() {
     dpr = window.devicePixelRatio || 1;
     W = wrap.clientWidth; H = wrap.clientHeight;
     canvas.width = W * dpr; canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    renderBackground();
     applySheetState();
-    draw();
+    requestDraw();
   }
   window.addEventListener('resize', resize);
 
@@ -377,6 +524,7 @@
   }
   // 平移缩放到指定年级区域
   function focusGrade(g) {
+    if (isMobile()) { focusGradeMobile(g); return; }
     const xs = topics.map(t => t._x);
     let cx = (Math.min(...xs) + Math.max(...xs)) / 2;
     // 窄屏同样以道法列为横向中心，避免主内容落在屏幕外
@@ -386,7 +534,17 @@
     scale = Math.min(6, Math.max(0.12, scale));
     tx = W / 2 - cx * scale;
     ty = H / 2 - cy * scale;
-    draw();
+    requestDraw();
+  }
+  // 移动端落地视图：定位到指定年级的道法列，scale≈0.9，节点可分辨可瞄准
+  function focusGradeMobile(g) {
+    const cx = subjX.get('道德与法治') != null ? subjX.get('道德与法治')
+      : (Math.min(...topics.map(t => t._x)) + Math.max(...topics.map(t => t._x))) / 2;
+    scale = 0.9;
+    const cy = g * ROW_H;
+    tx = W / 2 - cx * scale;
+    ty = H * 0.42 - cy * scale;
+    requestDraw();
   }
 
   // ---------- 状态 ----------
@@ -402,8 +560,10 @@
   function isMobile() { return window.innerWidth < 768; }
 
   // ---------- 绘制 ----------
-  function draw() {
+  function draw(now) {
+    now = now || performance.now();
     ctx.clearRect(0, 0, W, H);
+    ctx.drawImage(bgCanvas, 0, 0, W, H);
     ctx.font = '11px sans-serif';
     for (let g = 1; g <= 12; g++) {
       const [x0, sy] = worldToScreen(0, g * ROW_H);
@@ -428,7 +588,16 @@
       ctx.textAlign = 'left';
     }
 
+    // 入场动画进度：节点按年级从低到高 stagger 点亮（只播一次）
+    let enterNow = 1e9;
+    if (!enterDone) {
+      if (enterT0 < 0) enterT0 = now;
+      enterNow = now - enterT0;
+      if (enterNow > 820) enterDone = true;
+    }
+
     // 边
+    const dashOff = -((now / 30) % 24);   // 高亮链流动虚线：随时间递减，方向 = 先修 → 后续
     for (const d of deps) {
       const a = topicById.get(d.prerequisiteId), b = topicById.get(d.topicId);
       if (!a || !b || !visible(a) || !visible(b)) continue;
@@ -445,49 +614,61 @@
       ctx.moveTo(x1, y1);
       ctx.quadraticCurveTo(mx + dx, my, x2, y2);
       if (inHL) {
-        ctx.strokeStyle = 'rgba(255,214,90,0.95)'; ctx.lineWidth = 1.8;
+        ctx.strokeStyle = 'rgba(255,214,90,0.95)'; ctx.lineWidth = 2;
+        ctx.setLineDash([7, 5]); ctx.lineDashOffset = dashOff;
+        ctx.stroke(); ctx.setLineDash([]);
       } else {
-        ctx.strokeStyle = d.strength === 'hard' ? 'rgba(140,150,170,0.28)' : 'rgba(120,130,150,0.14)';
-        ctx.lineWidth = 1;
+        const alpha = d.strength === 'hard' ? 0.4 : 0.2;
+        const eg = ctx.createLinearGradient(x1, y1, x2, y2);
+        eg.addColorStop(0, hexA(a._color, alpha));
+        eg.addColorStop(1, hexA(b._color, alpha));
+        ctx.strokeStyle = eg; ctx.lineWidth = 1;
+        ctx.stroke();
       }
-      ctx.stroke();
     }
 
-    // 节点（掌握度着色：已掌握=绿色实心，还不会=橙红描边强调，未标记=学科原色）
+    // 节点（掌握度着色：已掌握=绿色实心，还不会=橙红描边强调，未标记=学科原色光晕）
+    const pulse = 1 + 0.14 * Math.sin(now / 280);   // 选中节点呼吸脉冲
     for (const t of topics) {
       if (!visible(t)) continue;
       const [sx, sy] = worldToScreen(t._x, t._y);
-      if (sx < -30 || sx > W + 30 || sy < -30 || sy > H + 30) continue;
-      const r = (t.id === selectedId ? 9 : t.id === hoverId ? 8 : 6.5) * Math.min(1.3, Math.max(0.6, scale));
+      if (sx < -40 || sx > W + 40 || sy < -40 || sy > H + 40) continue;
       const skeleton = t.status === 'skeleton';
       const m = mastery[t.id];
+      let ea = 1;
+      if (!enterDone) {
+        const delay = ((t._gMid - 1) / 11) * 520 + (hashStr(t.id) % 70);
+        const p = Math.max(0, Math.min(1, (enterNow - delay) / 180));
+        ea = p * p * (3 - 2 * p);
+        if (ea <= 0) continue;
+      }
+      let r = (t._r || 6) * Math.min(1.3, Math.max(0.6, scale));
+      if (t.id === selectedId) r *= 1.35 * pulse;
+      else if (t.id === hoverId) r *= 1.18;
+      if (!enterDone) r *= 0.5 + 0.5 * ea;
+      const S = r * 2 * SPR_K;
+      ctx.globalAlpha = ea * (skeleton ? 0.55 : 1);
+      ctx.drawImage(m === 'yes' ? spriteYes : sprites.get(t.subject), sx - S / 2, sy - S / 2, S, S);
+      ctx.globalAlpha = 1;
       ctx.beginPath();
-      ctx.arc(sx, sy, r, 0, Math.PI * 2);
       if (m === 'yes') {
-        ctx.globalAlpha = skeleton ? 0.85 : 1;
-        ctx.fillStyle = '#3fae6a'; ctx.fill();
-        ctx.globalAlpha = 1;
-        if (skeleton) { ctx.setLineDash([3, 3]); }
+        ctx.arc(sx, sy, r, 0, Math.PI * 2);
+        if (skeleton) ctx.setLineDash([3, 3]);
         ctx.strokeStyle = '#7fe0a4'; ctx.lineWidth = 1.5; ctx.stroke();
         ctx.setLineDash([]);
       } else if (m === 'no') {
-        ctx.globalAlpha = skeleton ? 0.5 : 0.9;
-        ctx.fillStyle = t._color; ctx.fill();
-        ctx.globalAlpha = 1;
-        ctx.beginPath(); ctx.arc(sx, sy, r + 1.5, 0, Math.PI * 2);
-        if (skeleton) { ctx.setLineDash([3, 3]); }
+        ctx.arc(sx, sy, r + 1.5, 0, Math.PI * 2);
+        if (skeleton) ctx.setLineDash([3, 3]);
         ctx.strokeStyle = '#ff6a3d'; ctx.lineWidth = 2.6; ctx.stroke();
         ctx.setLineDash([]);
       } else if (skeleton) {
-        ctx.globalAlpha = 0.45;
-        ctx.fillStyle = t._color; ctx.fill();
+        ctx.arc(sx, sy, r, 0, Math.PI * 2);
         ctx.setLineDash([3, 3]);
         ctx.strokeStyle = t._color; ctx.lineWidth = 1.5; ctx.stroke();
         ctx.setLineDash([]);
-        ctx.globalAlpha = 1;
       } else {
-        ctx.fillStyle = t._color; ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.arc(sx, sy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 1; ctx.stroke();
       }
       if (highlightSet.has(t.id)) {
         ctx.beginPath(); ctx.arc(sx, sy, r + 4.5, 0, Math.PI * 2);
@@ -503,9 +684,10 @@
       const t = topicById.get(selectedId);
       if (t) {
         const [sx, sy] = worldToScreen(t._x, t._y);
+        const r = (t._r || 6) * Math.min(1.3, Math.max(0.6, scale)) * 1.35 * pulse;
         ctx.font = 'bold 12px sans-serif';
         ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-        ctx.fillText(t.name, sx, sy - 14);
+        ctx.fillText(t.name, sx, sy - r - 7);
         ctx.textAlign = 'left';
       }
     }
@@ -514,17 +696,19 @@
   // ---------- 指针交互（鼠标 + 触摸统一 Pointer Events） ----------
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
+    inertia = null;
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
     const [wx, wy] = screenToWorld(mx, my);
     const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
     scale = Math.min(6, Math.max(0.12, scale * factor));
     tx = mx - wx * scale; ty = (H - my) - wy * scale;
-    draw();
+    requestDraw();
   }, { passive: false });
 
   const pointers = new Map();   // pointerId -> {x, y, t}
   let panMoved = 0, panLast = null, downTime = 0, pinch = null;
+  let velSamples = [];          // 单指平移速度采样（用于松手惯性）
 
   function hitTest(sx, sy, isTouch) {
     const [wx, wy] = screenToWorld(sx, sy);
@@ -539,11 +723,13 @@
   }
 
   canvas.addEventListener('pointerdown', (e) => {
-    canvas.setPointerCapture(e.pointerId);
+    try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, t: Date.now() });
     tooltip.style.display = 'none';
+    inertia = null;   // 新触点打断惯性滑行
     if (pointers.size === 1) {
       panMoved = 0; panLast = { x: e.clientX, y: e.clientY }; downTime = Date.now();
+      velSamples = [];
       pinch = null;
       canvas.classList.add('dragging');
     } else if (pointers.size === 2) {
@@ -571,7 +757,7 @@
       const [wx, wy] = screenToWorld(cx, cy);
       scale = newScale;
       tx = cx - wx * scale; ty = (H - cy) - wy * scale;
-      draw();
+      requestDraw();
       return;
     }
     if (pointers.size === 1 && panLast) {
@@ -579,7 +765,9 @@
       panMoved += Math.abs(dx) + Math.abs(dy);
       tx += dx; ty -= dy;
       panLast = { x: e.clientX, y: e.clientY };
-      draw();
+      velSamples.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+      if (velSamples.length > 6) velSamples.shift();
+      requestDraw();
       return;
     }
     // hover（仅鼠标）
@@ -595,7 +783,7 @@
           tooltip.innerHTML = `<div class="tt-name" style="color:${best._color}">${best.name}</div>
             <div class="tt-meta">${best.subject} · ${best.domain} · ${best.gradeRangeStart === best.gradeRangeEnd ? best.gradeRangeStart + '年级' : best.gradeRangeStart + '-' + best.gradeRangeEnd + '年级'}${best.status === 'skeleton' ? ' · 骨架占位' : ''}</div>`;
         } else tooltip.style.display = 'none';
-        draw();
+        requestDraw();
       } else if (best) {
         tooltip.style.left = (mx + 14) + 'px';
         tooltip.style.top = (my + 10) + 'px';
@@ -608,15 +796,39 @@
     const isTouch = e.pointerType !== 'mouse';
     pointers.delete(e.pointerId);
     if (pointers.size < 2) pinch = null;
+    if (pointers.size === 1) {
+      // 双指抬一指：panLast 重置为剩余手指当前位置，避免视图跳变
+      const [p] = [...pointers.values()];
+      panLast = { x: p.x, y: p.y };
+      velSamples = [];
+    }
     if (pointers.size === 0) {
       canvas.classList.remove('dragging');
-      // 轻点判定：位移 <10px 且时长 <300ms
-      if (wasSingle && panMoved < 10 && (Date.now() - downTime) < 300) {
+      // 轻点判定：位移 <10px 且时长 <500ms
+      if (wasSingle && panMoved < 10 && (Date.now() - downTime) < 500) {
         const rect = canvas.getBoundingClientRect();
         const best = hitTest(e.clientX - rect.left, e.clientY - rect.top, isTouch);
         if (best) selectTopic(best.id);
+      } else if (wasSingle && isTouch && panMoved >= 10 && velSamples.length >= 2) {
+        // 平移惯性：按最近 100ms 速度给 300–600ms 衰减位移（rAF 循环内推进）
+        const last = velSamples[velSamples.length - 1];
+        const recent = velSamples.filter(s => last.t - s.t <= 100);
+        const first = recent[0] || last;
+        const dt = Math.max(16, last.t - first.t);
+        let vx = (last.x - first.x) / dt, vy = (last.y - first.y) / dt;
+        const sp = Math.hypot(vx, vy);
+        if (sp > 0.05) {
+          const cap = 2.5;
+          if (sp > cap) { vx *= cap / sp; vy *= cap / sp; }
+          inertia = {
+            vx, vy: -vy, t0: performance.now(), last: performance.now(),
+            dur: Math.max(300, Math.min(600, 300 + sp * 200))
+          };
+          requestDraw();
+        }
       }
       panLast = null;
+      velSamples = [];
     }
   }
   canvas.addEventListener('pointerup', endPointer);
@@ -628,13 +840,23 @@
   const handle = document.getElementById('panel-handle');
   let sheetState = 'collapsed';   // collapsed | half | full
 
+  const EMPTY_HINT_HTML = '<div id="empty-hint">点击地图上的任意节点，查看详情。<br>用「已掌握 / 还不会」标记你的学习状态，再用「下一步学什么」获取推荐。</div>';
+  // 半屏档位：面板自然停靠在 bottom:0，translateY 相对自然位置；half = 面板高度的 42%
+  const SHEET_HALF_RATIO = 0.42;
+  function sheetStops() {
+    const h = panel.offsetHeight;
+    return [['full', 0], ['half', h * SHEET_HALF_RATIO], ['collapsed', h - 38]];
+  }
   function applySheetState() {
     if (!isMobile()) {
       panel.style.transform = '';
       panel.classList.remove('sheet-half', 'sheet-full', 'dragging');
       return;
     }
-    panel.style.transform = '';
+    // 用百分比/calc 而非 px：面板高度随头部回流变化时档位位置自动跟随
+    panel.style.transform = sheetState === 'full' ? 'translateY(0)'
+      : sheetState === 'half' ? `translateY(${SHEET_HALF_RATIO * 100}%)`
+      : 'translateY(calc(100% - 38px))';
     panel.classList.toggle('sheet-half', sheetState === 'half');
     panel.classList.toggle('sheet-full', sheetState === 'full');
   }
@@ -647,15 +869,15 @@
     else panel.classList.add('hidden');
     selectedId = null; panelView = 'empty'; diagRootId = null;
     highlightSet.clear(); highlightEdges.clear();
-    draw();
+    panelBody.innerHTML = EMPTY_HINT_HTML;   // 重置为空态，避免陈旧面板
+    requestDraw();
   }
   // 把手拖拽：上拉半屏→全屏，下拉收起
   let hDrag = null;
   handle.addEventListener('pointerdown', (e) => {
     if (!isMobile()) return;
-    handle.setPointerCapture(e.pointerId);
-    const cur = panel.getBoundingClientRect();
-    hDrag = { startY: e.clientY, baseTop: cur.top, moved: 0 };
+    try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+    hDrag = { startY: e.clientY, baseTop: panel.getBoundingClientRect().top, moved: 0 };
     panel.classList.add('dragging');
     e.preventDefault();
   });
@@ -665,22 +887,29 @@
     let top = hDrag.baseTop + (e.clientY - hDrag.startY);
     top = Math.max(wrapRect.top, Math.min(wrapRect.bottom - 38, top));
     hDrag.moved += Math.abs(e.movementY || 0);
-    panel.style.transform = `translateY(${top - wrapRect.top}px)`;
+    const naturalTop = wrapRect.bottom - panel.offsetHeight;   // bottom:0 的自然停靠位置
+    panel.style.transform = `translateY(${top - naturalTop}px)`;
   });
   handle.addEventListener('pointerup', (e) => {
     if (!hDrag) return;
     panel.classList.remove('dragging');
-    const wrapRect = wrap.getBoundingClientRect();
-    const top = panel.getBoundingClientRect().top - wrapRect.top;
-    panel.style.transform = '';
+    const h = panel.offsetHeight;
+    const naturalTop = wrap.getBoundingClientRect().bottom - h;
+    const curY = panel.getBoundingClientRect().top - naturalTop;
     if (hDrag.moved < 6) {
       // 轻点把手：在 半屏 ↔ 全屏 间切换（收起态则半屏弹出）
       sheetState = sheetState === 'collapsed' ? 'half' : (sheetState === 'half' ? 'full' : 'half');
     } else {
-      // 吸附到最近档位
-      const snaps = [['full', 0], ['half', wrapRect.height * 0.5], ['collapsed', wrapRect.height - 38]];
-      snaps.sort((a, b) => Math.abs(a[1] - top) - Math.abs(b[1] - top));
-      sheetState = snaps[0][0];
+      // 吸附：目标位置按实际档位静止位置计算（half = h*0.42），
+      // 最近档判定 ⇒ 半屏下拉需超过 half→collapsed 的一半距离才降级；当前档给 24px 粘滞
+      const stops = sheetStops();
+      let best = sheetState, bestD = Infinity;
+      for (const [name, y] of stops) {
+        let d = Math.abs(curY - y);
+        if (name === sheetState) d = Math.max(0, d - 24);
+        if (d < bestD) { bestD = d; best = name; }
+      }
+      sheetState = best;
     }
     hDrag = null;
     applySheetState();
@@ -724,8 +953,7 @@
     const mBadge = m === 'yes' ? '<span class="badge m-yes">已掌握 ✓</span>'
                  : m === 'no' ? '<span class="badge m-no">还不会</span>' : '';
     // 家长检验卡：检验问题 + 怎么算答对 + 答对了/没答对
-    const assessCard = t.assessmentPrompt ? `
-      <h3>家长检验卡</h3>
+    const assessInner = t.assessmentPrompt ? `
       <div class="assess-card">
         <div class="assess-q">检验问题：${t.assessmentPrompt}</div>
         ${(t.evidence && t.evidence.length) ? `<div class="assess-ev"><b>怎么算答对：</b><ul>${t.evidence.map(e => `<li>${e}</li>`).join('')}</ul></div>` : ''}
@@ -734,6 +962,14 @@
           <button class="bad" id="assess-bad">没答对</button>
         </div>
         <div class="assess-fb" id="assess-fb">${m === 'yes' ? '<span class="assess-fb ok">已标记为已掌握 ✓</span>' : m === 'no' ? '<span class="assess-fb bad">已标记为还不会</span>' : ''}</div>
+      </div>` : '';
+    // 身份差异：家长 → 默认展开并前置到描述之上；学生 → 默认折叠，保持原位
+    const isParent = profile && profile.role === 'parent';
+    const assessCardTop = (t.assessmentPrompt && isParent) ? `<h3>家长检验卡</h3>${assessInner}` : '';
+    const assessCard = (t.assessmentPrompt && !isParent) ? `
+      <div class="assess-wrap" id="assess-wrap">
+        <button class="assess-toggle" id="assess-toggle">家长检验卡 ▸ 点击展开</button>
+        ${assessInner}
       </div>` : '';
     panelBody.innerHTML = `
       <button id="panel-close" title="关闭">×</button>
@@ -751,6 +987,7 @@
       </div>
       <div class="mbtn-hint">再点一次同一按钮可取消标记</div>
       <button class="tbtn" id="btn-diag" style="width:100%;min-height:44px">这题/这个知识点我不会，帮我找原因</button>
+      ${assessCardTop}
       <div class="desc">${t.description}</div>
       ${t.status === 'skeleton' ? '<div class="placeholder-note">⚠ 骨架占位节点：内容待按该学科课标逐步填充，当前仅展示知识结构位置（仍可标记掌握度）。</div>' : ''}
       ${(t.evidence && t.evidence.length && !t.assessmentPrompt) ? `<h3>掌握证据（能做到这些就算学会）</h3><ul>${t.evidence.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
@@ -768,16 +1005,22 @@
     panelBody.querySelector('#mb-yes').onclick = () => { setMastery(selectedId, 'yes'); renderPanel(true); };
     panelBody.querySelector('#mb-no').onclick = () => { setMastery(selectedId, 'no'); renderPanel(true); };
     panelBody.querySelector('#btn-diag').onclick = () => { panelView = 'diag'; diagRootId = selectedId; renderPanel(); };
+    const at = panelBody.querySelector('#assess-toggle');
+    if (at) at.onclick = () => {
+      const w = panelBody.querySelector('#assess-wrap');
+      w.classList.toggle('open');
+      at.textContent = w.classList.contains('open') ? '家长检验卡 ▾ 点击收起' : '家长检验卡 ▸ 点击展开';
+    };
     const okBtn = panelBody.querySelector('#assess-ok');
     if (okBtn) {
       okBtn.onclick = () => {
-        if (mastery[selectedId] === 'yes') { delete mastery[selectedId]; saveMastery(); updateStats(); draw(); }
+        if (mastery[selectedId] === 'yes') { delete mastery[selectedId]; saveMastery(); updateStats(); requestDraw(); }
         else setMastery(selectedId, 'yes');
         renderPanel(true);
         toast(mastery[selectedId] === 'yes' ? '已标记为已掌握 ✓' : '已取消标记');
       };
       panelBody.querySelector('#assess-bad').onclick = () => {
-        if (mastery[selectedId] === 'no') { delete mastery[selectedId]; saveMastery(); updateStats(); draw(); }
+        if (mastery[selectedId] === 'no') { delete mastery[selectedId]; saveMastery(); updateStats(); requestDraw(); }
         else setMastery(selectedId, 'no');
         renderPanel(true);
         toast(mastery[selectedId] === 'no' ? '已标记为还不会，可以试试「帮我找原因」' : '已取消标记');
@@ -817,7 +1060,7 @@
       <button id="panel-close" title="关闭">×</button>
       <h2 style="color:${root._color}">错因回溯：${root.name}</h2>
       <div class="desc" style="color:var(--text-dim);font-size:12.5px">学不会往往是因为前面的基础有缺口。下面是「${root.name}」的完整先修链，逐个自评「会 / 不会」，我帮你找到最根上的缺口。（自评会直接写入掌握度标记）</div>
-      ${rows || '<div class="desc">这个知识点没有先修节点，它就是最基础的起点。</div>'}
+      <div class="diag-list">${rows || '<div class="desc">这个知识点没有先修节点，它就是最基础的起点。</div>'}</div>
       <div id="diag-conclusion-slot"></div>
       <button class="diag-exit" id="diag-exit">‹ 退出诊断，返回详情</button>
       <div style="height:20px"></div>`;
@@ -932,14 +1175,14 @@
     }
     openPanelMobile();
     renderPanel();
-    draw();
+    requestDraw();
   }
   function ensureVisible(t) {
     if (!t) return;
     const [sx, sy] = worldToScreen(t._x, t._y);
     const m = 80;
     if (sx < m || sx > W - m || sy < m || sy > H - m) {
-      tx = W / 2 - t._x * scale; ty = H / 2 - t._y * scale; draw();
+      tx = W / 2 - t._x * scale; ty = H / 2 - t._y * scale; requestDraw();
     }
   }
 
@@ -949,7 +1192,7 @@
   searchInput.addEventListener('input', () => {
     const q = searchInput.value.trim();
     searchMatches.clear();
-    if (!q) { srBox.style.display = 'none'; draw(); return; }
+    if (!q) { srBox.style.display = 'none'; requestDraw(); return; }
     const hits = topics.filter(t => visible(t) && (t.name.includes(q) || t.description.includes(q) || t.domain.includes(q))).slice(0, 12);
     hits.forEach(t => searchMatches.add(t.id));
     if (hits.length) {
@@ -963,7 +1206,7 @@
       srBox.innerHTML = '<div class="sr-item" style="color:var(--text-dim)">没有匹配的知识点</div>';
       srBox.style.display = 'block';
     }
-    draw();
+    requestDraw();
   });
   document.addEventListener('click', (e) => { if (!srBox.contains(e.target) && e.target !== searchInput) srBox.style.display = 'none'; });
 
@@ -979,11 +1222,11 @@
       if (activeSubjects.has(s)) { activeSubjects.delete(s); chip.classList.add('off'); chip.classList.remove('on'); }
       else { activeSubjects.add(s); chip.classList.remove('off'); chip.classList.add('on'); }
       updateStats();
-      draw();
+      requestDraw();
     };
     chipsBox.appendChild(chip);
   }
-  document.getElementById('cb-alledges').onchange = (e) => { showAllEdges = e.target.checked; draw(); };
+  document.getElementById('cb-alledges').onchange = (e) => { showAllEdges = e.target.checked; requestDraw(); };
 
   // ---------- 首次使用引导 ----------
   const onboard = document.getElementById('onboard');
@@ -1041,9 +1284,15 @@
   if (window.innerWidth < 860 && !isMobile()) panel.classList.add('hidden');
   if (isMobile()) { sheetState = 'collapsed'; panel.classList.remove('hidden'); }
   resize();
-  fitView();
+  // 落地视图：移动端不再全图 fitView——无 profile 定位到 7 年级道法区域（scale≈0.9），有 profile 定位到 profile 年级
+  if (isMobile()) focusGradeMobile(profile && profile.grade ? profile.grade : 7);
+  else fitView();
   updateStats();
-  draw();
+  enterT0 = performance.now(); enterDone = false;   // 入场 stagger 点亮，只播一次
+  requestDraw();
+
+  // 自动化验收辅助：按 id 取节点屏幕坐标
+  window.__cnkTest = { posOf: (id) => { const t = topicById.get(id); return t ? worldToScreen(t._x, t._y) : null; } };
 })();
 </script>
 </body>
