@@ -4,59 +4,111 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%234da3ff'/></svg>">
-<title>中国 K12 知识地图</title>
+<title>学习地图 · K12 家长导航</title>
 <style>
   :root {
-    --bg: #0f1115;
-    --panel: #171a21;
-    --panel-border: #2a2f3a;
+    --bg: #0A0C14;
+    --panel: #12151f;
+    --panel-2: #171b28;
+    --panel-border: #262c3b;
     --text: #e8eaf0;
     --text-dim: #9aa3b2;
     --accent: #4da3ff;
     --green: #3fae6a;
     --green-bright: #57d189;
     --bad: #ff6a3d;
+    --tabbar-h: 58px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
   #app { display: flex; flex-direction: column; height: 100%; }
-  header { padding: 10px 16px 6px; border-bottom: 1px solid var(--panel-border); background: var(--panel); }
-  header h1 { font-size: 18px; font-weight: 700; }
-  header .sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
-  #toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 16px;
-    border-bottom: 1px solid var(--panel-border); background: var(--panel); }
-  #search { flex: 0 1 260px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--panel-border);
-    background: #0d0f13; color: var(--text); font-size: 13px; outline: none; min-height: 32px; }
+  header { padding: 10px 16px 8px; border-bottom: 1px solid var(--panel-border); background: var(--panel); flex: 0 0 auto; }
+  header h1 { font-size: 17px; font-weight: 700; }
+  header h1 .dot { color: var(--accent); }
+  header .sub { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
+  @media (max-width: 767px) {
+    header { padding: 8px 12px 6px; }
+    header h1 { font-size: 15px; }
+    header .sub { font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  }
+
+  /* ---------- 视图容器 ---------- */
+  #views { flex: 1; min-height: 0; position: relative; }
+  .view { position: absolute; inset: 0; display: none; }
+  .view.active { display: block; }
+  #view-map.active { display: flex; flex-direction: column; }
+  .scroll-view { overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 16px 28px; }
+  .scroll-inner { max-width: 680px; margin: 0 auto; }
+
+  /* ---------- 底部四 tab ---------- */
+  #tabbar { flex: 0 0 auto; display: flex; border-top: 1px solid var(--panel-border);
+    background: rgba(14,17,26,0.98); padding-bottom: env(safe-area-inset-bottom, 0px); z-index: 30; }
+  .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; min-height: var(--tabbar-h); background: none; border: none; color: var(--text-dim);
+    font-size: 11px; cursor: pointer; position: relative; }
+  .tab-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.7;
+    stroke-linecap: round; stroke-linejoin: round; }
+  .tab-btn.active { color: var(--accent); }
+  .tab-badge { position: absolute; top: 6px; left: calc(50% + 8px); min-width: 17px; height: 17px;
+    border-radius: 999px; background: var(--bad); color: #fff; font-size: 10.5px; font-weight: 700;
+    display: none; align-items: center; justify-content: center; padding: 0 4px; }
+  .tab-badge.show { display: inline-flex; }
+
+  /* ---------- 图谱视图 ---------- */
+  #map-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 12px;
+    border-bottom: 1px solid var(--panel-border); background: var(--panel); flex: 0 0 auto; }
+  #search { flex: 0 1 240px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--panel-border);
+    background: #0d1017; color: var(--text); font-size: 13px; outline: none; min-height: 32px; }
   #search:focus { border-color: var(--accent); }
   #chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--panel-border); background: #0d0f13;
+  .chip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--panel-border); background: #0d1017;
     color: var(--text-dim); font-size: 12px; cursor: pointer; user-select: none; display: flex; align-items: center; gap: 5px;
     white-space: nowrap; }
   .chip .dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; }
   .chip.on { color: var(--text); border-color: var(--chip-color, var(--accent)); background: #1a2230; }
   .chip.off { opacity: 0.45; }
-  .toggle { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-dim); cursor: pointer; user-select: none; }
   .tbtn { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--panel-border); background: #1a2230;
     color: var(--text); font-size: 12.5px; cursor: pointer; min-height: 32px; white-space: nowrap; }
   .tbtn:hover { border-color: var(--accent); }
-  #mastery-stats { font-size: 12.5px; color: var(--text-dim); padding: 4px 10px; border-radius: 999px;
-    border: 1px solid var(--panel-border); background: #0d0f13; white-space: nowrap; }
+  #mastery-stats { font-size: 12px; color: var(--text-dim); padding: 4px 10px; border-radius: 999px;
+    border: 1px solid var(--panel-border); background: #0d1017; white-space: nowrap; }
   #mastery-stats b { font-weight: 700; }
   #mastery-stats .s-yes { color: var(--green-bright); }
   #mastery-stats .s-no { color: var(--bad); }
-  #main { flex: 1; display: flex; min-height: 0; position: relative; }
+  @media (max-width: 767px) {
+    #chips { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; padding-bottom: 2px;
+      -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%); }
+    #map-toolbar { gap: 5px; padding: 6px 8px; }
+    #map-toolbar .tbtn { min-height: 30px; padding: 5px 9px; font-size: 12px; }
+    #search { min-height: 30px; flex: 1 1 120px; font-size: 12px; }
+    #mastery-stats { display: none; }
+  }
+  #map-main { flex: 1; display: flex; min-height: 0; position: relative; }
   #canvas-wrap { flex: 1; position: relative; min-width: 0; }
   canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
   canvas.dragging { cursor: grabbing; }
-  #tooltip { position: absolute; pointer-events: none; background: rgba(20,24,32,0.95); border: 1px solid var(--panel-border);
+  #tooltip { position: absolute; pointer-events: none; background: rgba(18,22,32,0.95); border: 1px solid var(--panel-border);
     border-radius: 6px; padding: 5px 9px; font-size: 12px; max-width: 280px; display: none; z-index: 10; }
   #tooltip .tt-name { font-weight: 600; }
   #tooltip .tt-meta { color: var(--text-dim); font-size: 11px; margin-top: 2px; }
+  #legend { position: absolute; left: 12px; bottom: 12px; font-size: 11px; color: var(--text-dim);
+    background: rgba(14,17,26,0.85); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--panel-border); line-height: 1.8;
+    max-width: calc(100% - 24px); z-index: 8; }
+  #legend .lg-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+  #search-results { position: absolute; top: 6px; left: 12px; z-index: 20; background: var(--panel);
+    border: 1px solid var(--panel-border); border-radius: 8px; max-height: 260px; overflow-y: auto; display: none; min-width: 280px; }
+  .sr-item { padding: 7px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #1e222b; }
+  .sr-item:hover { background: #1a2230; }
+  .sr-item .m { color: var(--text-dim); font-size: 11px; }
+  #loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: var(--text-dim); font-size: 14px; z-index: 30; background: var(--bg); }
+
+  /* ---------- 图谱详情面板（桌面右侧 / 移动底部抽屉） ---------- */
   #panel { width: var(--pw, 420px); flex: 0 0 var(--pw, 420px); border-left: 1px solid var(--panel-border); background: var(--panel);
     overflow-y: auto; padding: 16px; transition: margin-right .2s; -webkit-overflow-scrolling: touch; }
   #panel.hidden { margin-right: calc(-1 * var(--pw, 420px)); }
-  /* 桌面端面板左缘拖拽调宽把手 */
   #panel-resizer { display: none; width: 8px; flex: 0 0 8px; cursor: col-resize; background: transparent;
     border-left: 1px solid transparent; touch-action: none; }
   #panel-resizer:hover, #panel-resizer.active { background: rgba(77,163,255,0.18); border-left-color: var(--accent); }
@@ -65,7 +117,6 @@
     #panel { position: absolute; right: 0; top: 0; bottom: 0; z-index: 15; box-shadow: -8px 0 24px rgba(0,0,0,0.55);
       max-width: 94vw; }
   }
-  /* ---- 移动端底部抽屉 ---- */
   #panel-handle { display: none; }
   @media (max-width: 767px) {
     #panel { position: absolute; left: 0; right: 0; top: auto; bottom: 0; width: auto; flex: none;
@@ -79,75 +130,87 @@
     #panel-handle { display: flex; align-items: center; justify-content: center; height: 38px;
       cursor: grab; flex: 0 0 38px; touch-action: none; margin: 0 -16px; }
     #panel-handle .grip { width: 44px; height: 5px; border-radius: 3px; background: #3a4150; }
-    #chips { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; padding-bottom: 2px;
-      -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%);
-      mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%); }
-    #toolbar { gap: 5px; padding: 6px 8px; }
-    #toolbar .tbtn { min-height: 30px; padding: 5px 9px; font-size: 12px; }
-    #toolbar .toggle { font-size: 11px; }
-    #toolbar .toggle.hide-m-row { display: none; }   /* 移动端隐藏先修线开关，保住工具栏高度 */
-    #toolbar .hide-m { display: none; }
-    #search { min-height: 30px; flex: 1 1 140px; font-size: 12px; }
-    #mastery-stats { font-size: 11.5px; padding: 3px 8px; }
-    header { padding: 6px 10px 3px; }
-    header h1 { font-size: 15px; }
-    header .sub { font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   }
   #panel h2 { font-size: 16px; line-height: 1.4; margin-bottom: 6px; }
-  #panel .badges { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
+  #panel h3 { font-size: 13px; color: var(--text-dim); margin: 14px 0 6px; border-top: 1px solid var(--panel-border); padding-top: 12px; }
+  #panel .desc { font-size: 13px; line-height: 1.7; color: var(--text); margin: 10px 0; }
+  #panel ul { padding-left: 18px; font-size: 12.5px; line-height: 1.8; }
+  .badges { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
   .badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--panel-border); color: var(--text-dim); }
   .badge.skeleton { color: #e0b34a; border-color: #6b5420; }
   .badge.type { color: #7fc4ff; border-color: #28527c; }
   .badge.grade { color: #9fe6a0; border-color: #2f6b31; }
   .badge.m-yes { color: var(--green-bright); border-color: #2f6b31; }
   .badge.m-no { color: var(--bad); border-color: #7c3a28; }
-  #panel .desc { font-size: 13px; line-height: 1.7; color: var(--text); margin: 10px 0; }
-  #panel h3 { font-size: 13px; color: var(--text-dim); margin: 14px 0 6px; border-top: 1px solid var(--panel-border); padding-top: 12px; }
-  #panel ul { padding-left: 18px; font-size: 12.5px; line-height: 1.8; }
-  /* ---- 掌握度大按钮 ---- */
-  .mbtns { display: flex; gap: 10px; margin: 12px 0 4px; }
-  .mbtn { flex: 1; min-height: 46px; border-radius: 10px; font-size: 14.5px; font-weight: 600; cursor: pointer;
-    border: 1.5px solid var(--panel-border); background: #0d0f13; color: var(--text-dim); }
-  .mbtn.m-no { border-color: #7c3a28; }
-  .mbtn.m-no.active { background: #3a1d14; color: var(--bad); border-color: var(--bad); }
-  .mbtn.m-yes { border-color: #2f6b31; }
-  .mbtn.m-yes.active { background: #12291a; color: var(--green-bright); border-color: var(--green-bright); }
-  .mbtn-hint { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
-  /* ---- 家长检验卡 ---- */
-  .assess-card { background: #10202f; border: 1px solid #1e3a52; border-radius: 10px; padding: 12px; margin-top: 6px; }
-  .assess-card .assess-q { font-size: 13px; line-height: 1.7; font-weight: 600; }
-  .assess-card .assess-ev { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
-  .assess-card .assess-ev ul { padding-left: 16px; line-height: 1.7; margin-top: 4px; }
-  .assess-card .assess-btns { display: flex; gap: 10px; margin-top: 10px; }
-  .assess-card .assess-btns button { flex: 1; min-height: 44px; border-radius: 8px; font-size: 14px; font-weight: 600;
-    cursor: pointer; border: 1.5px solid var(--panel-border); background: #0d0f13; color: var(--text); }
-  .assess-card .assess-btns .ok { border-color: #2f6b31; color: var(--green-bright); }
-  .assess-card .assess-btns .bad { border-color: #7c3a28; color: var(--bad); }
-  .assess-fb { font-size: 12.5px; margin-top: 8px; min-height: 18px; }
-  .assess-fb.ok { color: var(--green-bright); }
-  .assess-fb.bad { color: var(--bad); }
-  /* 学生视角：家长检验卡默认折叠 */
-  .assess-wrap { margin-top: 6px; }
-  .assess-toggle { width: 100%; text-align: left; background: #10202f; border: 1px solid #1e3a52; border-radius: 10px;
-    padding: 10px 12px; color: #7fc4ff; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 44px; }
-  .assess-wrap.open .assess-toggle { border-radius: 10px 10px 0 0; border-bottom: none; }
-  .assess-wrap .assess-card { display: none; border-radius: 0 0 10px 10px; margin-top: 0; border-top: none; }
-  .assess-wrap.open .assess-card { display: block; }
-  /* 诊断清单顶部留白，避免首行按钮贴折叠线 */
-  .diag-list { padding-top: 8px; }
+  #panel-close { float: right; background: none; border: none; color: var(--text-dim); font-size: 22px; cursor: pointer;
+    min-width: 44px; min-height: 44px; margin: -8px -10px 0 0; }
+  #empty-hint { color: var(--text-dim); font-size: 13px; line-height: 2; }
+  /* 追溯统计条 */
+  .trace-stats { display: flex; gap: 8px; margin: 10px 0; }
+  .trace-stat { flex: 1; background: #0d1017; border: 1px solid var(--panel-border); border-radius: 10px;
+    padding: 8px 6px; text-align: center; }
+  .trace-stat .n { font-size: 18px; font-weight: 800; color: var(--accent); }
+  .trace-stat .l { font-size: 10.5px; color: var(--text-dim); margin-top: 2px; }
+  /* coaching ask 卡 */
+  .ask-card { background: #101d2e; border: 1px solid #1e3a52; border-radius: 10px; padding: 12px; margin-top: 10px; }
+  .ask-card .ask-tag { font-size: 11px; color: #7fc4ff; font-weight: 700; margin-bottom: 5px; }
+  .ask-card .ask-q { font-size: 13.5px; line-height: 1.7; font-weight: 600; }
+  .ask-card .ask-pattern { font-size: 12px; color: var(--text-dim); line-height: 1.7; margin-top: 8px;
+    border-top: 1px dashed #1e3a52; padding-top: 8px; }
+  .ask-card .ask-sec { font-size: 11px; color: #7fc4ff; font-weight: 700; margin: 12px 0 6px;
+    border-top: 1px dashed #1e3a52; padding-top: 10px; }
+  .var-item { background: #0b1523; border: 1px solid #16304a; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
+  .var-item .v-t { font-size: 12.5px; line-height: 1.7; font-weight: 600; }
+  .var-item .v-e { font-size: 11.5px; color: var(--text-dim); line-height: 1.7; margin-top: 4px; }
+  .drill-item { background: #0b1523; border: 1px solid #16304a; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
+  .drill-item .d-q { font-size: 12.5px; line-height: 1.7; font-weight: 600; }
+  .drill-item .d-hint { font-size: 11.5px; color: #9fc7ea; line-height: 1.7; margin-top: 5px; }
+  .drill-item .d-hint b { color: #7fc4ff; }
+  .drill-ans-btn { margin-top: 6px; min-height: 32px; padding: 4px 12px; border-radius: 6px;
+    border: 1px dashed #28527c; background: none; color: #7fc4ff; font-size: 11.5px; cursor: pointer; }
+  .drill-ans { display: none; font-size: 12px; line-height: 1.7; margin-top: 6px;
+    border-top: 1px dashed #16304a; padding-top: 6px; color: var(--text-dim); }
+  .drill-ans b { color: var(--green-bright); }
+  .drill-item.open .drill-ans { display: block; }
   .chain-item { font-size: 12.5px; padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; cursor: pointer;
-    background: #0d0f13; border: 1px solid var(--panel-border); line-height: 1.5; }
+    background: #0d1017; border: 1px solid var(--panel-border); line-height: 1.5; }
   .chain-item:hover { border-color: var(--accent); }
   .chain-item .r { color: var(--text-dim); font-size: 11px; display: block; }
   .chain-item.hard { border-left: 3px solid #e0645a; }
   .chain-item.soft { border-left: 3px solid #4a90d9; }
   #panel .placeholder-note { font-size: 12px; color: #e0b34a; background: #241e10; padding: 8px 10px;
     border-radius: 6px; margin-top: 10px; }
-  #panel-close { float: right; background: none; border: none; color: var(--text-dim); font-size: 22px; cursor: pointer;
-    min-width: 44px; min-height: 44px; margin: -8px -10px 0 0; }
-  #empty-hint { color: var(--text-dim); font-size: 13px; line-height: 2; }
-  /* ---- 诊断模式 ---- */
-  .diag-row { background: #0d0f13; border: 1px solid var(--panel-border); border-radius: 8px; padding: 9px 10px; margin-bottom: 8px; }
+  /* 掌握度大按钮 */
+  .mbtns { display: flex; gap: 10px; margin: 12px 0 4px; }
+  .mbtn { flex: 1; min-height: 46px; border-radius: 10px; font-size: 14.5px; font-weight: 600; cursor: pointer;
+    border: 1.5px solid var(--panel-border); background: #0d1017; color: var(--text-dim); }
+  .mbtn.m-no { border-color: #7c3a28; }
+  .mbtn.m-no.active { background: #3a1d14; color: var(--bad); border-color: var(--bad); }
+  .mbtn.m-yes { border-color: #2f6b31; }
+  .mbtn.m-yes.active { background: #12291a; color: var(--green-bright); border-color: var(--green-bright); }
+  .mbtn-hint { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+  /* 家长检验卡 */
+  .assess-card { background: #10202f; border: 1px solid #1e3a52; border-radius: 10px; padding: 12px; margin-top: 6px; }
+  .assess-card .assess-q { font-size: 13px; line-height: 1.7; font-weight: 600; }
+  .assess-card .assess-ev { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
+  .assess-card .assess-ev ul { padding-left: 16px; line-height: 1.7; margin-top: 4px; }
+  .assess-card .assess-btns { display: flex; gap: 10px; margin-top: 10px; }
+  .assess-card .assess-btns button { flex: 1; min-height: 44px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid var(--panel-border); background: #0d1017; color: var(--text); }
+  .assess-card .assess-btns .ok { border-color: #2f6b31; color: var(--green-bright); }
+  .assess-card .assess-btns .bad { border-color: #7c3a28; color: var(--bad); }
+  .assess-fb { font-size: 12.5px; margin-top: 8px; min-height: 18px; }
+  .assess-fb.ok { color: var(--green-bright); }
+  .assess-fb.bad { color: var(--bad); }
+  .assess-wrap { margin-top: 6px; }
+  .assess-toggle { width: 100%; text-align: left; background: #10202f; border: 1px solid #1e3a52; border-radius: 10px;
+    padding: 10px 12px; color: #7fc4ff; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 44px; }
+  .assess-wrap.open .assess-toggle { border-radius: 10px 10px 0 0; border-bottom: none; }
+  .assess-wrap .assess-card { display: none; border-radius: 0 0 10px 10px; margin-top: 0; border-top: none; }
+  .assess-wrap.open .assess-card { display: block; }
+  /* 错因回溯 */
+  .diag-list { padding-top: 8px; }
+  .diag-row { background: #0d1017; border: 1px solid var(--panel-border); border-radius: 8px; padding: 9px 10px; margin-bottom: 8px; }
   .diag-row .dr-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .diag-row .dr-name { font-size: 13.5px; font-weight: 600; line-height: 1.4; }
   .diag-row .dr-grade { font-size: 11px; color: var(--text-dim); white-space: nowrap; }
@@ -164,8 +227,8 @@
     cursor: pointer; border: 1.5px solid var(--accent); background: #122031; color: var(--accent); }
   .diag-exit { width: 100%; min-height: 44px; border-radius: 8px; font-size: 13.5px; cursor: pointer;
     border: 1px solid var(--panel-border); background: #12151c; color: var(--text-dim); margin-top: 10px; }
-  /* ---- 下一步推荐 ---- */
-  .next-item { background: #0d0f13; border: 1px solid var(--panel-border); border-radius: 8px; padding: 10px;
+  /* 下一步推荐 */
+  .next-item { background: #0d1017; border: 1px solid var(--panel-border); border-radius: 8px; padding: 10px;
     margin-bottom: 8px; cursor: pointer; }
   .next-item:hover { border-color: var(--accent); }
   .next-item .ni-name { font-size: 13.5px; font-weight: 600; }
@@ -173,86 +236,101 @@
   .next-item .ni-desc { font-size: 12px; color: var(--text-dim); line-height: 1.6; margin-top: 5px; }
   .next-guide { font-size: 13px; line-height: 2; color: var(--text-dim); background: #12151c;
     border: 1px dashed var(--panel-border); border-radius: 10px; padding: 16px; margin-top: 10px; text-align: center; }
-  /* ---- ⑤ 学习路径 ---- */
-  .plan-item { background: #0d0f13; border: 1px solid var(--panel-border); border-radius: 10px;
-    padding: 10px 12px; margin-bottom: 10px; position: relative; }
-  .plan-item.done { opacity: 0.55; }
-  .plan-item.done .plan-name { text-decoration: line-through; }
-  .plan-head { display: flex; align-items: baseline; gap: 8px; }
-  .plan-no { flex: 0 0 22px; height: 22px; border-radius: 50%; background: #122031; border: 1px solid #28527c;
-    color: #7fc4ff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
-  .plan-name { font-size: 14px; font-weight: 700; cursor: pointer; line-height: 1.4; }
-  .plan-name:hover { text-decoration: underline; }
-  .plan-grade { margin-left: auto; font-size: 11px; color: var(--text-dim); white-space: nowrap; }
-  .plan-reason { font-size: 12px; color: var(--text-dim); line-height: 1.6; margin: 6px 0 8px; }
-  .plan-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .plan-course { flex: 1 1 100%; font-size: 12.5px; color: #7fc4ff; text-decoration: none; line-height: 1.5;
-    background: #122031; border: 1px solid #28527c; border-radius: 8px; padding: 7px 10px; }
-  .plan-course:hover { border-color: var(--accent); text-decoration: underline; }
-  .plan-course.none { color: var(--text-dim); border-style: dashed; border-color: var(--panel-border); background: none; }
-  .plan-quiz { min-height: 38px; padding: 6px 14px; border-color: #3a5a8c; color: #7fc4ff; background: #122031; font-weight: 600; }
-  .plan-check { min-height: 38px; padding: 6px 14px; border-radius: 6px; border: 1.5px solid var(--panel-border);
-    background: #12151c; color: var(--text-dim); font-size: 12.5px; font-weight: 600; cursor: pointer; }
-  .plan-check.on { border-color: var(--green-bright); color: var(--green-bright); background: #12291a; }
-  #legend { position: absolute; left: 12px; bottom: 12px; font-size: 11px; color: var(--text-dim);
-    background: rgba(20,24,32,0.85); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--panel-border); line-height: 1.8;
-    max-width: calc(100% - 24px); z-index: 8; }
-  #legend .lg-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
-  #search-results { position: absolute; top: 6px; left: 16px; z-index: 20; background: var(--panel);
-    border: 1px solid var(--panel-border); border-radius: 8px; max-height: 260px; overflow-y: auto; display: none; min-width: 280px; }
-  .sr-item { padding: 7px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #1e222b; }
-  .sr-item:hover { background: #1a2230; }
-  .sr-item .m { color: var(--text-dim); font-size: 11px; }
-  #loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    color: var(--text-dim); font-size: 14px; z-index: 30; background: var(--bg); }
-  /* ---- 首次引导 ---- */
-  #onboard { position: fixed; inset: 0; z-index: 60; background: rgba(8,10,14,0.72); display: none;
-    align-items: flex-end; justify-content: center; }
-  #onboard.show { display: flex; }
-  .ob-box { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 14px 14px 0 0;
-    width: 100%; max-width: 560px; padding: 20px 18px calc(18px + env(safe-area-inset-bottom, 0px)); }
-  @media (min-width: 768px) {
-    #onboard { align-items: center; }
-    .ob-box { border-radius: 14px; }
-  }
-  .ob-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-  .ob-sub { font-size: 12.5px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.6; }
-  .ob-roles { display: flex; gap: 10px; margin-bottom: 14px; }
-  .ob-roles button { flex: 1; min-height: 46px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;
-    border: 1.5px solid var(--panel-border); background: #0d0f13; color: var(--text-dim); }
-  .ob-roles button.active { border-color: var(--accent); color: var(--accent); background: #122031; }
-  .ob-grades { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-  .ob-grades button { min-height: 44px; min-width: 0; border-radius: 8px; font-size: 14px; cursor: pointer;
-    border: 1px solid var(--panel-border); background: #0d0f13; color: var(--text); }
-  @media (max-width: 767px) { .ob-grades { grid-template-columns: repeat(4, 1fr); } }
-  .ob-grades button:hover { border-color: var(--accent); }
-  .ob-close { width: 100%; margin-top: 12px; min-height: 40px; border-radius: 8px; border: none;
-    background: none; color: var(--text-dim); font-size: 12.5px; cursor: pointer; }
-  /* 分步引导 */
-  .ob-step-tag { font-size: 11.5px; color: var(--accent); font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px; }
-  .ob-next { width: 100%; min-height: 46px; border-radius: 10px; border: 1.5px solid var(--accent);
-    background: #122031; color: var(--accent); font-size: 14.5px; font-weight: 700; cursor: pointer; margin-top: 4px; }
-  .ob-next:disabled { opacity: 0.4; cursor: default; }
-  .ob-back { width: 100%; min-height: 38px; margin-top: 8px; border: none; background: none;
-    color: var(--text-dim); font-size: 12.5px; cursor: pointer; }
-  .ob-subjects { display: flex; gap: 10px; }
-  .ob-subjects button { flex: 1; min-height: 56px; border-radius: 10px; font-size: 15px; font-weight: 700;
-    cursor: pointer; border: 1.5px solid var(--panel-border); background: #0d0f13; color: var(--text); }
-  .ob-subjects button:hover, .ob-subjects button.active { border-color: var(--accent); color: var(--accent); background: #122031; }
-  .ob-summary { font-size: 13.5px; line-height: 2; background: #0d0f13; border: 1px solid var(--panel-border);
-    border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
-  .ob-summary b { color: var(--accent); }
-  .ob-enter { width: 100%; min-height: 48px; border-radius: 10px; border: none; background: var(--accent);
-    color: #0b1220; font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 4px; }
-  /* ---- 测一测 / 快速诊断 ---- */
+  /* 学习资源 */
+  .res-item { display: flex; gap: 10px; align-items: flex-start; background: #0d1017;
+    border: 1px solid var(--panel-border); border-radius: 8px; padding: 9px 10px; margin-bottom: 8px; }
+  .res-ico { flex: 0 0 26px; height: 26px; border-radius: 6px; display: flex; align-items: center;
+    justify-content: center; font-size: 12px; font-weight: 700; }
+  .res-course { background: #122031; color: #7fc4ff; border: 1px solid #28527c; }
+  .res-video { background: #2a1220; color: #e06ab0; border: 1px solid #6b2f52; }
+  .res-practice { background: #12291a; color: var(--green-bright); border: 1px solid #2f6b31; }
+  .res-article { background: #241e10; color: #e0b34a; border: 1px solid #6b5420; }
+  .res-main { flex: 1; min-width: 0; }
+  .res-title { font-size: 13px; font-weight: 600; color: var(--text); text-decoration: none; line-height: 1.5;
+    background: none; border: none; padding: 0; cursor: pointer; text-align: left; display: inline; font-family: inherit; }
+  button.res-title:hover, a.res-title:hover { color: var(--accent); text-decoration: underline; }
+  .res-title.no-link { color: var(--text-dim); cursor: default; }
+  .res-note { font-size: 11.5px; color: var(--text-dim); line-height: 1.6; margin-top: 4px; }
+  .res-src { flex: 0 0 auto; max-width: 38%; font-size: 10px; color: var(--text-dim);
+    border: 1px solid var(--panel-border); border-radius: 999px; padding: 2px 7px; line-height: 1.5; }
+  .res-locked { background: #12151c; border: 1px dashed #3a5a8c; border-radius: 10px; padding: 14px; text-align: center; }
+  .res-locked-t { font-size: 13.5px; font-weight: 700; color: #7fc4ff; }
+  .res-locked-s { font-size: 12px; color: var(--text-dim); margin: 6px 0 10px; line-height: 1.6; }
   .quiz-entry { width: 100%; min-height: 44px; margin: 2px 0 8px; border-color: #3a5a8c; color: #7fc4ff;
     background: #122031; font-weight: 600; }
   .quiz-entry:hover { border-color: var(--accent); }
+
+  /* ---------- 诊断 tab ---------- */
+  .hero { background: linear-gradient(160deg, #12203a 0%, #101728 60%, #0d1017 100%);
+    border: 1px solid #23406b; border-radius: 14px; padding: 20px 16px; margin-bottom: 14px; }
+  .hero h2 { font-size: 19px; font-weight: 800; line-height: 1.5; }
+  .hero p { font-size: 12.5px; color: var(--text-dim); line-height: 1.8; margin-top: 8px; }
+  .card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 12px;
+    padding: 14px; margin-bottom: 12px; }
+  .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .card .c-sub { font-size: 12px; color: var(--text-dim); line-height: 1.7; }
+  .big-cta { width: 100%; min-height: 50px; border-radius: 12px; border: none; background: var(--accent);
+    color: #0b1220; font-size: 15.5px; font-weight: 800; cursor: pointer; margin-top: 12px; }
+  .ghost-cta { width: 100%; min-height: 44px; border-radius: 10px; border: 1.5px solid var(--panel-border);
+    background: none; color: var(--text-dim); font-size: 13.5px; cursor: pointer; margin-top: 8px; }
+  .ghost-cta:hover { border-color: var(--accent); color: var(--text); }
+  .qd-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+  .qd-btn { min-height: 52px; border-radius: 10px; border: 1.5px solid var(--panel-border); background: #0d1017;
+    color: var(--text); font-size: 14px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 3px; }
+  .qd-btn:disabled { opacity: 0.45; cursor: default; }
+  .qd-btn:not(:disabled):hover { border-color: var(--accent); }
+  .qd-soon { font-size: 10.5px; color: var(--text-dim); font-weight: 400; }
+  .lastdiag { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .lastdiag .ld-t { font-size: 13px; line-height: 1.6; }
+  .lastdiag .ld-t b { color: var(--accent); }
+
+  /* ---------- 计划 tab（打卡清单） ---------- */
+  .plan-meta { font-size: 12.5px; color: var(--text-dim); margin: 2px 0 10px; }
+  .prog { height: 8px; border-radius: 999px; background: #1a1f2c; overflow: hidden; margin-bottom: 6px; }
+  .prog-bar { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #2f7a4d, var(--green-bright));
+    transition: width .3s; }
+  .prog-txt { font-size: 12px; color: var(--text-dim); margin-bottom: 14px; }
+  .prog-txt b { color: var(--green-bright); }
+  .todo { display: flex; gap: 10px; background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+  .todo.done { opacity: 0.55; }
+  .todo.done .todo-action { text-decoration: line-through; }
+  .todo-check { flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; margin-top: 2px;
+    border: 2px solid #3a4150; background: #0d1017; color: var(--green-bright); font-size: 15px; font-weight: 800;
+    cursor: pointer; }
+  .todo.done .todo-check { border-color: var(--green-bright); background: #12291a; }
+  .todo-main { flex: 1; min-width: 0; }
+  .todo-action { font-size: 14.5px; font-weight: 700; line-height: 1.5; }
+  .todo-sub { font-size: 12px; color: var(--text-dim); line-height: 1.7; margin-top: 4px; }
+  .todo-min { color: #e0b34a; font-weight: 600; }
+  .todo-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .todo-acts .tbtn { min-height: 36px; font-size: 12px; }
+  .todo-course { border-color: #3a5a8c; color: #7fc4ff; background: #122031; max-width: 100%;
+    overflow: hidden; text-overflow: ellipsis; }
+  .plan-foot { margin-top: 16px; border-top: 1px solid var(--panel-border); padding-top: 14px; }
+
+  /* ---------- 我的 tab ---------- */
+  .me-row { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid #1c212e; font-size: 13.5px; }
+  .me-row:last-child { border-bottom: none; }
+  .me-row .k { color: var(--text-dim); }
+  .me-row .v { font-weight: 600; text-align: right; }
+  .me-row button { min-height: 36px; }
+  .danger { color: var(--bad); border-color: #7c3a28; background: none; }
+
+  /* ---------- 答题全屏层 ---------- */
+  #quiz-screen { position: fixed; inset: 0; z-index: 45; background: var(--bg); display: none;
+    overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  #quiz-screen.show { display: block; }
+  #quiz-body { max-width: 640px; margin: 0 auto; padding: 18px 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
+  #quiz-body h2 { font-size: 17px; line-height: 1.4; margin-bottom: 6px; }
+  #quiz-body h3 { font-size: 13px; color: var(--text-dim); margin: 14px 0 6px; border-top: 1px solid var(--panel-border); padding-top: 12px; }
   .quiz-meta { font-size: 12px; color: var(--text-dim); margin: 6px 0 10px; line-height: 1.6; }
   .quiz-q { font-size: 14.5px; line-height: 1.7; font-weight: 600; margin-bottom: 12px; }
   .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
   .quiz-opt { text-align: left; min-height: 46px; border-radius: 10px; border: 1.5px solid var(--panel-border);
-    background: #0d0f13; color: var(--text); font-size: 13.5px; line-height: 1.6; padding: 10px 12px; cursor: pointer; }
+    background: #0d1017; color: var(--text); font-size: 13.5px; line-height: 1.6; padding: 10px 12px; cursor: pointer; }
   .quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
   .quiz-opt:disabled { cursor: default; opacity: 0.85; }
   .quiz-opt.correct { border-color: var(--green-bright); background: #12291a; color: var(--green-bright); opacity: 1; }
@@ -267,115 +345,186 @@
   .quiz-next { width: 100%; min-height: 46px; margin-top: 12px; border-color: var(--accent); color: var(--accent);
     background: #122031; font-weight: 600; font-size: 14px; }
   .quiz-score { font-size: 20px; font-weight: 800; margin: 8px 0 4px; }
-  .quiz-wr { background: #0d0f13; border: 1px solid #7c3a28; border-radius: 8px; padding: 9px 10px;
+  .quiz-wr { background: #0d1017; border: 1px solid #7c3a28; border-radius: 8px; padding: 9px 10px;
     margin-bottom: 8px; font-size: 12.5px; line-height: 1.6; }
   .quiz-wr .wr-q { font-weight: 600; margin-bottom: 4px; }
   .quiz-wr .wr-a { color: var(--green-bright); }
   .quiz-wr .wr-e { color: var(--text-dim); margin-top: 4px; font-size: 12px; }
-  /* ---- 学习资源区 ---- */
-  .res-item { display: flex; gap: 10px; align-items: flex-start; background: #0d0f13;
-    border: 1px solid var(--panel-border); border-radius: 8px; padding: 9px 10px; margin-bottom: 8px; }
-  .res-ico { flex: 0 0 26px; height: 26px; border-radius: 6px; display: flex; align-items: center;
-    justify-content: center; font-size: 12px; font-weight: 700; }
-  .res-course { background: #122031; color: #7fc4ff; border: 1px solid #28527c; }
-  .res-video { background: #2a1220; color: #e06ab0; border: 1px solid #6b2f52; }
-  .res-practice { background: #12291a; color: var(--green-bright); border: 1px solid #2f6b31; }
-  .res-article { background: #241e10; color: #e0b34a; border: 1px solid #6b5420; }
-  .res-main { flex: 1; min-width: 0; }
-  .res-title { font-size: 13px; font-weight: 600; color: var(--text); text-decoration: none; line-height: 1.5; }
-  a.res-title:hover { color: var(--accent); text-decoration: underline; }
-  .res-title.no-link { color: var(--text-dim); }
-  .res-note { font-size: 11.5px; color: var(--text-dim); line-height: 1.6; margin-top: 4px; }
-  .res-src { flex: 0 0 auto; max-width: 38%; font-size: 10px; color: var(--text-dim);
-    border: 1px solid var(--panel-border); border-radius: 999px; padding: 2px 7px; line-height: 1.5; }
-  .res-locked { background: #12151c; border: 1px dashed #3a5a8c; border-radius: 10px; padding: 14px; text-align: center; }
-  .res-locked-t { font-size: 13.5px; font-weight: 700; color: #7fc4ff; }
-  .res-locked-s { font-size: 12px; color: var(--text-dim); margin: 6px 0 10px; line-height: 1.6; }
-  /* ---- 快速诊断 ---- */
-  .qd-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
-  .qd-btn { min-height: 52px; border-radius: 10px; border: 1.5px solid var(--panel-border); background: #0d0f13;
-    color: var(--text); font-size: 14px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 3px; }
-  .qd-btn:disabled { opacity: 0.45; cursor: default; }
-  .qd-btn:not(:disabled):hover { border-color: var(--accent); }
-  .qd-soon { font-size: 10.5px; color: var(--text-dim); font-weight: 400; }
   .qd-group-t { font-size: 13px; font-weight: 700; margin: 14px 0 6px; }
   .qd-group-t.ok { color: var(--green-bright); }
   .qd-group-t.bad { color: var(--bad); }
-  /* ---- 会员弹层 ---- */
-  #member-modal { position: fixed; inset: 0; z-index: 65; background: rgba(8,10,14,0.72); display: none;
+
+  /* ---------- 站内看课（iframe 全屏层） ---------- */
+  #course-screen { position: fixed; inset: 0; z-index: 44; background: var(--bg); display: none;
+    flex-direction: column; }
+  #course-screen.show { display: flex; }
+  .cs-top { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--panel);
+    border-bottom: 1px solid var(--panel-border); flex: 0 0 auto; }
+  #cs-back { min-height: 40px; padding: 4px 12px; border-radius: 8px; border: 1px solid var(--panel-border);
+    background: #0d1017; color: var(--text); font-size: 14px; cursor: pointer; flex: 0 0 auto; }
+  .cs-title { font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cs-src { font-size: 11px; color: var(--text-dim); padding: 5px 12px; background: #0d1017;
+    border-bottom: 1px solid var(--panel-border); flex: 0 0 auto; }
+  .cs-src a { color: #7fc4ff; text-decoration: none; }
+  /* 五件套条：看视频 → 领任务单 → 做课后练习（→ 课件 / 教学设计） */
+  .cs-pack { display: flex; gap: 8px; overflow-x: auto; padding: 8px 12px; background: var(--panel);
+    border-bottom: 1px solid var(--panel-border); flex: 0 0 auto; -webkit-overflow-scrolling: touch; }
+  .cs-pack:empty { display: none; }
+  .pk-item { flex: 0 0 auto; width: 128px; border: 1.5px solid var(--panel-border);
+    background: #0d1017; border-radius: 10px; padding: 7px 9px; cursor: pointer; text-align: left;
+    color: var(--text); font-family: inherit; }
+  .pk-item.active { border-color: var(--accent); background: #122031; }
+  .pk-item .pk-type { font-size: 10.5px; font-weight: 700; color: #7fc4ff; }
+  .pk-item .pk-title { font-size: 11.5px; line-height: 1.4; margin-top: 2px; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .pk-item .pk-fmt { font-size: 10px; color: var(--text-dim); margin-top: 3px; }
+  #cs-frame { flex: 1; border: none; background: #fff; min-height: 0; }
+  .cs-bottom { display: flex; gap: 10px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--panel); border-top: 1px solid var(--panel-border); flex: 0 0 auto; }
+  .cs-bottom .tbtn { flex: 1; min-height: 46px; font-size: 14px; font-weight: 700; }
+  #cs-checkin { border-color: #2f6b31; color: var(--green-bright); background: #12291a; }
+  #cs-checkin.done { opacity: 0.6; }
+
+  /* ---------- 会员弹层 / 引导 / 提示 ---------- */
+  #member-modal, #onboard { position: fixed; inset: 0; z-index: 65; background: rgba(6,8,12,0.72); display: none;
     align-items: flex-end; justify-content: center; }
-  #member-modal.show { display: flex; }
+  #member-modal.show, #onboard.show { display: flex; }
+  .ob-box { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 14px 14px 0 0;
+    width: 100%; max-width: 560px; padding: 20px 18px calc(18px + env(safe-area-inset-bottom, 0px)); }
   @media (min-width: 768px) {
-    #member-modal { align-items: center; }
-    #member-modal .ob-box { border-radius: 14px; }
+    #member-modal, #onboard { align-items: center; }
+    .ob-box { border-radius: 14px; }
   }
+  .ob-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .ob-sub { font-size: 12.5px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.6; }
+  .ob-roles { display: flex; gap: 10px; margin-bottom: 14px; }
+  .ob-roles button { flex: 1; min-height: 46px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;
+    border: 1.5px solid var(--panel-border); background: #0d1017; color: var(--text-dim); }
+  .ob-roles button.active { border-color: var(--accent); color: var(--accent); background: #122031; }
+  .ob-grades { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  .ob-grades button { min-height: 44px; min-width: 0; border-radius: 8px; font-size: 14px; cursor: pointer;
+    border: 1px solid var(--panel-border); background: #0d1017; color: var(--text); }
+  @media (max-width: 767px) { .ob-grades { grid-template-columns: repeat(4, 1fr); } }
+  .ob-grades button:hover { border-color: var(--accent); }
+  .ob-close { width: 100%; margin-top: 12px; min-height: 40px; border-radius: 8px; border: none;
+    background: none; color: var(--text-dim); font-size: 12.5px; cursor: pointer; }
+  .ob-step-tag { font-size: 11.5px; color: var(--accent); font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px; }
+  .ob-back { width: 100%; min-height: 38px; margin-top: 8px; border: none; background: none;
+    color: var(--text-dim); font-size: 12.5px; cursor: pointer; }
+  .ob-subjects { display: flex; gap: 10px; }
+  .ob-subjects button { flex: 1; min-height: 56px; border-radius: 10px; font-size: 15px; font-weight: 700;
+    cursor: pointer; border: 1.5px solid var(--panel-border); background: #0d1017; color: var(--text); }
+  .ob-subjects button:hover, .ob-subjects button.active { border-color: var(--accent); color: var(--accent); background: #122031; }
+  .ob-summary { font-size: 13.5px; line-height: 2; background: #0d1017; border: 1px solid var(--panel-border);
+    border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+  .ob-summary b { color: var(--accent); }
+  .ob-enter { width: 100%; min-height: 48px; border-radius: 10px; border: none; background: var(--accent);
+    color: #0b1220; font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 4px; }
   .member-benefits { list-style: none; margin-bottom: 14px; }
   .member-benefits li { font-size: 13px; line-height: 1.6; padding: 8px 10px; margin-bottom: 6px;
-    background: #0d0f13; border: 1px solid var(--panel-border); border-radius: 8px; }
+    background: #0d1017; border: 1px solid var(--panel-border); border-radius: 8px; }
   .member-benefits li b { color: #7fc4ff; }
   .member-act { display: flex; gap: 8px; }
   .member-act input { flex: 1; min-height: 44px; min-width: 0; padding: 8px 12px; border-radius: 8px;
-    border: 1px solid var(--panel-border); background: #0d0f13; color: var(--text); font-size: 14px; outline: none; }
+    border: 1px solid var(--panel-border); background: #0d1017; color: var(--text); font-size: 14px; outline: none; }
   .member-act input:focus { border-color: var(--accent); }
   .member-act button { min-height: 44px; padding: 0 22px; border-radius: 8px; border: 1.5px solid var(--accent);
     background: #122031; color: var(--accent); font-size: 14.5px; font-weight: 700; cursor: pointer; }
   .member-note { font-size: 11.5px; color: var(--text-dim); margin-top: 8px; }
   .member-err { font-size: 12.5px; color: var(--bad); min-height: 18px; margin-top: 4px; }
-  /* ---- 轻提示 ---- */
   #toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 70;
     background: rgba(24,30,40,0.96); border: 1px solid var(--accent); color: var(--text);
     padding: 10px 18px; border-radius: 999px; font-size: 13.5px; display: none; max-width: 88vw; text-align: center;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5); pointer-events: none; }
 </style>
 </head>
 <body>
 <div id="app">
   <header>
-    <h1>中国 K12 知识地图</h1>
-    <div class="sub">每个点是一个微知识点 · 颜色 = 学科 · 纵轴 = 年级（1 在下，12 在上）· 连线 = 先修关系 · 数据对齐 2022 版义务教育课程标准 · 「道德与法治」「语文」已按 2024 版新教材/新课标完整填充（道法 143、语文 150 个知识点），其余学科为骨架占位</div>
+    <h1>学习地图<span class="dot"> · </span>K12 家长导航</h1>
+    <div class="sub">不诊断，不推荐 · 数据对齐 2022 版义务教育课程标准 · 课程资源来自国家中小学智慧教育平台</div>
   </header>
-  <div id="toolbar">
-    <input id="search" type="text" placeholder="搜索知识点名称…" autocomplete="off">
-    <div id="chips"></div>
-    <span id="mastery-stats"></span>
-    <button class="tbtn" id="btn-next">下一步学什么</button>
-    <button class="tbtn" id="btn-plan">学习路径</button>
-    <button class="tbtn" id="btn-qdiag">快速诊断</button>
-    <button class="tbtn" id="btn-grade">我的年级</button>
-    <button class="tbtn" id="btn-member">会员</button>
-    <label class="toggle hide-m-row"><input type="checkbox" id="cb-alledges"> 显示全部先修线<span class="hide-m">（默认只显示道法内部）</span></label>
-  </div>
-  <div id="main">
-    <div id="canvas-wrap">
-      <canvas id="map"></canvas>
-      <div id="tooltip"></div>
-      <div id="search-results"></div>
-      <div id="legend">
-        <span class="lg-dot" style="background:var(--green)"></span>已掌握 &nbsp;
-        <span class="lg-dot" style="background:transparent;border:2px solid var(--bad);width:6px;height:6px"></span>还不会 &nbsp;
-        <span class="lg-dot" style="background:#8a8f9a"></span>未标记（学科原色）<br>
-        实色圆点 = 完整知识点 · 虚线半透明 = 骨架占位 · 纵轴：年级（下 1 → 上 12）<br>
-        滚轮/双指缩放 · 拖拽平移 · 点击节点查看详情
+
+  <div id="views">
+    <!-- 诊断 tab（主入口） -->
+    <section id="view-diag" class="view scroll-view"><div class="scroll-inner" id="diag-body"></div></section>
+
+    <!-- 计划 tab -->
+    <section id="view-plan" class="view scroll-view"><div class="scroll-inner" id="plan-body"></div></section>
+
+    <!-- 图谱 tab -->
+    <section id="view-map" class="view">
+      <div id="map-toolbar">
+        <input id="search" type="text" placeholder="搜索知识点名称…" autocomplete="off">
+        <div id="chips"></div>
+        <span id="mastery-stats"></span>
+        <button class="tbtn" id="btn-next">下一步学什么</button>
       </div>
-      <div id="loading">正在加载数据…</div>
-    </div>
-    <div id="panel-resizer" title="拖拽调整面板宽度"></div>
-    <div id="panel">
-      <div id="panel-handle"><div class="grip"></div></div>
-      <div id="panel-body"><div id="empty-hint">点击地图上的任意节点，查看详情。<br>用「已掌握 / 还不会」标记你的学习状态，再用「下一步学什么」获取推荐。</div></div>
-    </div>
+      <div id="map-main">
+        <div id="canvas-wrap">
+          <canvas id="map"></canvas>
+          <div id="tooltip"></div>
+          <div id="search-results"></div>
+          <div id="legend">
+            <span class="lg-dot" style="background:var(--green)"></span>已掌握 &nbsp;
+            <span class="lg-dot" style="background:transparent;border:2px solid var(--bad);width:6px;height:6px"></span>还不会 &nbsp;
+            <span class="lg-dot" style="background:#8a8f9a"></span>未标记<br>
+            图谱缓慢自转，悬停/触摸即停 · 点选节点可追溯先修链<br>
+            滚轮/双指缩放 · 拖拽平移 · 纵轴 = 年级（下 1 → 上 12）
+          </div>
+          <div id="loading">正在加载数据…</div>
+        </div>
+        <div id="panel-resizer" title="拖拽调整面板宽度"></div>
+        <div id="panel">
+          <div id="panel-handle"><div class="grip"></div></div>
+          <div id="panel-body"><div id="empty-hint">点击图谱上的任意节点，查看它的先修链与详情。<br>先用「诊断」找出孩子的薄弱点，再来这里追溯根源。</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 我的 tab -->
+    <section id="view-me" class="view scroll-view"><div class="scroll-inner" id="me-body"></div></section>
+  </div>
+
+  <nav id="tabbar">
+    <button class="tab-btn" data-tab="diag">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      诊断
+    </button>
+    <button class="tab-btn" data-tab="plan">
+      <svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 5.5l1.2 1.2L7.5 4.5M4 11.5l1.2 1.2 2.3-2.2M4 17.5l1.2 1.2 2.3-2.2"/></svg>
+      计划<span class="tab-badge" id="plan-badge"></span>
+    </button>
+    <button class="tab-btn" data-tab="map">
+      <svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.4"/><circle cx="12" cy="6" r="2.4"/><circle cx="18.5" cy="15" r="2.4"/><path d="M7.4 16.2l3.2-8M13.9 7.6l3.4 5.6"/></svg>
+      图谱
+    </button>
+    <button class="tab-btn" data-tab="me">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.4-3.6 4.2-5.4 7.5-5.4s6.1 1.8 7.5 5.4"/></svg>
+      我的
+    </button>
+  </nav>
+</div>
+
+<div id="quiz-screen"><div id="quiz-body"></div></div>
+
+<div id="course-screen">
+  <div class="cs-top">
+    <button id="cs-back">‹ 返回</button>
+    <div class="cs-title" id="cs-title"></div>
+  </div>
+  <div class="cs-src">课程资源来自国家中小学智慧教育平台 · <a id="cs-ext" href="#" target="_blank" rel="noopener noreferrer">加载异常？在浏览器打开 ↗</a></div>
+  <div class="cs-pack" id="cs-pack"></div>
+  <iframe id="cs-frame" title="国家中小学智慧教育平台课时" allowfullscreen></iframe>
+  <div class="cs-bottom">
+    <button class="tbtn" id="cs-quiz">配套练习 · 测一测</button>
+    <button class="tbtn" id="cs-checkin">看完打卡 ✓</button>
   </div>
 </div>
 
-<div id="onboard">
-  <div class="ob-box" id="ob-box"></div>
-</div>
+<div id="onboard"><div class="ob-box" id="ob-box"></div></div>
+<div id="member-modal"><div class="ob-box" id="member-box"></div></div>
 <div id="toast"></div>
-
-<div id="member-modal">
-  <div class="ob-box" id="member-box"></div>
-</div>
 
 <script>
 (async function () {
@@ -387,6 +536,36 @@
     fetch('data/quiz.json').then(r => r.json()),
     fetch('data/resources.json').then(r => r.json()),
   ]);
+  // coaching 数据（R4 内容原子，另一管线产出）：文件不存在或结构不符时优雅降级为空
+  let coaching = {};
+  try {
+    const r = await fetch('data/coaching.json');
+    if (r.ok) {
+      const c = await r.json();
+      // key 可能在顶层，也可能嵌在 coaching 字段下
+      const raw = c && typeof c === 'object' && !Array.isArray(c)
+        ? (c.coaching && typeof c.coaching === 'object' && !Array.isArray(c.coaching) ? c.coaching : c)
+        : {};
+      for (const k of Object.keys(raw)) {
+        const v = raw[k];
+        if (v && typeof v === 'object' && !Array.isArray(v)) coaching[k] = v;
+      }
+    }
+  } catch (e) { coaching = {}; }
+  // 五件套课程包（R5）：视频课程/课件/教学设计/学习任务单/课后练习，按 topicId 关联；缺失时优雅降级
+  const resPackByTopic = new Map();
+  try {
+    const r = await fetch('data/resources_pack.json');
+    if (r.ok) {
+      const d = await r.json();
+      const packs = d && (d.packs || d.resources);
+      if (Array.isArray(packs)) {
+        for (const p of packs) {
+          if (p && p.topicId && Array.isArray(p.items)) resPackByTopic.set(p.topicId, p.items);
+        }
+      }
+    }
+  } catch (e) {}
   document.getElementById('loading').remove();
 
   const topics = topicsData.topics;
@@ -396,7 +575,7 @@
   for (const c of standardsData.curricula) for (const s of c.standards) stdByKey.set(s.key, s);
   const clusterByKey = new Map(clustersData.clusters.map(c => [c.subject + '|' + c.domain, c]));
 
-  // ---------- 题库与学习资源（data/quiz.json / data/resources.json） ----------
+  // ---------- 题库与学习资源 ----------
   const quizByTopic = new Map();
   for (const q of quizData.questions) {
     if (!quizByTopic.has(q.topicId)) quizByTopic.set(q.topicId, []);
@@ -420,6 +599,10 @@
     }
     return a;
   }
+  function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
 
   // ---------- 布局 ----------
   const SUBJECT_ORDER = ['道德与法治','语文','数学','英语','科学','物理','化学','生物','历史','地理','思想政治','信息科技','体育与健康','艺术','劳动'];
@@ -428,7 +611,7 @@
     '物理':'#38b6d9','化学':'#d94f9e','生物':'#7bc043','历史':'#c98a4b','地理':'#4aa06a',
     '思想政治':'#d94f4f','信息科技':'#5a6ee0','体育与健康':'#e0c23a','艺术':'#e06ab0','劳动':'#8a8f6a'
   };
-  const COL_W = 300, ROW_H = 78, GRADE_BASE = 0;   // y 世界坐标向上为正
+  const COL_W = 300, ROW_H = 78, GRADE_BASE = 0;
   const subjects = SUBJECT_ORDER.filter(s => topics.some(t => t.subject === s));
   const subjX = new Map(subjects.map((s, i) => [s, i * COL_W + COL_W / 2]));
 
@@ -439,7 +622,6 @@
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(t);
   }
-  // 同（学科,年级）组内按黄金角螺旋（θ=i×2.4, r=c√i）散布成簇；y 保持年级硬约束（仅 ±12 微抖动避免全重叠）
   for (const [key, list] of groups) {
     list.sort((a, b) => a.domain.localeCompare(b.domain, 'zh') || a.name.localeCompare(b.name, 'zh'));
     const SPIRAL_C = Math.min(24, 118 / Math.sqrt(Math.max(list.length - 1, 1)));
@@ -464,6 +646,7 @@
     if (!unlocksOf.has(d.prerequisiteId)) unlocksOf.set(d.prerequisiteId, []);
     unlocksOf.get(d.prerequisiteId).push({ id: d.topicId, strength: d.strength, reason: d.reason });
   }
+  // 传递闭包（BFS）
   function collectChain(startId, map) {
     const seen = new Map();
     const stack = [startId];
@@ -479,7 +662,7 @@
     return seen;
   }
 
-  // ---------- 轻量 x 向力导向松弛（静态：加载时一次算好，y 不动） ----------
+  // ---------- x 向力导向松弛（加载时一次算好） ----------
   (function relaxLayout() {
     const deg = new Map();
     for (const d of deps) {
@@ -490,7 +673,6 @@
     for (const t of topics) {
       const dg = deg.get(t.id) || 0;
       t._deg = dg;
-      // 枢纽节点（先修边多）半径放大 1.3–2 倍
       t._r = 6 * (dg < 3 ? 1 : Math.min(2, 1.3 + (dg - 3) * 0.175));
     }
     const ITER = 60, K_ATT = 0.015, MIN_D = 30;
@@ -500,14 +682,12 @@
       bySubj.get(t.subject).push(t);
     }
     for (let it = 0; it < ITER; it++) {
-      // 1) 同学科先修边 x 向吸引 → 先修链呈自然链状
       for (const d of deps) {
         const a = topicById.get(d.prerequisiteId), b = topicById.get(d.topicId);
         if (!a || !b || a.subject !== b.subject) continue;
         const dx = (b._x - a._x) * K_ATT;
         a._x += dx; b._x -= dx;
       }
-      // 2) x 向碰撞松弛（同学科内按 x 排序做近邻检测，y 不动）
       for (const list of bySubj.values()) {
         list.sort((p, q) => p._x - q._x);
         for (let i = 0; i < list.length; i++) {
@@ -522,7 +702,6 @@
           }
         }
       }
-      // 3) 列边界钳制：学科列之间不混在一起
       for (const t of topics) {
         const cx = subjX.get(t.subject);
         t._x = Math.max(cx - 138, Math.min(cx + 138, t._x));
@@ -539,10 +718,9 @@
   try { profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null'); } catch (e) { profile = null; }
   function saveMastery() { try { localStorage.setItem(MASTERY_KEY, JSON.stringify(mastery)); } catch (e) {} }
   function saveProfile() { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) {} }
-  // state: 'yes' | 'no' | null(取消)
   function setMastery(id, state) {
-    if (id == null || !topicById.has(id)) return;   // 脏数据拒绝写入
-    if (state && mastery[id] === state) delete mastery[id];       // 同状态再点一次 = 取消
+    if (id == null || !topicById.has(id)) return;
+    if (state && mastery[id] === state) delete mastery[id];
     else if (state) mastery[id] = state;
     else delete mastery[id];
     saveMastery();
@@ -557,11 +735,9 @@
       if (mastery[t.id] === 'yes') yes++;
       else if (mastery[t.id] === 'no') no++;
     }
-    document.getElementById('mastery-stats').innerHTML =
-      `已掌握 <b class="s-yes">${yes}</b> / 还不会 <b class="s-no">${no}</b> / 共 ${total}（当前筛选范围）`;
-    updatePlanBtn();   // 掌握度变化会改变学习路径队列长度
+    const el = document.getElementById('mastery-stats');
+    if (el) el.innerHTML = `已掌握 <b class="s-yes">${yes}</b> / 还不会 <b class="s-no">${no}</b> / 共 ${total}`;
   }
-  // 强制写入掌握度（测一测/快速诊断判分用，不走"同状态再点取消"的 toggle 逻辑）
   function forceMastery(id, state) {
     if (id == null || !topicById.has(id)) return;
     mastery[id] = state;
@@ -570,15 +746,60 @@
     requestDraw();
   }
 
-  // ---------- Canvas ----------
+  // ---------- Tab 管理 ----------
+  const TAB_NAMES = { diag: '诊断', plan: '计划', map: '图谱', me: '我的' };
+  let currentTab = null;
+  let mapVisible = false;
+  function switchTab(name) {
+    if (!TAB_NAMES[name]) return;
+    currentTab = name;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    if (name === 'map') {
+      mapVisible = true;
+      if (!mapInited) initMapView();
+      resize();
+      requestDraw();
+    } else {
+      mapVisible = false;
+      if (rafId != null) { cancelAnimationFrame(rafId); rafId = null; }
+      lastTick = 0;
+      if (name === 'diag') renderDiagTab();
+      else if (name === 'plan') renderPlanTab();
+      else if (name === 'me') renderMeTab();
+    }
+  }
+  document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
+
+  // ---------- Canvas（Marble 美学：深空底 + 慢速自转 + 生长入场） ----------
   const wrap = document.getElementById('canvas-wrap');
   const canvas = document.getElementById('map');
   const ctx = canvas.getContext('2d');
   const tooltip = document.getElementById('tooltip');
   let W = 0, H = 0, dpr = 1;
   let scale = 0.8, tx = 0, ty = 0;
-  function worldToScreen(x, y) { return [x * scale + tx, H - (y * scale + ty)]; }
-  function screenToWorld(sx, sy) { return [(sx - tx) / scale, (H - sy - ty) / scale]; }
+  let rotAngle = 0;                    // 自转角度（弧度，绕屏幕中心）
+  const ROT_SPEED = 0.006;             // rad/s，约 17 分钟一圈
+  let hoverPause = false, touchPause = false;
+  let focusTween = null;               // 聚焦补间 {t0,dur,from:{tx,ty,scale},to:{...}}
+
+  // 世界 → 屏幕：先仿射，再绕屏幕中心旋转 rotAngle（屏幕中心像素不动）
+  function worldToScreen(x, y) {
+    const sx = x * scale + tx, sy = H - (y * scale + ty);
+    if (!rotAngle) return [sx, sy];
+    const cx = W / 2, cy = H / 2, c = Math.cos(rotAngle), s = Math.sin(rotAngle);
+    const dx = sx - cx, dy = sy - cy;
+    return [cx + dx * c - dy * s, cy + dx * s + dy * c];
+  }
+  function screenToWorld(sx, sy) {
+    if (rotAngle) {
+      const cx = W / 2, cy = H / 2, c = Math.cos(-rotAngle), s = Math.sin(-rotAngle);
+      const dx = sx - cx, dy = sy - cy;
+      sx = cx + dx * c - dy * s; sy = cy + dx * s + dy * c;
+    }
+    return [(sx - tx) / scale, (H - sy - ty) / scale];
+  }
 
   function hexA(hex, a) {
     const n = parseInt(hex.slice(1), 16);
@@ -586,7 +807,7 @@
   }
   function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); }
 
-  // ---- 离屏背景：深色径向渐变（中心略亮）+ 静态星云/微光粒子（resize 时重渲染一次，不每帧算） ----
+  // ---- 离屏背景：#0A0C14 深空径向渐变 + 静态星云/星点（resize 时重渲染一次） ----
   const bgCanvas = document.createElement('canvas');
   function renderBackground() {
     bgCanvas.width = Math.max(1, Math.round(W * dpr));
@@ -594,7 +815,7 @@
     const b = bgCanvas.getContext('2d');
     b.setTransform(dpr, 0, 0, dpr, 0, 0);
     const g = b.createRadialGradient(W * 0.5, H * 0.42, 0, W * 0.5, H * 0.42, Math.hypot(W, H) * 0.75);
-    g.addColorStop(0, '#181d29'); g.addColorStop(0.55, '#11141c'); g.addColorStop(1, '#0a0c11');
+    g.addColorStop(0, '#141828'); g.addColorStop(0.55, '#0e1120'); g.addColorStop(1, '#0A0C14');
     b.fillStyle = g; b.fillRect(0, 0, W, H);
     let seed = 20240612;
     const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
@@ -613,8 +834,8 @@
     }
   }
 
-  // ---- 节点光晕精灵：每学科色 + 掌握绿 各预渲染一张（内芯亮 → 学科色 → 透明） ----
-  const SPR_SIZE = 128, SPR_CORE = 24, SPR_K = SPR_SIZE / (SPR_CORE * 2);   // 光晕外径 ≈ 2.67r
+  // ---- 节点光晕精灵 ----
+  const SPR_SIZE = 128, SPR_CORE = 24, SPR_K = SPR_SIZE / (SPR_CORE * 2);
   function makeSprite(color) {
     const c = document.createElement('canvas');
     c.width = c.height = SPR_SIZE;
@@ -632,18 +853,31 @@
   for (const s of subjects) sprites.set(s, makeSprite(COLORS[s] || '#999'));
   const spriteYes = makeSprite('#3fae6a');
 
-  // ---------- 渲染循环：标脏 + rAF 合帧；脉冲/流动线/入场/惯性共用同一循环，静止时停帧 ----------
+  // ---------- 渲染循环 ----------
   let rafId = null;
-  let enterT0 = -1, enterDone = false;   // 入场 stagger 动画（只播一次）
-  let inertia = null;                    // 平移惯性
-  function animActive() { return !enterDone || !!inertia || selectedId != null || highlightEdges.size > 0; }
-  function requestDraw() { if (rafId == null) rafId = requestAnimationFrame(tick); }
+  let lastTick = 0;
+  let enterT0 = -1, enterDone = false;
+  let inertia = null;
+  function rotActive() { return mapVisible && !hoverPause && !touchPause && !focusTween && !inertia; }
+  function animActive() {
+    return mapVisible && (!enterDone || !!inertia || !!focusTween || selectedId != null
+      || highlightEdges.size > 0 || rotActive());
+  }
+  function requestDraw() {
+    if (!mapVisible) return;
+    if (rafId == null) rafId = requestAnimationFrame(tick);
+  }
   function tick(now) {
     rafId = null;
-    window.__cnkFrames = (window.__cnkFrames || 0) + 1;   // 帧计数（停帧自检用）
+    window.__cnkFrames = (window.__cnkFrames || 0) + 1;
+    const dt = lastTick ? Math.min(64, now - lastTick) : 16;
+    lastTick = now;
     stepInertia(now);
+    stepTween(now);
+    if (rotActive()) rotAngle += ROT_SPEED * dt / 1000;
     draw(now);
     if (animActive()) requestDraw();
+    else lastTick = 0;
   }
   function stepInertia(now) {
     if (!inertia) return;
@@ -654,17 +888,40 @@
     inertia.vx *= decay; inertia.vy *= decay;
     if (now - inertia.t0 > inertia.dur || Math.hypot(inertia.vx, inertia.vy) < 0.02) inertia = null;
   }
+  function stepTween(now) {
+    if (!focusTween) return;
+    const p = Math.min(1, (now - focusTween.t0) / focusTween.dur);
+    const e = 1 - Math.pow(1 - p, 3);   // easeOutCubic
+    tx = focusTween.from.tx + (focusTween.to.tx - focusTween.from.tx) * e;
+    ty = focusTween.from.ty + (focusTween.to.ty - focusTween.from.ty) * e;
+    scale = focusTween.from.scale + (focusTween.to.scale - focusTween.from.scale) * e;
+    if (p >= 1) focusTween = null;
+  }
+  // 点选节点 → 相机聚焦补间
+  function startFocus(t) {
+    if (!t) return;
+    const targetScale = Math.min(2.4, Math.max(1.15, scale));
+    const syTarget = isMobile() ? H * 0.32 : H / 2;
+    focusTween = {
+      t0: performance.now(), dur: 620,
+      from: { tx, ty, scale },
+      to: { tx: W / 2 - t._x * targetScale, ty: (H - syTarget) - t._y * targetScale, scale: targetScale }
+    };
+    requestDraw();
+  }
 
   function resize() {
+    if (!mapVisible && !mapInited) return;
     dpr = window.devicePixelRatio || 1;
     W = wrap.clientWidth; H = wrap.clientHeight;
+    if (!W || !H) return;
     canvas.width = W * dpr; canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     renderBackground();
     applySheetState();
     requestDraw();
   }
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', () => { if (mapVisible) resize(); });
 
   function fitView() {
     const xs = topics.map(t => t._x), ys = topics.map(t => t._y);
@@ -674,27 +931,11 @@
     scale = Math.max(0.2, Math.min(1.0, scale));
     tx = (W - (minX + maxX) * scale) / 2;
     ty = (H - (minY + maxY) * scale) / 2;
-    // 窄屏（手机）：全图缩不下时，横向居中到已完整填充的「道德与法治」列
     if (W < 768 && (maxX - minX) * scale > W) {
       const dfX = subjX.get('道德与法治');
       if (dfX != null) tx = W / 2 - dfX * scale;
     }
   }
-  // 平移缩放到指定年级区域
-  function focusGrade(g) {
-    if (isMobile()) { focusGradeMobile(g); return; }
-    const xs = topics.map(t => t._x);
-    let cx = (Math.min(...xs) + Math.max(...xs)) / 2;
-    // 窄屏同样以道法列为横向中心，避免主内容落在屏幕外
-    if (W < 768 && subjX.get('道德与法治') != null) cx = subjX.get('道德与法治');
-    const cy = g * ROW_H;
-    scale = Math.min(1.1, Math.max(0.5, W / 2600, H / 900));
-    scale = Math.min(6, Math.max(0.12, scale));
-    tx = W / 2 - cx * scale;
-    ty = H / 2 - cy * scale;
-    requestDraw();
-  }
-  // 移动端落地视图：定位到指定年级的学科列（默认道法），scale≈0.9，节点可分辨可瞄准
   function focusGradeMobile(g, subject) {
     const want = subject && subjX.get(subject) != null ? subject : '道德与法治';
     const cx = subjX.get(want) != null ? subjX.get(want)
@@ -703,9 +944,7 @@
     const cy = g * ROW_H;
     tx = W / 2 - cx * scale;
     ty = H * 0.42 - cy * scale;
-    requestDraw();
   }
-  // 定位到「年级 × 学科」区域（桌面端）
   function focusGradeSubject(g, subject) {
     if (isMobile()) { focusGradeMobile(g, subject); return; }
     let cx = subject && subjX.get(subject) != null ? subjX.get(subject) : null;
@@ -719,19 +958,17 @@
     scale = Math.min(6, Math.max(0.12, scale));
     tx = W / 2 - cx * scale;
     ty = H / 2 - cy * scale;
-    requestDraw();
   }
 
   // ---------- 状态 ----------
   const activeSubjects = new Set(subjects);
-  let showAllEdges = false;
   let selectedId = null, hoverId = null;
   let highlightSet = new Set(), highlightEdges = new Set();
   let searchMatches = new Set();
-  let panelView = 'empty';   // 'empty' | 'detail' | 'diag' | 'next' | 'quiz' | 'qdiag' | 'plan'
+  let panelView = 'empty';   // 'empty' | 'detail' | 'diag' | 'next'
   let diagRootId = null;
-  let quiz = null;           // 答题会话 { mode:'node'|'quick', topicId?, grade?, items, idx, picked, results, scored }
-  let qdiag = { step: 'subject' };   // 快速诊断流程状态 subject | grade
+  let quiz = null;           // 答题会话 { mode:'node'|'quick', returnTo, topicId?, grade?, subject?, items, idx, picked, results, scored }
+  let diagFlow = { step: 'subject' };   // 诊断 tab 流程：subject | grade
 
   function visible(t) { return activeSubjects.has(t.subject); }
   function isMobile() { return window.innerWidth < 768; }
@@ -741,46 +978,44 @@
     now = now || performance.now();
     ctx.clearRect(0, 0, W, H);
     ctx.drawImage(bgCanvas, 0, 0, W, H);
+    // 年级网格线（随世界旋转）
     ctx.font = '11px sans-serif';
     for (let g = 1; g <= 12; g++) {
-      const [x0, sy] = worldToScreen(0, g * ROW_H);
-      ctx.strokeStyle = g % 3 === 1 ? '#232833' : '#1a1e27';
-      ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
+      const [x0, y0] = worldToScreen(-600, g * ROW_H);
+      const [x1, y1] = worldToScreen(5200, g * ROW_H);
+      ctx.strokeStyle = g % 3 === 1 ? 'rgba(80,92,120,0.16)' : 'rgba(80,92,120,0.08)';
+      ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      const [lx, ly] = worldToScreen(-70, g * ROW_H);
       ctx.fillStyle = '#5a6373';
-      ctx.fillText(g + ' 年级', 6, sy - 4);
-    }
-    const bandLabel = [[1, '小学'], [7, '初中'], [10, '高中']];
-    for (const [g, name] of bandLabel) {
-      const [, sy] = worldToScreen(0, g * ROW_H + 30);
-      ctx.fillStyle = '#3d4452'; ctx.font = 'bold 13px sans-serif';
-      ctx.fillText(name, W - 46, sy);
+      ctx.textAlign = 'right';
+      ctx.fillText(g + ' 年级', lx, ly - 4);
+      ctx.textAlign = 'left';
     }
     ctx.font = 'bold 13px sans-serif';
     for (const s of subjects) {
       if (!activeSubjects.has(s)) continue;
-      const [sx] = worldToScreen(subjX.get(s), 0);
+      const [sx, sy] = worldToScreen(subjX.get(s), 12 * ROW_H + 70);
       ctx.fillStyle = COLORS[s];
       ctx.textAlign = 'center';
-      ctx.fillText(s, sx, 20);
+      ctx.fillText(s, sx, sy);
       ctx.textAlign = 'left';
     }
 
-    // 入场动画进度：节点按年级从低到高 stagger 点亮（只播一次）
+    // 入场生长动画：节点按年级从低到高 stagger 点亮（每次进入图谱播一次）
     let enterNow = 1e9;
     if (!enterDone) {
       if (enterT0 < 0) enterT0 = now;
       enterNow = now - enterT0;
-      if (enterNow > 820) enterDone = true;
+      if (enterNow > 900) enterDone = true;
     }
 
-    // 边
-    const dashOff = -((now / 30) % 24);   // 高亮链流动虚线：随时间递减，方向 = 先修 → 后续
+    // 边：默认透明度 ≤0.1（Marble 暗纹）；选中后只画高亮先修链
+    const dashOff = -((now / 30) % 24);
     for (const d of deps) {
       const a = topicById.get(d.prerequisiteId), b = topicById.get(d.topicId);
       if (!a || !b || !visible(a) || !visible(b)) continue;
-      const isDf = a.subject === '道德与法治' && b.subject === '道德与法治';
       const inHL = highlightEdges.has(d.prerequisiteId + '>' + d.topicId);
-      if (!inHL && !showAllEdges && !isDf) continue;
+      if (selectedId && !inHL) continue;   // 选中态：无关心整条隐去
       const [x1, y1] = worldToScreen(a._x, a._y);
       const [x2, y2] = worldToScreen(b._x, b._y);
       if ((x1 < -50 && x2 < -50) || (x1 > W + 50 && x2 > W + 50)) continue;
@@ -795,7 +1030,7 @@
         ctx.setLineDash([7, 5]); ctx.lineDashOffset = dashOff;
         ctx.stroke(); ctx.setLineDash([]);
       } else {
-        const alpha = d.strength === 'hard' ? 0.4 : 0.2;
+        const alpha = d.strength === 'hard' ? 0.09 : 0.05;
         const eg = ctx.createLinearGradient(x1, y1, x2, y2);
         eg.addColorStop(0, hexA(a._color, alpha));
         eg.addColorStop(1, hexA(b._color, alpha));
@@ -804,8 +1039,8 @@
       }
     }
 
-    // 节点（掌握度着色：已掌握=绿色实心，还不会=橙红描边强调，未标记=学科原色光晕）
-    const pulse = 1 + 0.14 * Math.sin(now / 280);   // 选中节点呼吸脉冲
+    // 节点
+    const pulse = 1 + 0.14 * Math.sin(now / 280);
     for (const t of topics) {
       if (!visible(t)) continue;
       const [sx, sy] = worldToScreen(t._x, t._y);
@@ -814,19 +1049,21 @@
       const m = mastery[t.id];
       let ea = 1;
       if (!enterDone) {
-        const delay = ((t._gMid - 1) / 11) * 520 + (hashStr(t.id) % 70);
-        const p = Math.max(0, Math.min(1, (enterNow - delay) / 180));
+        const delay = ((t._gMid - 1) / 11) * 560 + (hashStr(t.id) % 80);
+        const p = Math.max(0, Math.min(1, (enterNow - delay) / 200));
         ea = p * p * (3 - 2 * p);
         if (ea <= 0) continue;
       }
+      // 选中态：无关节点降至 4% 透明度
+      if (selectedId && !highlightSet.has(t.id) && t.id !== selectedId) ea *= 0.04;
       let r = (t._r || 6) * Math.min(1.3, Math.max(0.6, scale));
       if (t.id === selectedId) r *= 1.35 * pulse;
       else if (t.id === hoverId) r *= 1.18;
-      if (!enterDone) r *= 0.5 + 0.5 * ea;
+      if (!enterDone) r *= 0.3 + 0.7 * Math.min(1, ea * 2);
       const S = r * 2 * SPR_K;
-      ctx.globalAlpha = ea * (skeleton ? 0.55 : 1);
+      const nodeAlpha = ea * (skeleton ? 0.55 : 1);
+      ctx.globalAlpha = nodeAlpha;
       ctx.drawImage(m === 'yes' ? spriteYes : sprites.get(t.subject), sx - S / 2, sy - S / 2, S, S);
-      ctx.globalAlpha = 1;
       ctx.beginPath();
       if (m === 'yes') {
         ctx.arc(sx, sy, r, 0, Math.PI * 2);
@@ -847,7 +1084,8 @@
         ctx.arc(sx, sy, r, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 1; ctx.stroke();
       }
-      if (highlightSet.has(t.id)) {
+      ctx.globalAlpha = 1;   // 高亮/搜索圈不受节点透明度影响
+      if (highlightSet.has(t.id) && t.id !== selectedId) {
         ctx.beginPath(); ctx.arc(sx, sy, r + 4.5, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(255,214,90,0.9)'; ctx.lineWidth = 2; ctx.stroke();
       }
@@ -870,10 +1108,10 @@
     }
   }
 
-  // ---------- 指针交互（鼠标 + 触摸统一 Pointer Events） ----------
+  // ---------- 指针交互 ----------
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
-    inertia = null;
+    inertia = null; focusTween = null;
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
     const [wx, wy] = screenToWorld(mx, my);
@@ -883,13 +1121,20 @@
     requestDraw();
   }, { passive: false });
 
-  const pointers = new Map();   // pointerId -> {x, y, t}
+  // 悬停即停（仅鼠标）
+  canvas.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'mouse') { hoverPause = true; }
+  });
+  canvas.addEventListener('pointerleave', (e) => {
+    if (e.pointerType === 'mouse') { hoverPause = false; tooltip.style.display = 'none'; hoverId = null; requestDraw(); }
+  });
+
+  const pointers = new Map();
   let panMoved = 0, panLast = null, downTime = 0, pinch = null;
-  let velSamples = [];          // 单指平移速度采样（用于松手惯性）
+  let velSamples = [];
 
   function hitTest(sx, sy, isTouch) {
     const [wx, wy] = screenToWorld(sx, sy);
-    // 触控热区放大：世界坐标判定半径至少 28/scale
     let best = null, bestD = isTouch ? Math.max(28 / scale, 10) : 16 / scale + 8;
     for (const t of topics) {
       if (!visible(t)) continue;
@@ -903,7 +1148,8 @@
     try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, t: Date.now() });
     tooltip.style.display = 'none';
-    inertia = null;   // 新触点打断惯性滑行
+    inertia = null; focusTween = null;
+    touchPause = true;   // 触摸即停
     if (pointers.size === 1) {
       panMoved = 0; panLast = { x: e.clientX, y: e.clientY }; downTime = Date.now();
       velSamples = [];
@@ -916,7 +1162,7 @@
         mx: (p1.x + p2.x) / 2, my: (p1.y + p2.y) / 2,
         scale, tx, ty
       };
-      panMoved = 999;   // 双指后不再算轻点
+      panMoved = 999;
     }
   });
 
@@ -926,7 +1172,6 @@
     if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, t: pointers.get(e.pointerId).t });
 
     if (pointers.size === 2 && pinch) {
-      // 双指捏合缩放，以两指中心为锚点
       const [p1, p2] = [...pointers.values()];
       const d = Math.hypot(p2.x - p1.x, p2.y - p1.y);
       const cx = (p1.x + p2.x) / 2 - rect.left, cy = (p1.y + p2.y) / 2 - rect.top;
@@ -947,7 +1192,6 @@
       requestDraw();
       return;
     }
-    // hover（仅鼠标）
     if (e.pointerType === 'mouse' && pointers.size === 0) {
       const best = hitTest(mx, my, false);
       const newHover = best ? best.id : null;
@@ -972,22 +1216,20 @@
     const wasSingle = pointers.size === 1 && pointers.has(e.pointerId);
     const isTouch = e.pointerType !== 'mouse';
     pointers.delete(e.pointerId);
+    if (pointers.size === 0) touchPause = false;   // 抬起后恢复自转（鼠标悬停仍暂停）
     if (pointers.size < 2) pinch = null;
     if (pointers.size === 1) {
-      // 双指抬一指：panLast 重置为剩余手指当前位置，避免视图跳变
       const [p] = [...pointers.values()];
       panLast = { x: p.x, y: p.y };
       velSamples = [];
     }
     if (pointers.size === 0) {
       canvas.classList.remove('dragging');
-      // 轻点判定：位移 <10px 且时长 <500ms
       if (wasSingle && panMoved < 10 && (Date.now() - downTime) < 500) {
         const rect = canvas.getBoundingClientRect();
         const best = hitTest(e.clientX - rect.left, e.clientY - rect.top, isTouch);
         if (best) selectTopic(best.id);
       } else if (wasSingle && isTouch && panMoved >= 10 && velSamples.length >= 2) {
-        // 平移惯性：按最近 100ms 速度给 300–600ms 衰减位移（rAF 循环内推进）
         const last = velSamples[velSamples.length - 1];
         const recent = velSamples.filter(s => last.t - s.t <= 100);
         const first = recent[0] || last;
@@ -1015,10 +1257,9 @@
   const panel = document.getElementById('panel');
   const panelBody = document.getElementById('panel-body');
   const handle = document.getElementById('panel-handle');
-  let sheetState = 'collapsed';   // collapsed | half | full
+  let sheetState = 'collapsed';
 
-  const EMPTY_HINT_HTML = '<div id="empty-hint">点击地图上的任意节点，查看详情。<br>用「已掌握 / 还不会」标记你的学习状态，再用「下一步学什么」获取推荐。</div>';
-  // 半屏档位：面板自然停靠在 bottom:0，translateY 相对自然位置；half = 面板高度的 42%
+  const EMPTY_HINT_HTML = '<div id="empty-hint">点击图谱上的任意节点，查看它的先修链与详情。<br>先用「诊断」找出孩子的薄弱点，再来这里追溯根源。</div>';
   const SHEET_HALF_RATIO = 0.42;
   function sheetStops() {
     const h = panel.offsetHeight;
@@ -1030,7 +1271,6 @@
       panel.classList.remove('sheet-half', 'sheet-full', 'dragging');
       return;
     }
-    // 用百分比/calc 而非 px：面板高度随头部回流变化时档位位置自动跟随
     panel.style.transform = sheetState === 'full' ? 'translateY(0)'
       : sheetState === 'half' ? `translateY(${SHEET_HALF_RATIO * 100}%)`
       : 'translateY(calc(100% - 38px))';
@@ -1045,12 +1285,10 @@
     if (isMobile()) { sheetState = 'collapsed'; applySheetState(); }
     else panel.classList.add('hidden');
     selectedId = null; panelView = 'empty'; diagRootId = null;
-    quiz = null; qdiag = { step: 'subject' };
     highlightSet.clear(); highlightEdges.clear();
-    panelBody.innerHTML = EMPTY_HINT_HTML;   // 重置为空态，避免陈旧面板
+    panelBody.innerHTML = EMPTY_HINT_HTML;
     requestDraw();
   }
-  // 把手拖拽：上拉半屏→全屏，下拉收起
   let hDrag = null;
   handle.addEventListener('pointerdown', (e) => {
     if (!isMobile()) return;
@@ -1065,7 +1303,7 @@
     let top = hDrag.baseTop + (e.clientY - hDrag.startY);
     top = Math.max(wrapRect.top, Math.min(wrapRect.bottom - 38, top));
     hDrag.moved += Math.abs(e.movementY || 0);
-    const naturalTop = wrapRect.bottom - panel.offsetHeight;   // bottom:0 的自然停靠位置
+    const naturalTop = wrapRect.bottom - panel.offsetHeight;
     panel.style.transform = `translateY(${top - naturalTop}px)`;
   });
   handle.addEventListener('pointerup', (e) => {
@@ -1075,11 +1313,8 @@
     const naturalTop = wrap.getBoundingClientRect().bottom - h;
     const curY = panel.getBoundingClientRect().top - naturalTop;
     if (hDrag.moved < 6) {
-      // 轻点把手：在 半屏 ↔ 全屏 间切换（收起态则半屏弹出）
       sheetState = sheetState === 'collapsed' ? 'half' : (sheetState === 'half' ? 'full' : 'half');
     } else {
-      // 吸附：目标位置按实际档位静止位置计算（half = h*0.42），
-      // 最近档判定 ⇒ 半屏下拉需超过 half→collapsed 的一半距离才降级；当前档给 24px 粘滞
       const stops = sheetStops();
       let best = sheetState, bestD = Infinity;
       for (const [name, y] of stops) {
@@ -1094,19 +1329,19 @@
   });
   handle.addEventListener('pointercancel', () => { hDrag = null; panel.classList.remove('dragging'); applySheetState(); });
 
-  // ---------- 详情面板 ----------
+  // ---------- 详情面板（点选节点 → 追溯视图） ----------
   const TYPE_CN = { CONCEPTUAL: '概念理解', PROCEDURAL: '方法技能', REPRESENTATIONAL: '表征方式', LANGUAGE: '语言表达', META: '元认知' };
   function gradeTxtOf(t) { return t.gradeRangeStart === t.gradeRangeEnd ? t.gradeRangeStart + ' 年级' : t.gradeRangeStart + '–' + t.gradeRangeEnd + ' 年级'; }
-  function chainHtml(chain, title) {
-    if (!chain.size) return '';
-    const items = [...chain.entries()].map(([id, e]) => {
-      const t = topicById.get(id);
-      return `<div class="chain-item ${e.strength}" data-id="${id}">
-        <span style="color:${t._color}">${t.name}</span>
-        <span class="r">${t.gradeRangeStart === t.gradeRangeEnd ? t.gradeRangeStart + '年级' : t.gradeRangeStart + '-' + t.gradeRangeEnd + '年级'} · ${e.strength === 'hard' ? '硬依赖' : '软依赖'}：${e.reason}</span>
+  function chainListHtml(list, emptyTxt) {
+    if (!list.length) return `<div class="desc" style="color:var(--text-dim);font-size:12px">${emptyTxt}</div>`;
+    return list.map(e => {
+      const t = topicById.get(e.id);
+      if (!t) return '';
+      return `<div class="chain-item ${e.strength}" data-id="${e.id}">
+        <span style="color:${t._color}">${esc(t.name)}</span>
+        <span class="r">${gradeTxtOf(t)} · ${e.strength === 'hard' ? '硬依赖' : '软依赖'}${e.reason ? '：' + esc(e.reason) : ''}</span>
       </div>`;
     }).join('');
-    return `<h3>${title}（${chain.size}）</h3>${items}`;
   }
 
   function renderPanel(keepScroll) {
@@ -1114,17 +1349,45 @@
     if (panelView === 'detail' && selectedId) renderDetail();
     else if (panelView === 'diag' && diagRootId) renderDiag();
     else if (panelView === 'next') renderNext();
-    else if (panelView === 'quiz' && quiz) renderQuiz();
-    else if (panelView === 'qdiag') renderQDiag();
-    else if (panelView === 'plan') renderPlan();
     if (keepScroll) panelBody.scrollTop = st;
+  }
+
+  // coaching 卡：ask 问句 + pattern 规律 + variants 课外变式 + drills 同类训练（答案默认折叠，给思路不给答案）
+  function renderCoachCard(coach) {
+    const vars = Array.isArray(coach.variants) ? coach.variants : [];
+    const drills = Array.isArray(coach.drills) ? coach.drills : [];
+    if (!coach.ask && !coach.pattern && !vars.length && !drills.length) return '';
+    const varsHtml = vars.length ? `
+      <div class="ask-sec">课外变式 · 换个语境还是这条规律（${vars.length}）</div>
+      ${vars.map(v => `<div class="var-item">
+        <div class="v-t">${esc(v.text)}</div>
+        <div class="v-e">${esc(v.explain)}</div>
+      </div>`).join('')}` : '';
+    const drillsHtml = drills.length ? `
+      <div class="ask-sec">同类训练（${drills.length}）· 先看思路提示，做完再点开核对</div>
+      ${drills.map((d, i) => `<div class="drill-item">
+        <div class="d-q">${esc(d.q)}</div>
+        ${d.hint ? `<div class="d-hint"><b>思路：</b>${esc(d.hint)}</div>` : ''}
+        <button class="drill-ans-btn" type="button">查看答案（先自己做完再对）</button>
+        <div class="drill-ans"><b>参考答案：</b>${esc(d.answer)}</div>
+      </div>`).join('')}` : '';
+    return `
+      <div class="ask-card">
+        ${coach.ask ? `<div class="ask-tag">家长一问 · 可观察行为</div><div class="ask-q">${esc(coach.ask)}</div>` : ''}
+        ${coach.pattern ? `<div class="ask-pattern">规律：${esc(coach.pattern)}</div>` : ''}
+        ${varsHtml}
+        ${drillsHtml}
+      </div>`;
   }
 
   function renderDetail() {
     const t = topicById.get(selectedId);
     if (!t) return;
-    const pre = collectChain(selectedId, prereqsOf);
-    const unlock = collectChain(selectedId, unlocksOf);
+    const preClosure = collectChain(selectedId, prereqsOf);          // 先修总数（传递闭包 BFS）
+    const unlockClosure = collectChain(selectedId, unlocksOf);
+    const directPre = prereqsOf.get(selectedId) || [];               // 直接先修
+    const directUnlock = unlocksOf.get(selectedId) || [];            // 解锁什么
+    const coach = coaching[selectedId] || null;
     const cluster = clusterByKey.get(t.subject + '|' + t.domain);
     const m = mastery[selectedId];
     const stdHtml = (t.standards || []).map(k => {
@@ -1133,7 +1396,9 @@
     }).join('');
     const mBadge = m === 'yes' ? '<span class="badge m-yes">已掌握 ✓</span>'
                  : m === 'no' ? '<span class="badge m-no">还不会</span>' : '';
-    // 家长检验卡：检验问题 + 怎么算答对 + 答对了/没答对
+    // coaching 卡（ask/pattern/variants/drills 来自 data/coaching.json；无数据时不渲染此卡）
+    const askHtml = coach ? renderCoachCard(coach) : '';
+    // 家长检验卡
     const assessInner = t.assessmentPrompt ? `
       <div class="assess-card">
         <div class="assess-q">检验问题：${t.assessmentPrompt}</div>
@@ -1144,7 +1409,6 @@
         </div>
         <div class="assess-fb" id="assess-fb">${m === 'yes' ? '<span class="assess-fb ok">已标记为已掌握 ✓</span>' : m === 'no' ? '<span class="assess-fb bad">已标记为还不会</span>' : ''}</div>
       </div>` : '';
-    // 身份差异：家长 → 默认展开并前置到描述之上；学生 → 默认折叠，保持原位
     const isParent = profile && profile.role === 'parent';
     const assessCardTop = (t.assessmentPrompt && isParent) ? `<h3>家长检验卡</h3>${assessInner}` : '';
     const assessCard = (t.assessmentPrompt && !isParent) ? `
@@ -1152,19 +1416,23 @@
         <button class="assess-toggle" id="assess-toggle">家长检验卡 ▸ 点击展开</button>
         ${assessInner}
       </div>` : '';
-    // 测一测入口（会员功能）：仅该知识点有题库时显示
     const quizBtnHtml = quizByTopic.has(selectedId)
-      ? `<button class="tbtn quiz-entry" id="btn-quiz">测一测 · 3 道题确证掌握度${isMember() ? '' : '（会员）'}</button>` : '';
+      ? `<button class="tbtn quiz-entry" id="btn-quiz">测一测 · ${quizByTopic.get(selectedId).length} 道题确证掌握度${isMember() ? '' : '（会员）'}</button>` : '';
     const resHtml = resourceSectionHtml(selectedId);
     panelBody.innerHTML = `
       <button id="panel-close" title="关闭">×</button>
-      <h2 style="color:${t._color}">${t.name}</h2>
+      <h2 style="color:${t._color}">${esc(t.name)}</h2>
       <div class="badges">
         <span class="badge" style="color:${t._color};border-color:${t._color}">${t.subject} · ${t.domain}</span>
         <span class="badge type">${TYPE_CN[t.type] || t.type}</span>
         <span class="badge grade">${gradeTxtOf(t)}</span>
-        ${t.status === 'skeleton' ? '<span class="badge skeleton">骨架占位</span>' : '<span class="badge" style="color:#9fe6a0;border-color:#2f6b31">已完整填充</span>'}
+        ${t.status === 'skeleton' ? '<span class="badge skeleton">骨架占位</span>' : ''}
         ${mBadge}
+      </div>
+      <div class="trace-stats">
+        <div class="trace-stat"><div class="n">${preClosure.size}</div><div class="l">先修总数（全链）</div></div>
+        <div class="trace-stat"><div class="n">${directPre.length}</div><div class="l">直接先修</div></div>
+        <div class="trace-stat"><div class="n">${directUnlock.length}</div><div class="l">学会后解锁</div></div>
       </div>
       <div class="mbtns">
         <button class="mbtn m-no ${m === 'no' ? 'active' : ''}" id="mb-no">✗ 还不会</button>
@@ -1172,9 +1440,10 @@
       </div>
       <div class="mbtn-hint">再点一次同一按钮可取消标记</div>
       ${quizBtnHtml}
-      <button class="tbtn" id="btn-plan-detail" style="width:100%;min-height:44px;margin-bottom:8px">学习路径：把不会的按顺序排好 ›</button>
-      <button class="tbtn" id="btn-diag" style="width:100%;min-height:44px">这题/这个知识点我不会，帮我找原因</button>
+      <button class="tbtn" id="btn-addplan" style="width:100%;min-height:44px;margin-bottom:8px">把「还不会」的先修链排进今日清单 ›</button>
+      <button class="tbtn" id="btn-diag" style="width:100%;min-height:44px">这个知识点不会，帮我找原因</button>
       ${assessCardTop}
+      ${askHtml}
       <div class="desc">${t.description}</div>
       ${t.status === 'skeleton' ? '<div class="placeholder-note">⚠ 骨架占位节点：内容待按该学科课标逐步填充，当前仅展示知识结构位置（仍可标记掌握度）。</div>' : ''}
       ${(t.evidence && t.evidence.length && !t.assessmentPrompt) ? `<h3>掌握证据（能做到这些就算学会）</h3><ul>${t.evidence.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
@@ -1182,8 +1451,12 @@
       ${stdHtml ? `<h3>课标对齐（2022 年版义务教育课程标准）</h3>${stdHtml}` : ''}
       ${cluster ? `<h3>本单元概述</h3><div class="desc" style="font-size:12.5px;color:var(--text-dim)">${cluster.summary}</div>` : ''}
       ${resHtml}
-      ${chainHtml(pre, '↑ 先学这些（先修链）')}
-      ${chainHtml(unlock, '↓ 学会后能解锁（后续知识点）')}
+      <h3>直接先修（${directPre.length}）</h3>
+      ${chainListHtml(directPre, '没有直接先修，这是基础起点。')}
+      <h3>学会后能解锁（${directUnlock.length}）</h3>
+      ${chainListHtml(directUnlock, '暂无后续知识点依赖它。')}
+      <h3>完整先修链（${preClosure.size}）</h3>
+      ${chainListHtml([...preClosure.values()], '这个知识点没有先修节点。')}
       <div style="height:20px"></div>`;
     bindDetailEvents();
   }
@@ -1193,15 +1466,16 @@
     panelBody.querySelector('#mb-yes').onclick = () => { setMastery(selectedId, 'yes'); renderPanel(true); };
     panelBody.querySelector('#mb-no').onclick = () => { setMastery(selectedId, 'no'); renderPanel(true); };
     panelBody.querySelector('#btn-diag').onclick = () => { panelView = 'diag'; diagRootId = selectedId; renderPanel(); };
-    panelBody.querySelector('#btn-plan-detail').onclick = () => {
+    panelBody.querySelector('#btn-addplan').onclick = () => {
       const ids = buildPlanIds();
-      if (!ids.length) { toast('还没有排队的内容：先把不会的知识点标记「还不会」，或做一次快速诊断'); return; }
-      openPlan();
+      if (!ids.length) { toast('先把不会的知识点标记「还不会」，或到「诊断」tab 做一次诊断'); return; }
+      buildTodayPlan(ids);
+      switchTab('plan');
     };
     const bq = panelBody.querySelector('#btn-quiz');
-    if (bq) bq.onclick = () => requireMember(() => startNodeQuiz(selectedId));
+    if (bq) bq.onclick = () => requireMember(() => startNodeQuiz(selectedId, 'map'));
     const br = panelBody.querySelector('#btn-retest');
-    if (br) br.onclick = () => requireMember(() => startNodeQuiz(selectedId));
+    if (br) br.onclick = () => requireMember(() => startNodeQuiz(selectedId, 'map'));
     const ru = panelBody.querySelector('#res-unlock');
     if (ru) ru.onclick = () => requireMember(() => renderPanel(true));
     const at = panelBody.querySelector('#assess-toggle');
@@ -1225,17 +1499,22 @@
         toast(mastery[selectedId] === 'no' ? '已标记为还不会，可以试试「帮我找原因」' : '已取消标记');
       };
     }
-    panelBody.querySelectorAll('.chain-item').forEach(el => el.onclick = () => {
-      selectTopic(el.dataset.id); ensureVisible(topicById.get(el.dataset.id));
+    panelBody.querySelectorAll('.chain-item').forEach(el => el.onclick = () => selectTopic(el.dataset.id));
+    panelBody.querySelectorAll('.drill-ans-btn').forEach(btn => btn.onclick = () => {
+      const item = btn.closest('.drill-item');
+      const open = item.classList.toggle('open');
+      btn.textContent = open ? '收起答案' : '查看答案（先自己做完再对）';
+    });
+    panelBody.querySelectorAll('[data-course-url]').forEach(el => el.onclick = () => {
+      openCourse(selectedId, el.dataset.courseUrl, el.dataset.courseTitle);
     });
   }
 
-  // ---------- 错因回溯（诊断模式） ----------
+  // ---------- 错因回溯（诊断模式，面板内） ----------
   function renderDiag() {
     const root = topicById.get(diagRootId);
     if (!root) return;
     const chain = collectChain(diagRootId, prereqsOf);
-    // 先修链按年级从高到低（离当前知识点最近的先排前面）
     const list = [...chain.entries()].sort((a, b) => {
       const ta = topicById.get(a[0]), tb = topicById.get(b[0]);
       return tb.gradeRangeStart - ta.gradeRangeStart;
@@ -1245,10 +1524,10 @@
       const m = mastery[id];
       return `<div class="diag-row" data-id="${id}">
         <div class="dr-head">
-          <span class="dr-name" style="color:${t._color}">${t.name}</span>
+          <span class="dr-name" style="color:${t._color}">${esc(t.name)}</span>
           <span class="dr-grade">${gradeTxtOf(t)}</span>
         </div>
-        <div class="dr-reason">为什么相关：${e.reason}</div>
+        <div class="dr-reason">为什么相关：${esc(e.reason || '后续学习以它为基础')}</div>
         <div class="dr-btns">
           <button class="no ${m === 'no' ? 'active' : ''}" data-id="${id}" data-v="no">不会</button>
           <button class="yes ${m === 'yes' ? 'active' : ''}" data-id="${id}" data-v="yes">会</button>
@@ -1257,23 +1536,23 @@
     }).join('');
     panelBody.innerHTML = `
       <button id="panel-close" title="关闭">×</button>
-      <h2 style="color:${root._color}">错因回溯：${root.name}</h2>
-      <div class="desc" style="color:var(--text-dim);font-size:12.5px">学不会往往是因为前面的基础有缺口。下面是「${root.name}」的完整先修链，逐个自评「会 / 不会」，我帮你找到最根上的缺口。（自评会直接写入掌握度标记）</div>
+      <h2 style="color:${root._color}">错因回溯：${esc(root.name)}</h2>
+      <div class="desc" style="color:var(--text-dim);font-size:12.5px">学不会往往是因为前面的基础有缺口。下面是「${esc(root.name)}」的完整先修链，逐个自评「会 / 不会」，帮你找到最根上的缺口。（自评会直接写入掌握度标记）</div>
       <div class="diag-list">${rows || '<div class="desc">这个知识点没有先修节点，它就是最基础的起点。</div>'}</div>
       <div id="diag-conclusion-slot"></div>
-      <button class="diag-exit" id="diag-exit">‹ 退出诊断，返回详情</button>
+      <button class="diag-exit" id="diag-exit">‹ 退出，返回详情</button>
       <div style="height:20px"></div>`;
     panelBody.querySelector('#panel-close').onclick = closePanel;
     panelBody.querySelector('#diag-exit').onclick = () => { panelView = 'detail'; selectedId = diagRootId; renderPanel(); };
     panelBody.querySelectorAll('.dr-btns button').forEach(btn => {
       btn.onclick = () => {
         const id = btn.dataset.id, v = btn.dataset.v;
-        setMastery(id, v);   // 同状态再点 = 取消
+        setMastery(id, v);
         const row = panelBody.querySelector(`.diag-row[data-id="${id}"]`);
         if (row) {
-          const m = mastery[id];
-          row.querySelector('.yes').classList.toggle('active', m === 'yes');
-          row.querySelector('.no').classList.toggle('active', m === 'no');
+          const m2 = mastery[id];
+          row.querySelector('.yes').classList.toggle('active', m2 === 'yes');
+          row.querySelector('.no').classList.toggle('active', m2 === 'no');
         }
         renderDiagConclusion();
       };
@@ -1284,7 +1563,6 @@
     const slot = panelBody.querySelector('#diag-conclusion-slot');
     if (!slot) return;
     const chain = collectChain(diagRootId, prereqsOf);
-    // 最深的（年级最低）且标记"不会"的节点
     let deepest = null;
     let anyNo = false, total = 0, answered = 0;
     for (const id of chain.keys()) {
@@ -1300,14 +1578,12 @@
     if (deepest) {
       const t = topicById.get(deepest);
       slot.innerHTML = `<div class="diag-conclusion">
-        建议从这里开始补：<b>${t.name}</b>（${gradeTxtOf(t)}）—— 它是你不会的链条里最根上的缺口。把它补上，再回来重学「${topicById.get(diagRootId).name}」会顺很多。
+        建议从这里开始补：<b>${esc(t.name)}</b>（${gradeTxtOf(t)}）—— 它是不会的链条里最根上的缺口。把它补上，再回来重学「${esc(topicById.get(diagRootId).name)}」会顺很多。
         <button class="jump" id="diag-jump">跳转查看 ›</button>
       </div>`;
-      slot.querySelector('#diag-jump').onclick = () => {
-        selectTopic(deepest); ensureVisible(t);
-      };
+      slot.querySelector('#diag-jump').onclick = () => selectTopic(deepest);
     } else if (total > 0 && answered === total && !anyNo) {
-      slot.innerHTML = `<div class="diag-conclusion">整条先修链你都标记了「会」——基础没问题，可以直接攻克这个知识点本身，多练几道题试试。</div>`;
+      slot.innerHTML = `<div class="diag-conclusion">整条先修链都标记了「会」——基础没问题，可以直接攻克这个知识点本身，多练几道题试试。</div>`;
     } else if (answered > 0) {
       slot.innerHTML = `<div class="diag-conclusion" style="border-color:var(--panel-border);background:#12151c;color:var(--text-dim)">已自评 ${answered}/${total} 个先修节点，继续把剩下的评完，结论会更准。</div>`;
     } else {
@@ -1322,7 +1598,7 @@
   try { member = JSON.parse(localStorage.getItem(MEMBER_KEY) || 'null'); } catch (e) { member = null; }
   function isMember() { return !!(member && member.active); }
   function saveMember() { try { localStorage.setItem(MEMBER_KEY, JSON.stringify(member)); } catch (e) {} }
-  let pendingMemberAction = null;   // 开通成功后继续执行的动作（如进入测一测）
+  let pendingMemberAction = null;
   function requireMember(action) {
     if (isMember()) { action(); return; }
     pendingMemberAction = action;
@@ -1331,10 +1607,10 @@
   const memberModal = document.getElementById('member-modal');
   const memberBox = document.getElementById('member-box');
   const MEMBER_BENEFITS = [
-    ['诊断测确证掌握度', '每个知识点 3 道题，全对才算真掌握，不再凭感觉打勾'],
+    ['题库诊断确证掌握度', '每个知识点配题实测，全对才算真掌握，不再凭感觉打勾'],
     ['错因归因报告', '答错自动接「帮我找原因」，沿先修链追溯到最根上的缺口'],
-    ['学习资源导航', '每个知识点配套课程 / 视频 / 练习 / 方法文章，直接可学'],
-    ['复测跟踪', '学完再测一次，选项随机重排，反复确证直到全对'],
+    ['今日打卡清单', '诊断结果直接变成可勾选的动作清单，存在本地随时回来接着做'],
+    ['站内看课 + 复测跟踪', '官方课时站内播放，看完打卡；学完再测一次，反复确证直到全对'],
   ];
   function renderMemberModal() {
     if (isMember()) {
@@ -1345,8 +1621,8 @@
         <button class="ob-close" id="member-close" style="display:block">关闭</button>`;
     } else {
       memberBox.innerHTML = `
-        <div class="ob-title">开通会员，跑通「诊断测 → 找原因 → 学资源 → 复测」闭环</div>
-        <div class="ob-sub">地图浏览、自评标记、先修链、搜索、推荐永久免费；以下学习能力为会员专享：</div>
+        <div class="ob-title">开通会员，跑通「诊断 → 清单 → 看课 → 复测」闭环</div>
+        <div class="ob-sub">图谱浏览、自评标记、先修链追溯、搜索永久免费；以下能力为会员专享：</div>
         <ul class="member-benefits">${MEMBER_BENEFITS.map(([b, d]) => `<li><b>${b}</b> —— ${d}</li>`).join('')}</ul>
         <div class="member-act">
           <input id="member-code" type="text" placeholder="输入激活码" autocomplete="off">
@@ -1361,9 +1637,8 @@
         if (code === MEMBER_CODE) {
           member = { active: true, code, ts: Date.now() };
           saveMember();
-          updateMemberBtn();
           memberModal.classList.remove('show');
-          toast('会员已开通 ✓ 测一测 / 快速诊断 / 学习资源全部解锁');
+          toast('会员已开通 ✓ 诊断 / 清单 / 站内看课全部解锁');
           const act = pendingMemberAction;
           pendingMemberAction = null;
           if (act) act();
@@ -1387,13 +1662,8 @@
   memberModal.addEventListener('click', (e) => {
     if (e.target === memberModal) { memberModal.classList.remove('show'); pendingMemberAction = null; }
   });
-  function updateMemberBtn() {
-    document.getElementById('btn-member').textContent = isMember() ? '会员 ✓' : '会员';
-  }
-  document.getElementById('btn-member').onclick = openMemberModal;
-  updateMemberBtn();
 
-  // ---------- 学习资源区（会员功能） ----------
+  // ---------- 学习资源区（会员功能；课程/视频站内 iframe 播放） ----------
   const RES_ICON = { course: '课', video: '视', practice: '练', article: '文' };
   function resourceSectionHtml(topicId) {
     const items = resByTopic.get(topicId);
@@ -1402,27 +1672,38 @@
       return `<h3>学习资源（${items.length}）</h3>
         <div class="res-locked">
           <div class="res-locked-t">会员专享 · ${items.length} 个配套学习资源</div>
-          <div class="res-locked-s">课程 / 视频 / 练习 / 方法文章，学完可直接「再测一次」</div>
+          <div class="res-locked-s">课程 / 视频 / 方法文章，站内直接看，看完可打卡</div>
           <button class="tbtn" id="res-unlock" style="min-height:44px">开通会员解锁 ›</button>
         </div>`;
     }
-    const list = items.map(it => `
+    const list = items.map(it => {
+      const inApp = it.url && (it.type === 'course' || it.type === 'video');
+      return `
       <div class="res-item">
         <span class="res-ico res-${esc(it.type)}">${RES_ICON[it.type] || '资'}</span>
         <div class="res-main">
           ${it.url
-            ? `<a class="res-title" href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">${esc(it.title)} ↗</a>`
+            ? (inApp
+              ? `<button class="res-title" data-course-url="${esc(it.url)}" data-course-title="${esc(it.title)}">${esc(it.title)}（站内看课）</button>`
+              : `<a class="res-title" href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">${esc(it.title)} ↗</a>`)
             : `<span class="res-title no-link">${esc(it.title)}</span>`}
           ${it.note ? `<div class="res-note">${esc(it.note)}</div>` : ''}
         </div>
         ${it.source ? `<span class="res-src">${esc(it.source)}</span>` : ''}
-      </div>`).join('');
+      </div>`;
+    }).join('');
     return `<h3 id="res-section">学习资源（${items.length}）</h3>${list}
       <button class="tbtn quiz-entry" id="btn-retest">学完了，再测一次 ›</button>`;
   }
+  function courseOf(id) {
+    return (resByTopic.get(id) || []).find(it => it.type === 'course' && it.url)
+        || (resByTopic.get(id) || []).find(it => it.type === 'video' && it.url)
+        || null;
+  }
 
-  // ---------- 测一测 / 快速诊断 答题引擎 ----------
-  // 把原始题目转成答题项：选项去字母标号并打乱，判断题保留布尔答案
+  // ---------- 答题引擎（全屏层，诊断 tab 与图谱共用） ----------
+  const quizScreen = document.getElementById('quiz-screen');
+  const quizBody = document.getElementById('quiz-body');
   function buildQuizItems(questions) {
     return shuffle(questions).map(q => {
       if (q.type === 'choice') {
@@ -1435,16 +1716,17 @@
       return { topicId: q.topicId, type: 'judge', q: q.q, answer: !!q.answer, explain: q.explain };
     });
   }
-  function startNodeQuiz(topicId) {
+  function showQuizScreen() { quizScreen.classList.add('show'); }
+  function hideQuizScreen() { quizScreen.classList.remove('show'); }
+  function startNodeQuiz(topicId, returnTo) {
     const qs = quizByTopic.get(topicId);
     if (!qs || !qs.length) { toast('该知识点题库建设中'); return; }
-    quiz = { mode: 'node', topicId, items: buildQuizItems(qs), idx: 0, picked: null, results: [], scored: false };
-    panelView = 'quiz';
-    openPanelMobile('full');   // 答题需要完整浏览空间：移动端直接全屏档
-    renderPanel();
+    quiz = { mode: 'node', topicId, returnTo: returnTo || 'map', items: buildQuizItems(qs), idx: 0, picked: null, results: [], scored: false };
+    showQuizScreen();
+    renderQuiz();
   }
   function startQuickQuiz(grade, subject) {
-    const subj = subject || qdiag.subject || '道德与法治';
+    const subj = subject || '道德与法治';
     const pool = topics.filter(t => t.subject === subj
       && t.gradeRangeStart <= grade && t.gradeRangeEnd >= grade && quizByTopic.has(t.id));
     const pickedTopics = shuffle(pool).slice(0, Math.min(10, pool.length));
@@ -1453,21 +1735,24 @@
       const arr = quizByTopic.get(t.id);
       return arr[Math.floor(Math.random() * arr.length)];
     });
-    quiz = { mode: 'quick', grade, subject: subj, items: buildQuizItems(qs), idx: 0, picked: null, results: [], scored: false };
-    panelView = 'quiz';
-    openPanelMobile('full');
-    renderPanel();
+    quiz = { mode: 'quick', grade, subject: subj, returnTo: 'diag', items: buildQuizItems(qs), idx: 0, picked: null, results: [], scored: false };
+    showQuizScreen();
+    renderQuiz();
   }
   function exitQuiz() {
-    if (quiz && quiz.mode === 'node') {
-      panelView = 'detail'; selectedId = quiz.topicId;
-    } else {
-      panelView = 'qdiag'; qdiag = { step: 'subject' };
-    }
+    const mode = quiz && quiz.mode;
+    const topicId = quiz && quiz.topicId;
+    const returnTo = quiz && quiz.returnTo;
     quiz = null;
-    renderPanel();
+    hideQuizScreen();
+    if (mode === 'node') {
+      if (returnTo === 'plan') { switchTab('plan'); }
+      else if (returnTo === 'course') { /* 课程层仍在下方，无需切换 */ }
+      else { switchTab('map'); selectTopic(topicId); }
+    }
   }
   function renderQuiz() {
+    if (!quiz) return;
     if (quiz.idx >= quiz.items.length) { renderQuizResult(); return; }
     const item = quiz.items[quiz.idx];
     const it = topicById.get(item.topicId);
@@ -1496,9 +1781,8 @@
     const ok = answered && (item.type === 'choice' ? item.options[quiz.picked].correct : quiz.picked === item.answer);
     const title = quiz.mode === 'node'
       ? `测一测：<span style="color:${it._color}">${esc(it.name)}</span>`
-      : '快速诊断';
-    panelBody.innerHTML = `
-      <button id="panel-close" title="关闭">×</button>
+      : `快速诊断 · ${quiz.grade} 年级 ${esc(quiz.subject)}`;
+    quizBody.innerHTML = `
       <h2>${title}</h2>
       <div class="quiz-meta">第 ${quiz.idx + 1} / ${quiz.items.length} 题 · ${item.type === 'choice' ? '单选题' : '判断题'}${quiz.mode === 'quick' ? ` · 知识点：<span style="color:${it._color}">${esc(it.name)}</span>` : ''}</div>
       <div class="quiz-q">${esc(item.q)}</div>
@@ -1506,11 +1790,11 @@
       ${answered ? `<div class="quiz-fb ${ok ? 'ok' : 'bad'}">${ok ? '✓ 回答正确' : '✗ 回答错误'}</div>
         <div class="quiz-explain">${esc(item.explain)}</div>
         <button class="tbtn quiz-next" id="quiz-next">${quiz.idx + 1 < quiz.items.length ? '下一题 ›' : '查看结果 ›'}</button>` : ''}
-      <button class="diag-exit" id="quiz-exit">‹ 退出${quiz.mode === 'node' ? '，返回详情' : '快速诊断'}</button>
+      <button class="diag-exit" id="quiz-exit">‹ 退出答题</button>
       <div style="height:20px"></div>`;
-    panelBody.querySelector('#panel-close').onclick = closePanel;
-    panelBody.querySelector('#quiz-exit').onclick = exitQuiz;
-    panelBody.querySelectorAll('.quiz-opt').forEach(btn => btn.onclick = () => {
+    quizBody.parentElement.scrollTop = 0;
+    quizBody.querySelector('#quiz-exit').onclick = exitQuiz;
+    quizBody.querySelectorAll('.quiz-opt').forEach(btn => btn.onclick = () => {
       if (quiz.picked !== null) return;
       let ok2, answerText;
       if (item.type === 'choice') {
@@ -1525,10 +1809,10 @@
         answerText = v ? '对' : '错';
       }
       quiz.results.push({ item, ok: ok2, answerText });
-      renderPanel(true);
+      renderQuiz();
     });
-    const nx = panelBody.querySelector('#quiz-next');
-    if (nx) nx.onclick = () => { quiz.idx++; quiz.picked = null; renderPanel(); };
+    const nx = quizBody.querySelector('#quiz-next');
+    if (nx) nx.onclick = () => { quiz.idx++; quiz.picked = null; renderQuiz(); };
   }
   function renderQuizResult() {
     const total = quiz.results.length;
@@ -1538,7 +1822,7 @@
       const allOk = total > 0 && okCount === total;
       if (!quiz.scored) {
         quiz.scored = true;
-        forceMastery(quiz.topicId, allOk ? 'yes' : 'no');   // 3/3 → 已掌握；否则 → 还不会
+        forceMastery(quiz.topicId, allOk ? 'yes' : 'no');
       }
       const wrong = quiz.results.filter(r => !r.ok);
       const wrongHtml = wrong.map(r => {
@@ -1549,8 +1833,8 @@
           <div class="wr-e">${esc(r.item.explain)}</div>
         </div>`;
       }).join('');
-      panelBody.innerHTML = `
-        <button id="panel-close" title="关闭">×</button>
+      const course = courseOf(quiz.topicId);
+      quizBody.innerHTML = `
         <h2 style="color:${t._color}">测一测结果：${esc(t.name)}</h2>
         <div class="quiz-score" style="color:${allOk ? 'var(--green-bright)' : 'var(--bad)'}">${okCount} / ${total}</div>
         ${allOk
@@ -1558,27 +1842,30 @@
           : `<div class="quiz-fb bad">有 ${wrong.length} 道题答错，已标记为「还不会」</div>
              <h3>错题回顾</h3>${wrongHtml}
              <button class="tbtn quiz-entry" id="qr-diag">帮我找原因 ›</button>
-             ${(resByTopic.get(quiz.topicId) || []).length ? `<button class="tbtn quiz-entry" id="qr-res">看学习资源 ›</button>` : ''}`}
+             ${course ? `<button class="tbtn quiz-entry" id="qr-course">站内看课 ›</button>` : ''}`}
         <button class="tbtn quiz-next" id="qr-retest">再测一次（题目与选项重新打乱）</button>
-        <button class="diag-exit" id="qr-back">‹ 返回知识点详情</button>
+        <button class="diag-exit" id="qr-back">‹ 返回</button>
         <div style="height:20px"></div>`;
-      panelBody.querySelector('#panel-close').onclick = closePanel;
-      panelBody.querySelector('#qr-retest').onclick = () => startNodeQuiz(quiz.topicId);
-      panelBody.querySelector('#qr-back').onclick = () => {
-        panelView = 'detail'; selectedId = quiz.topicId; quiz = null; renderPanel();
-      };
-      const qd = panelBody.querySelector('#qr-diag');
+      quizBody.querySelector('#qr-retest').onclick = () => startNodeQuiz(quiz.topicId, quiz.returnTo);
+      quizBody.querySelector('#qr-back').onclick = exitQuiz;
+      const qd = quizBody.querySelector('#qr-diag');
       if (qd) qd.onclick = () => {
-        diagRootId = quiz.topicId; selectedId = quiz.topicId; quiz = null;
-        panelView = 'diag'; renderPanel();
-      };
-      const qr = panelBody.querySelector('#qr-res');
-      if (qr) qr.onclick = () => {
-        panelView = 'detail'; selectedId = quiz.topicId; quiz = null;
-        if (isMobile()) { sheetState = 'full'; applySheetState(); }   // 资源列表在全屏档浏览
+        const tid = quiz.topicId;
+        quiz = null;
+        hideQuizScreen();
+        switchTab('map');
+        selectedId = tid; diagRootId = tid; panelView = 'diag';
+        applyHighlight(tid);
+        openPanelMobile('full');
         renderPanel();
-        const sec = panelBody.querySelector('#res-section');
-        if (sec) sec.scrollIntoView({ block: 'start' });
+        startFocus(topicById.get(tid));
+      };
+      const qc = quizBody.querySelector('#qr-course');
+      if (qc) qc.onclick = () => {
+        const tid = quiz.topicId;
+        quiz = null;
+        hideQuizScreen();
+        openCourse(tid, course.url, course.title);
       };
       return;
     }
@@ -1592,6 +1879,12 @@
     }
     const okIds = [...byTopic.entries()].filter(([, e]) => e.ok === e.total).map(([id]) => id);
     const badIds = [...byTopic.entries()].filter(([, e]) => e.ok < e.total).map(([id]) => id);
+    // 记录最近一次诊断（复测入口用）
+    try {
+      localStorage.setItem('cnk12_lastdiag', JSON.stringify({
+        ts: Date.now(), grade: quiz.grade, subject: quiz.subject, ok: okCount, total, bad: badIds.length
+      }));
+    } catch (e) {}
     const itemHtml = (id) => {
       const t = topicById.get(id);
       const m = mastery[id];
@@ -1600,46 +1893,59 @@
         <div class="ni-meta">${gradeTxtOf(t)} · 当前标记：${m === 'yes' ? '已掌握 ✓' : m === 'no' ? '还不会' : '未标记'}</div>
       </div>`;
     };
-    panelBody.innerHTML = `
-      <button id="panel-close" title="关闭">×</button>
-      <h2>快速诊断结果（${quiz.grade} 年级 · ${esc(quiz.subject || '道德与法治')}）</h2>
+    quizBody.innerHTML = `
+      <h2>诊断结果（${quiz.grade} 年级 · ${esc(quiz.subject)}）</h2>
       <div class="quiz-score" style="color:${badIds.length ? 'var(--bad)' : 'var(--green-bright)'}">${okCount} / ${total} 题答对</div>
-      <div class="desc" style="color:var(--text-dim);font-size:12.5px">涉及 ${byTopic.size} 个知识点，点击任意知识点可跳转到地图详情。</div>
-      <button class="tbtn quiz-next" id="qr-mark">把结果标记到战况图</button>
-      <button class="tbtn quiz-entry" id="qr-plan">按诊断结果生成学习路径 ›</button>
+      <div class="quiz-meta">涉及 ${byTopic.size} 个知识点。诊断结果可以直接变成今天要打卡的动作清单——每项都有动作、用时和验收标准。</div>
+      ${badIds.length
+        ? `<button class="big-cta" id="qr-plan">生成今日打卡清单（${badIds.length} 个薄弱点）›</button>`
+        : `<div class="quiz-fb ok" style="margin:10px 0">全部答对，太扎实了！可以去图谱挑战更高年级的内容。</div>`}
+      <button class="ghost-cta" id="qr-mark">先把结果标记到图谱</button>
       <div class="qd-group-t ok">✓ 答对的知识点（${okIds.length}）</div>
-      ${okIds.map(itemHtml).join('') || '<div class="desc" style="color:var(--text-dim)">无</div>'}
+      ${okIds.map(itemHtml).join('') || '<div class="quiz-meta">无</div>'}
       <div class="qd-group-t bad">✗ 答错的知识点（${badIds.length}）</div>
-      ${badIds.length ? '<div class="desc" style="color:var(--text-dim);font-size:12px;margin-top:-2px">点进去用「帮我找原因」追溯根子。</div>' : ''}
-      ${badIds.map(itemHtml).join('') || '<div class="desc" style="color:var(--text-dim)">无</div>'}
-      <button class="tbtn quiz-entry" id="qr-again" style="margin-top:12px">重新抽题，再诊断一次 ›</button>
-      <button class="diag-exit" id="qr-exit">‹ 退出快速诊断</button>
+      ${badIds.map(itemHtml).join('') || '<div class="quiz-meta">无</div>'}
+      <button class="ghost-cta" id="qr-again" style="margin-top:12px">重新抽题，再诊断一次 ›</button>
+      <button class="diag-exit" id="qr-exit">‹ 返回诊断</button>
       <div style="height:20px"></div>`;
-    panelBody.querySelector('#panel-close').onclick = closePanel;
-    panelBody.querySelector('#qr-exit').onclick = () => { quiz = null; qdiag = { step: 'subject' }; panelView = 'qdiag'; renderPanel(); };
-    panelBody.querySelector('#qr-again').onclick = () => startQuickQuiz(quiz.grade, quiz.subject);
-    panelBody.querySelector('#qr-mark').onclick = (e) => {
+    quizBody.parentElement.scrollTop = 0;
+    quizBody.querySelector('#qr-exit').onclick = () => { quiz = null; hideQuizScreen(); switchTab('diag'); };
+    quizBody.querySelector('#qr-again').onclick = () => startQuickQuiz(quiz.grade, quiz.subject);
+    quizBody.querySelector('#qr-mark').onclick = () => {
       for (const id of okIds) forceMastery(id, 'yes');
       for (const id of badIds) forceMastery(id, 'no');
       toast(`已标记：${okIds.length} 个已掌握 / ${badIds.length} 个还不会`);
-      renderQuizResult();   // 重渲染刷新「当前标记」列
-    };
-    panelBody.querySelector('#qr-plan').onclick = () => {
-      // 答错的先记入掌握度（若还没点「标记到战况图」），再排路径
-      for (const id of badIds) forceMastery(id, 'no');
+      switchTab('map');
       quiz = null;
-      openPlan();
+      hideQuizScreen();
     };
-    panelBody.querySelectorAll('.next-item').forEach(el => el.onclick = () => {
-      selectTopic(el.dataset.id); ensureVisible(topicById.get(el.dataset.id));
+    const qp = quizBody.querySelector('#qr-plan');
+    if (qp) qp.onclick = () => {
+      for (const id of badIds) forceMastery(id, 'no');
+      const ids = buildPlanIds();
+      quiz = null;
+      hideQuizScreen();
+      buildTodayPlan(ids);
+      switchTab('plan');
+    };
+    quizBody.querySelectorAll('.next-item').forEach(el => el.onclick = () => {
+      quiz = null;
+      hideQuizScreen();
+      switchTab('map');
+      selectTopic(el.dataset.id);
     });
   }
 
-  // ---------- 快速诊断（会员功能，独立流程） ----------
-  function renderQDiag() {
-    if (qdiag.step === 'grade') {
-      const subj = qdiag.subject || '道德与法治';
-      // 该学科有题的年级动态生成
+  // ---------- 诊断 tab（主入口） ----------
+  const diagBody = document.getElementById('diag-body');
+  function lastDiag() {
+    try { return JSON.parse(localStorage.getItem('cnk12_lastdiag') || 'null'); } catch (e) { return null; }
+  }
+  function renderDiagTab() {
+    const ld = lastDiag();
+    const planN = plan2 && plan2.items ? plan2.items.filter(it => !it.done).length : 0;
+    if (diagFlow.step === 'grade') {
+      const subj = diagFlow.subject || '道德与法治';
       const grades = [...new Set(topics.filter(t => t.subject === subj && quizByTopic.has(t.id))
         .flatMap(t => { const gs = []; for (let g = t.gradeRangeStart; g <= Math.min(t.gradeRangeEnd, 12); g++) gs.push(g); return gs; }))].sort((a, b) => a - b);
       const gradeBtn = (g) => {
@@ -1647,51 +1953,55 @@
           && t.gradeRangeStart <= g && t.gradeRangeEnd >= g && quizByTopic.has(t.id)).length;
         return `<button class="qd-btn" data-g="${g}" ${n ? '' : 'disabled'}>${g} 年级<span class="qd-soon">${n ? `共 ${n} 个知识点，随机抽 ${Math.min(10, n)} 题` : '题库建设中'}</span></button>`;
       };
-      panelBody.innerHTML = `
-        <button id="panel-close" title="关闭">×</button>
-        <h2>快速诊断 · ${esc(subj)}</h2>
-        <div class="desc" style="color:var(--text-dim);font-size:12.5px">选年级，系统从该年级全部知识点里跨节点随机抽题，逐题作答后按知识点分组出报告：</div>
-        <div class="qd-grid">${grades.map(gradeBtn).join('')}</div>
-        <button class="diag-exit" id="qd-back">‹ 返回选学科</button>
-        <div style="height:20px"></div>`;
-      panelBody.querySelector('#panel-close').onclick = closePanel;
-      panelBody.querySelector('#qd-back').onclick = () => { qdiag.step = 'subject'; renderPanel(); };
-      panelBody.querySelectorAll('.qd-btn:not(:disabled)').forEach(btn => btn.onclick = () => {
-        startQuickQuiz(+btn.dataset.g, subj);
+      diagBody.innerHTML = `
+        <div class="card">
+          <h3>选年级 · ${esc(subj)}</h3>
+          <div class="c-sub">从该年级全部知识点里跨节点随机抽题，逐题作答后按知识点分组出结果。</div>
+          <div class="qd-grid">${grades.map(gradeBtn).join('')}</div>
+        </div>
+        <button class="ghost-cta" id="dg-back">‹ 返回选学科</button>`;
+      diagBody.querySelector('#dg-back').onclick = () => { diagFlow = { step: 'subject' }; renderDiagTab(); };
+      diagBody.querySelectorAll('.qd-btn:not(:disabled)').forEach(btn => btn.onclick = () => {
+        requireMember(() => startQuickQuiz(+btn.dataset.g, subj));
       });
       return;
     }
-    panelBody.innerHTML = `
-      <button id="panel-close" title="关闭">×</button>
-      <h2>快速诊断</h2>
-      <div class="desc" style="color:var(--text-dim);font-size:12.5px">随机抽题跨节点测一遍，快速分清哪些知识点是真会、哪些是「以为会了」。先选学科：</div>
-      <div class="qd-grid">${subjects.map(s => {
-        const ok = quizSubjects.has(s);
-        return `<button class="qd-btn" data-s="${esc(s)}" ${ok ? '' : 'disabled'} ${ok ? `style="border-color:${COLORS[s]};color:${COLORS[s]}"` : ''}>${esc(s)}${ok ? '' : '<span class="qd-soon">题库建设中</span>'}</button>`;
-      }).join('')}</div>
-      <div style="height:20px"></div>`;
-    panelBody.querySelector('#panel-close').onclick = closePanel;
-    panelBody.querySelectorAll('.qd-btn:not(:disabled)').forEach(btn => btn.onclick = () => {
-      qdiag = { step: 'grade', subject: btn.dataset.s };
-      renderPanel();
+    diagBody.innerHTML = `
+      <div class="hero">
+        <h2>先诊断，再学习</h2>
+        <p>随机抽 10 道题，跨知识点测一遍。哪里不会，今天的打卡清单就补哪里——不做没有依据的推荐。</p>
+        ${ld ? `<p style="margin-top:10px;color:var(--text)">上次诊断：${ld.grade} 年级 ${esc(ld.subject)} · ${ld.ok}/${ld.total} 题答对 · ${new Date(ld.ts).toLocaleDateString('zh-CN')}</p>` : ''}
+      </div>
+      ${planN ? `<div class="card"><div class="lastdiag">
+          <div class="ld-t">今日清单进行中：<b>${planN}</b> 项待打卡</div>
+          <button class="tbtn" id="dg-goplan" style="min-height:38px">去看看 ›</button>
+        </div></div>` : ''}
+      <div class="card">
+        <h3>第一步：选学科</h3>
+        <div class="c-sub">「道德与法治」「语文」题库已按 2024 版新教材填好，其他学科建设中。</div>
+        <div class="qd-grid">${subjects.map(s => {
+          const ok = quizSubjects.has(s);
+          return `<button class="qd-btn" data-s="${esc(s)}" ${ok ? '' : 'disabled'} ${ok ? `style="border-color:${COLORS[s]};color:${COLORS[s]}"` : ''}>${esc(s)}${ok ? '' : '<span class="qd-soon">题库建设中</span>'}</button>`;
+        }).join('')}</div>
+      </div>
+      <div class="card">
+        <h3>诊断完了会怎样？</h3>
+        <div class="c-sub">① 按知识点分组出结果，分清「真会」和「以为会了」<br>② 一键生成今日打卡清单：每项 = 动作 + 预计分钟 + 验收标准<br>③ 薄弱点自动关联官方课时，站内看课、看完打卡<br>④ 完成后随时可以复测，确证真掌握</div>
+      </div>`;
+    const gp = diagBody.querySelector('#dg-goplan');
+    if (gp) gp.onclick = () => switchTab('plan');
+    diagBody.querySelectorAll('.qd-btn:not(:disabled)').forEach(btn => btn.onclick = () => {
+      diagFlow = { step: 'grade', subject: btn.dataset.s };
+      renderDiagTab();
     });
   }
-  document.getElementById('btn-qdiag').onclick = () => requireMember(() => {
-    qdiag = { step: 'subject' };
-    panelView = 'qdiag';
-    openPanelMobile();
-    renderPanel();
-  });
 
-  // ---------- ⑤ 学习路径建议 ----------
-  // 把孩子「答错的 + 标记还不会的」知识点，连同它们还没掌握的前置，按先修关系排成顺序队列：
-  // 先补基础、再学新知。队列与完成勾选存 localStorage，可随时从工具栏回来接着学。
-  const PLAN_KEY = 'cnk12_plan';
-  let planDone = {};
-  try { planDone = (JSON.parse(localStorage.getItem(PLAN_KEY) || 'null') || {}).done || {}; } catch (e) { planDone = {}; }
-  function savePlan(ids) {
-    try { localStorage.setItem(PLAN_KEY, JSON.stringify({ ids, done: planDone, ts: Date.now() })); } catch (e) {}
-  }
+  // ---------- 今日打卡清单（R2：诊断输出 = 可执行计划） ----------
+  const PLAN2_KEY = 'cnk12_plan2';
+  let plan2 = null;
+  try { plan2 = JSON.parse(localStorage.getItem(PLAN2_KEY) || 'null'); } catch (e) { plan2 = null; }
+  function savePlan2() { try { localStorage.setItem(PLAN2_KEY, JSON.stringify(plan2)); } catch (e) {} }
+
   // 拓扑排序：前置没掌握的排前面（Kahn，同层按年级从低到高）
   function buildPlanIds() {
     const weak = Object.keys(mastery).filter(id => mastery[id] === 'no' && topicById.has(id));
@@ -1724,105 +2034,287 @@
         if (indeg.get(nx) === 0) { avail.push(nx); avail.sort(byGrade); }
       }
     }
-    for (const id of inPlan) if (!out.includes(id)) out.push(id);   // 防御：有环时兜底追加
+    for (const id of inPlan) if (!out.includes(id)) out.push(id);
     return out;
   }
-  // 「为什么先学它」：优先用它指向队列内后续知识点的依赖理由（dependencies.reason）
-  function planReason(id, idsSet) {
-    for (const e of (unlocksOf.get(id) || [])) {
-      if (idsSet.has(e.id) && e.id !== id) {
-        const t = topicById.get(e.id);
-        return `为什么先学它：要学「${t.name}」得先会这个——${e.reason}`;
-      }
-    }
-    if (mastery[id] === 'no') return '为什么先学它：这是你标记为「还不会」的知识点，前面的基础补齐后就来攻克它。';
-    return '为什么先学它：这是后面内容的基础，先把它补牢，往后学就不卡了。';
+  // 计划项：动作 + 预计分钟 + 验收标准 + 关联资源
+  const PLAN_CAP = 8;   // 一次只做一件事：今日清单最多 8 项
+  function toPlanItem(id) {
+    const t = topicById.get(id);
+    const course = courseOf(id);
+    const coach = coaching[id];
+    const hasQuiz = quizByTopic.has(id);
+    const drillsN = coach && Array.isArray(coach.drills) ? coach.drills.length : 0;
+    const minutes = (course ? 15 : 10) + (hasQuiz ? 5 : 0) + (drillsN ? 5 : 0);
+    let criteria;
+    if (hasQuiz) criteria = '测一测全部答对';
+    else if (drillsN) criteria = `做完 ${drillsN} 道变式训练，核对答案能讲清错因`;
+    else if (coach && coach.ask) criteria = coach.ask;
+    else if (t.evidence && t.evidence.length) criteria = '能做到：' + t.evidence[0];
+    else criteria = '能用自己的话给家长讲明白';
+    // 有变式训练的知识点：动作直接落到"完成 N 道变式训练"（题在图谱节点详情的 coaching 卡里）
+    const action = drillsN
+      ? `学习「${t.name}」并完成 ${drillsN} 道变式训练`
+      : `学习「${t.name}」`;
+    return { id, action, minutes, criteria, done: false };
   }
-  function courseOf(id) {
-    return (resByTopic.get(id) || []).find(it => it.type === 'course' && it.url) || null;
+  function buildTodayPlan(ids) {
+    const capped = ids.slice(0, PLAN_CAP);
+    plan2 = { date: todayStr(), items: capped.map(toPlanItem) };
+    savePlan2();
+    updatePlanBadge();
+    if (ids.length > PLAN_CAP) toast(`今日清单已生成 ${PLAN_CAP} 项；其余 ${ids.length - PLAN_CAP} 个已排队，明天继续`);
+    else toast(`今日清单已生成：${capped.length} 项，做完一项勾一项`);
   }
-  function updatePlanBtn() {
-    const ids = buildPlanIds();
-    const n = ids.filter(id => !planDone[id]).length;
-    document.getElementById('btn-plan').textContent = n ? `学习路径(${n})` : '学习路径';
+  function updatePlanBadge() {
+    const badge = document.getElementById('plan-badge');
+    const n = plan2 && plan2.items ? plan2.items.filter(it => !it.done).length : 0;
+    badge.textContent = n;
+    badge.classList.toggle('show', n > 0);
   }
-  function openPlan() {
-    const ids = buildPlanIds();
-    if (!ids.length && panelView !== 'plan') {
-      // 允许打开空态（里面有引导），不拦
-    }
-    savePlan(ids);
-    panelView = 'plan';
-    openPanelMobile();
-    renderPanel();
-  }
-  function renderPlan() {
-    const ids = buildPlanIds();
-    savePlan(ids);
-    const idsSet = new Set(ids);
-    const remaining = ids.filter(id => !planDone[id]).length;
-    let bodyHtml;
-    if (!ids.length) {
-      bodyHtml = `<div class="next-guide">现在还没有排队要学的内容。<br>在地图上把不会的知识点标记「还不会」，<br>或先做一次「快速诊断」，我会按先补基础的顺序帮你排好。</div>
-        <button class="tbtn quiz-entry" id="plan-qdiag">先做一次快速诊断 ›</button>`;
-    } else {
-      bodyHtml = `<div class="desc" style="color:var(--text-dim);font-size:12.5px;margin-top:2px">
-          按「先补基础、再学新知」排好了，从上往下学就行。每步先看课程，再「测一测」确证，最后打勾。</div>` +
-        ids.map((id, i) => {
-          const t = topicById.get(id);
-          const done = !!planDone[id];
-          const course = courseOf(id);
-          return `<div class="plan-item ${done ? 'done' : ''}" data-id="${id}">
-            <div class="plan-head">
-              <span class="plan-no">${i + 1}</span>
-              <span class="plan-name" style="color:${t._color}" data-id="${id}">${esc(t.name)}</span>
-              <span class="plan-grade">${gradeTxtOf(t)}</span>
-            </div>
-            <div class="plan-reason">${esc(planReason(id, idsSet))}</div>
-            <div class="plan-acts">
-              ${course
-                ? `<a class="plan-course" href="${esc(course.url)}" target="_blank" rel="noopener noreferrer">课程：${esc(course.title)} ↗</a>`
-                : '<span class="plan-course none">配套课程链接建设中</span>'}
-              ${quizByTopic.has(id) ? `<button class="tbtn plan-quiz" data-id="${id}">测一测</button>` : ''}
-              <button class="plan-check ${done ? 'on' : ''}" data-id="${id}">${done ? '✓ 已完成' : '标记完成'}</button>
-            </div>
-          </div>`;
-        }).join('');
-    }
-    panelBody.innerHTML = `
-      <button id="panel-close" title="关闭">×</button>
-      <h2>学习路径${ids.length ? `（还剩 ${remaining} 步）` : ''}</h2>
-      ${bodyHtml}
-      <div style="height:20px"></div>`;
-    panelBody.querySelector('#panel-close').onclick = closePanel;
-    const pq = panelBody.querySelector('#plan-qdiag');
-    if (pq) pq.onclick = () => requireMember(() => { qdiag = { step: 'subject' }; panelView = 'qdiag'; renderPanel(); });
-    panelBody.querySelectorAll('.plan-name').forEach(el => el.onclick = () => {
-      selectTopic(el.dataset.id); ensureVisible(topicById.get(el.dataset.id));
-    });
-    panelBody.querySelectorAll('.plan-quiz').forEach(el => el.onclick = () => {
-      requireMember(() => startNodeQuiz(el.dataset.id));
-    });
-    panelBody.querySelectorAll('.plan-check').forEach(el => el.onclick = () => {
-      const id = el.dataset.id;
-      if (planDone[id]) delete planDone[id];
-      else {
-        planDone[id] = true;
-        toast(mastery[id] === 'yes' ? '这一步完成 ✓' : '已打勾。记得「测一测」全对才算真掌握');
-      }
-      savePlan(buildPlanIds());
-      updatePlanBtn();
-      renderPanel(true);
-    });
-  }
-  document.getElementById('btn-plan').onclick = openPlan;
 
-  // ---------- 下一步学什么 ----------
+  const planBody = document.getElementById('plan-body');
+  function renderPlanTab() {
+    if (!plan2 || !plan2.items || !plan2.items.length) {
+      planBody.innerHTML = `
+        <div class="hero">
+          <h2>还没有今日清单</h2>
+          <p>清单来自诊断：先测出孩子哪里不会，系统按「先补基础、再学新知」排成可打卡的动作。</p>
+        </div>
+        <button class="big-cta" id="pl-godiag">先做一次诊断 ›</button>`;
+      planBody.querySelector('#pl-godiag').onclick = () => switchTab('diag');
+      return;
+    }
+    const items = plan2.items;
+    const doneN = items.filter(it => it.done).length;
+    const totalMin = items.reduce((s, it) => s + (it.minutes || 0), 0);
+    const leftMin = items.filter(it => !it.done).reduce((s, it) => s + (it.minutes || 0), 0);
+    const pct = items.length ? Math.round(doneN / items.length * 100) : 0;
+    const d = plan2.date || todayStr();
+    const dateTxt = d === todayStr() ? '今天' : `${+d.slice(5, 7)}月${+d.slice(8, 10)}日`;
+    const rows = items.map((it, i) => {
+      const t = topicById.get(it.id);
+      if (!t) return '';
+      const course = courseOf(it.id);
+      const hasQuiz = quizByTopic.has(it.id);
+      return `<div class="todo ${it.done ? 'done' : ''}" data-i="${i}">
+        <button class="todo-check" data-i="${i}" aria-label="打卡">${it.done ? '✓' : ''}</button>
+        <div class="todo-main">
+          <div class="todo-action">${esc(it.action)}</div>
+          <div class="todo-sub"><span class="todo-min">约 ${it.minutes} 分钟</span> · 验收：${esc(it.criteria)}</div>
+          <div class="todo-acts">
+            ${course ? `<button class="tbtn todo-course" data-i="${i}">看课：${esc(course.title)}</button>` : ''}
+            ${hasQuiz ? `<button class="tbtn todo-quiz" data-id="${it.id}">测一测</button>` : ''}
+            <button class="tbtn todo-locate" data-id="${it.id}">图谱定位</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    planBody.innerHTML = `
+      <div class="card">
+        <h3>${dateTxt}打卡清单</h3>
+        <div class="plan-meta">共 ${items.length} 项 · 全程约 ${totalMin} 分钟${doneN < items.length ? ` · 还剩约 ${leftMin} 分钟` : ''}</div>
+        <div class="prog"><div class="prog-bar" style="width:${pct}%"></div></div>
+        <div class="prog-txt">已完成 <b>${doneN}</b> / ${items.length} 项${doneN === items.length ? ' · 全部完成，记得复测确证 ✓' : ''}</div>
+      </div>
+      ${rows}
+      <div class="plan-foot">
+        <button class="big-cta" id="pl-retest">${doneN === items.length ? '全部完成，来一次复测 ›' : '复测（重做诊断）›'}</button>
+        <button class="ghost-cta" id="pl-rediag">换一批题目，重新诊断</button>
+      </div>`;
+    planBody.querySelectorAll('.todo-check').forEach(el => el.onclick = () => {
+      const it = plan2.items[+el.dataset.i];
+      if (!it) return;
+      it.done = !it.done;
+      savePlan2();
+      updatePlanBadge();
+      if (it.done) toast(mastery[it.id] === 'yes' ? '打卡 ✓' : '已打卡。验收别忘：' + it.criteria);
+      renderPlanTab();
+    });
+    planBody.querySelectorAll('.todo-course').forEach(el => el.onclick = () => {
+      const it = plan2.items[+el.dataset.i];
+      const course = it && courseOf(it.id);
+      if (course) openCourse(it.id, course.url, course.title, it.id);
+    });
+    planBody.querySelectorAll('.todo-quiz').forEach(el => el.onclick = () => {
+      requireMember(() => startNodeQuiz(el.dataset.id, 'plan'));
+    });
+    planBody.querySelectorAll('.todo-locate').forEach(el => el.onclick = () => {
+      switchTab('map');
+      selectTopic(el.dataset.id);
+    });
+    planBody.querySelector('#pl-retest').onclick = () => {
+      const ld = lastDiag();
+      if (ld) requireMember(() => startQuickQuiz(ld.grade, ld.subject));
+      else switchTab('diag');
+    };
+    planBody.querySelector('#pl-rediag').onclick = () => { diagFlow = { step: 'subject' }; switchTab('diag'); };
+  }
+
+  // ---------- 站内看课（R3：iframe 内嵌官方课时 + 自家外壳 UI） ----------
+  const courseScreen = document.getElementById('course-screen');
+  const csFrame = document.getElementById('cs-frame');
+  const csTitle = document.getElementById('cs-title');
+  const csExt = document.getElementById('cs-ext');
+  const csQuizBtn = document.getElementById('cs-quiz');
+  const csCheckin = document.getElementById('cs-checkin');
+  let csCtx = null;   // { topicId, planKey }
+  const WATCH_KEY = 'cnk12_watch';
+  let watchLog = {};
+  try { watchLog = JSON.parse(localStorage.getItem(WATCH_KEY) || '{}') || {}; } catch (e) { watchLog = {}; }
+  function saveWatch() { try { localStorage.setItem(WATCH_KEY, JSON.stringify(watchLog)); } catch (e) {} }
+
+  // 五件套呈现顺序：看视频 → 领任务单 → 做课后练习 → 课件 → 教学设计
+  const PACK_ORDER = [['video', '看视频'], ['taskSheet', '领任务单'], ['exercise', '做课后练习'], ['courseware', '课件'], ['lessonPlan', '教学设计']];
+  // 合规：标了 requiresAuth 的资源一律不直链文件本体，统一跳课时 playUrl 页
+  function packEntryUrl(lesson, item) {
+    if (!item) return lesson.playUrl || null;
+    if (item.requiresAuth) return lesson.playUrl || null;
+    return item.playUrl || lesson.playUrl || null;
+  }
+  function fmtDur(d) {   // ISO8601 PT15M20S → 15分20秒
+    const m = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(d || '');
+    if (!m) return '';
+    return (m[1] ? m[1] + '时' : '') + (m[2] ? m[2] + '分' : '') + (m[3] ? m[3] + '秒' : '');
+  }
+  function renderPackStrip() {
+    const box = document.getElementById('cs-pack');
+    const lesson = csCtx && csCtx.lesson;
+    if (!lesson || !lesson.pack) { box.innerHTML = ''; return; }
+    const entries = [];
+    for (const [key, label] of PACK_ORDER) {
+      const items = Array.isArray(lesson.pack[key]) ? lesson.pack[key] : [];
+      for (const it of items) entries.push({ label, it });
+    }
+    if (!entries.length) { box.innerHTML = ''; return; }
+    box.innerHTML = entries.map((e, i) => `
+      <button class="pk-item ${i === csCtx.packSel ? 'active' : ''}" data-i="${i}" type="button">
+        <div class="pk-type">${e.label}</div>
+        <div class="pk-title">${esc(e.it.title || lesson.lessonTitle || '官方资源')}</div>
+        <div class="pk-fmt">${esc(e.it.format || '')}${e.it.duration ? ' · ' + fmtDur(e.it.duration) : ''}</div>
+      </button>`).join('');
+    box.querySelectorAll('.pk-item').forEach(btn => btn.onclick = () => {
+      const e = entries[+btn.dataset.i];
+      const u = packEntryUrl(lesson, e.it);
+      if (!u) { toast('该资源需在国家中小学智慧教育平台页面内查看'); return; }
+      csCtx.packSel = +btn.dataset.i;
+      csCtx.url = u;
+      csFrame.src = u;
+      csExt.href = u;
+      csTitle.textContent = e.it.title || csCtx.title;
+      box.querySelectorAll('.pk-item').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  }
+  function openCourse(topicId, url, title, planKey) {
+    if (!url) return;
+    // 匹配五件套课时：优先按 playUrl 精确匹配，否则取该知识点的第一个课时；无数据时优雅降级为旧行为
+    const lessons = (topicId && resPackByTopic.get(topicId)) || [];
+    const lesson = lessons.find(l => l && l.playUrl === url) || lessons[0] || null;
+    csCtx = { topicId, planKey: planKey || null, lesson, url, title: title || '官方课时', packSel: 0 };
+    csTitle.textContent = csCtx.title;
+    csExt.href = url;
+    csFrame.src = url;
+    csQuizBtn.style.display = (topicId && quizByTopic.has(topicId)) ? '' : 'none';
+    renderPackStrip();
+    updateCheckinBtn();
+    courseScreen.classList.add('show');
+  }
+  function closeCourse() {
+    courseScreen.classList.remove('show');
+    csFrame.src = 'about:blank';   // 停掉播放器
+    document.getElementById('cs-pack').innerHTML = '';
+    csCtx = null;
+  }
+  function updateCheckinBtn() {
+    const watched = csCtx && csCtx.topicId && watchLog[csCtx.topicId];
+    const planDoneIt = csCtx && csCtx.planKey && plan2 && plan2.items
+      && plan2.items.some(it => it.id === csCtx.planKey && it.done);
+    const done = !!(watched || planDoneIt);
+    csCheckin.textContent = done ? '已打卡 ✓' : '看完打卡 ✓';
+    csCheckin.classList.toggle('done', done);
+  }
+  document.getElementById('cs-back').onclick = closeCourse;
+  csQuizBtn.onclick = () => {
+    if (!csCtx || !csCtx.topicId) return;
+    requireMember(() => startNodeQuiz(csCtx.topicId, 'course'));
+  };
+  csCheckin.onclick = () => {
+    if (!csCtx) return;
+    const { topicId, planKey } = csCtx;
+    if (topicId) { watchLog[topicId] = Date.now(); saveWatch(); }
+    // 从计划清单进来的看课：打卡即勾选对应计划项
+    if (planKey && plan2 && plan2.items) {
+      const it = plan2.items.find(x => x.id === planKey && !x.done);
+      if (it) {
+        it.done = true;
+        savePlan2();
+        updatePlanBadge();
+        if (currentTab === 'plan') renderPlanTab();
+        toast('已打卡，计划清单同步勾选 ✓');
+        updateCheckinBtn();
+        return;
+      }
+    }
+    toast('已打卡 ✓ 看完记得做配套练习确证');
+    updateCheckinBtn();
+  };
+
+  // ---------- 我的 tab ----------
+  const meBody = document.getElementById('me-body');
+  function renderMeTab() {
+    let yes = 0, no = 0;
+    for (const id of Object.keys(mastery)) {
+      if (!topicById.has(id)) continue;
+      if (mastery[id] === 'yes') yes++;
+      else if (mastery[id] === 'no') no++;
+    }
+    const roleTxt = profile && profile.role === 'parent' ? '家长' : profile && profile.role === 'student' ? '学生' : '未设置';
+    const gradeTxt = profile && profile.grade ? profile.grade + ' 年级' : '未设置';
+    const subjTxt = profile && profile.subject ? profile.subject : '未设置';
+    meBody.innerHTML = `
+      <div class="card">
+        <h3>学习档案</h3>
+        <div class="me-row"><span class="k">身份</span><span class="v">${roleTxt}</span></div>
+        <div class="me-row"><span class="k">年级</span><span class="v">${gradeTxt}</span></div>
+        <div class="me-row"><span class="k">关注学科</span><span class="v">${esc(subjTxt)}</span></div>
+        <div class="me-row"><span class="k"></span><button class="tbtn" id="me-profile">修改档案</button></div>
+      </div>
+      <div class="card">
+        <h3>会员</h3>
+        <div class="me-row"><span class="k">状态</span><span class="v" style="color:${isMember() ? 'var(--green-bright)' : 'var(--text-dim)'}">${isMember() ? '已开通 ✓' : '未开通'}</span></div>
+        <div class="me-row"><span class="k"></span><button class="tbtn" id="me-member">${isMember() ? '查看会员信息' : '开通会员'}</button></div>
+      </div>
+      <div class="card">
+        <h3>掌握度总览</h3>
+        <div class="me-row"><span class="k">已掌握</span><span class="v" style="color:var(--green-bright)">${yes} 个</span></div>
+        <div class="me-row"><span class="k">还不会</span><span class="v" style="color:var(--bad)">${no} 个</span></div>
+        <div class="me-row"><span class="k">图谱总节点</span><span class="v">${topics.length} 个</span></div>
+        <div class="me-row"><span class="k"></span><button class="tbtn" id="me-gomap">去图谱标记 ›</button></div>
+      </div>
+      <div class="card">
+        <h3>数据与说明</h3>
+        <div class="c-sub">所有标记、清单、会员状态只存在这台设备的浏览器里（localStorage），不上传任何服务器。课程资源来自国家中小学智慧教育平台等公开官方渠道，本工具只做学习导航，不出售课程。</div>
+        <div class="me-row" style="margin-top:8px"><span class="k"></span><button class="tbtn danger" id="me-clear">清除本机数据</button></div>
+      </div>`;
+    meBody.querySelector('#me-profile').onclick = openOnboard;
+    meBody.querySelector('#me-member').onclick = openMemberModal;
+    meBody.querySelector('#me-gomap').onclick = () => switchTab('map');
+    meBody.querySelector('#me-clear').onclick = () => {
+      if (!confirm('确定清除本机上的全部学习数据（标记、清单、会员、档案）吗？此操作不可撤销。')) return;
+      for (const k of ['cnk12_mastery', 'cnk12_profile', 'cnk12_member', 'cnk12_plan', 'cnk12_plan2', 'cnk12_lastdiag', 'cnk12_watch', 'cnk12_panel_w']) {
+        try { localStorage.removeItem(k); } catch (e) {}
+      }
+      location.reload();
+    };
+  }
+
+  // ---------- 下一步学什么（图谱工具栏） ----------
   function renderNext() {
     const hasAnyMark = Object.keys(mastery).length > 0;
     let bodyHtml;
     if (!hasAnyMark) {
-      bodyHtml = `<div class="next-guide">先在地图上标记几个你会的和不会的，<br>我才能告诉你接下来学什么。</div>`;
+      bodyHtml = `<div class="next-guide">先在图谱上标记几个你会的和不会的，<br>或到「诊断」tab 测一次，<br>我才能告诉你接下来学什么。</div>`;
     } else {
       const recs = [];
       for (const t of topics) {
@@ -1834,13 +2326,13 @@
       recs.sort((a, b) => a.gradeRangeStart - b.gradeRangeStart || a.subject.localeCompare(b.subject, 'zh'));
       const top = recs.slice(0, 8);
       bodyHtml = top.length
-        ? `<div class="desc" style="color:var(--text-dim);font-size:12.5px;margin-top:4px">以下条件全部满足：所有硬先修已掌握 + 你还没标记已掌握。按年级从低到高排列：</div>` +
+        ? `<div class="desc" style="color:var(--text-dim);font-size:12.5px;margin-top:4px">以下条件全部满足：所有硬先修已掌握 + 还没标记已掌握。按年级从低到高：</div>` +
           top.map(t => `<div class="next-item" data-id="${t.id}">
-            <div class="ni-name" style="color:${t._color}">${t.name}</div>
+            <div class="ni-name" style="color:${t._color}">${esc(t.name)}</div>
             <div class="ni-meta">${t.subject} · ${gradeTxtOf(t)}</div>
-            <div class="ni-desc">${t.description.slice(0, 60)}${t.description.length > 60 ? '…' : ''}</div>
+            <div class="ni-desc">${esc(t.description.slice(0, 60))}${t.description.length > 60 ? '…' : ''}</div>
           </div>`).join('')
-        : `<div class="next-guide">暂时没有可推荐的知识点——<br>可能你标记「已掌握」的先修还不够，多标记几个试试。</div>`;
+        : `<div class="next-guide">暂时没有可推荐的知识点——<br>可能标记「已掌握」的先修还不够，多标记几个试试。</div>`;
     }
     panelBody.innerHTML = `
       <button id="panel-close" title="关闭">×</button>
@@ -1848,9 +2340,7 @@
       ${bodyHtml}
       <div style="height:20px"></div>`;
     panelBody.querySelector('#panel-close').onclick = closePanel;
-    panelBody.querySelectorAll('.next-item').forEach(el => el.onclick = () => {
-      selectTopic(el.dataset.id); ensureVisible(topicById.get(el.dataset.id));
-    });
+    panelBody.querySelectorAll('.next-item').forEach(el => el.onclick = () => selectTopic(el.dataset.id));
   }
   document.getElementById('btn-next').onclick = () => {
     panelView = 'next';
@@ -1858,10 +2348,8 @@
     renderPanel();
   };
 
-  function selectTopic(id) {
-    selectedId = id;
-    panelView = 'detail';
-    diagRootId = null;
+  // ---------- 点选节点 → 聚焦补间 + 先修链高亮 ----------
+  function applyHighlight(id) {
     const pre = collectChain(id, prereqsOf);
     const unlock = collectChain(id, unlocksOf);
     highlightSet = new Set([...pre.keys(), ...unlock.keys()]);
@@ -1874,17 +2362,16 @@
           highlightEdges.add(d.prerequisiteId + '>' + d.topicId);
       }
     }
+  }
+  function selectTopic(id) {
+    selectedId = id;
+    panelView = 'detail';
+    diagRootId = null;
+    applyHighlight(id);
     openPanelMobile();
     renderPanel();
+    startFocus(topicById.get(id));
     requestDraw();
-  }
-  function ensureVisible(t) {
-    if (!t) return;
-    const [sx, sy] = worldToScreen(t._x, t._y);
-    const m = 80;
-    if (sx < m || sx > W - m || sy < m || sy > H - m) {
-      tx = W / 2 - t._x * scale; ty = H / 2 - t._y * scale; requestDraw();
-    }
   }
 
   // ---------- 搜索 ----------
@@ -1897,10 +2384,10 @@
     const hits = topics.filter(t => visible(t) && (t.name.includes(q) || t.description.includes(q) || t.domain.includes(q))).slice(0, 12);
     hits.forEach(t => searchMatches.add(t.id));
     if (hits.length) {
-      srBox.innerHTML = hits.map(t => `<div class="sr-item" data-id="${t.id}"><span style="color:${t._color}">${t.name}</span> <span class="m">${t.subject} · ${t.gradeRangeStart}年级</span></div>`).join('');
+      srBox.innerHTML = hits.map(t => `<div class="sr-item" data-id="${t.id}"><span style="color:${t._color}">${esc(t.name)}</span> <span class="m">${t.subject} · ${t.gradeRangeStart}年级</span></div>`).join('');
       srBox.style.display = 'block';
       srBox.querySelectorAll('.sr-item').forEach(el => el.onclick = () => {
-        selectTopic(el.dataset.id); ensureVisible(topicById.get(el.dataset.id));
+        selectTopic(el.dataset.id);
         srBox.style.display = 'none';
       });
     } else {
@@ -1927,24 +2414,22 @@
     };
     chipsBox.appendChild(chip);
   }
-  document.getElementById('cb-alledges').onchange = (e) => { showAllEdges = e.target.checked; requestDraw(); };
 
-  // ---------- 首次使用引导（分步：角色 → 年级 → 学科 → 进入地图） ----------
+  // ---------- 首次使用引导（分步：角色 → 年级 → 学科 → 进入） ----------
   const onboard = document.getElementById('onboard');
   const obBox = document.getElementById('ob-box');
-  const OB_SUBJECTS = ['道德与法治', '语文'];   // 已完整填充的学科
+  const OB_SUBJECTS = ['道德与法治', '语文'];
   let obState = { step: 1, role: null, grade: null, subject: null };
   function skipOnboard() {
     if (!profile) { profile = { skipped: true }; saveProfile(); }
     onboard.classList.remove('show');
   }
   function applyOnboard() {
-    profile = { role: obState.role || 'student', grade: obState.grade, subject: obState.subject };
+    profile = { role: obState.role || 'parent', grade: obState.grade, subject: obState.subject };
     saveProfile();
     onboard.classList.remove('show');
-    updateGradeBtn();
-    if (obState.grade) focusGradeSubject(obState.grade, obState.subject);
-    toast(`这里是 ${obState.grade} 年级${obState.subject}的知识地图。先点一个圆点看看，或点「快速诊断」测一遍。`);
+    switchTab('diag');
+    toast(`档案已保存。先做一次「诊断」，看看 ${obState.grade} 年级${obState.subject}哪里需要补。`);
   }
   function renderOnboard() {
     const s = obState;
@@ -1966,7 +2451,7 @@
       obBox.innerHTML = `
         <div class="ob-step-tag">第 2 步 / 共 3 步</div>
         <div class="ob-title">孩子现在上几年级？</div>
-        <div class="ob-sub">选完我直接带你到对应年级的知识区域。</div>
+        <div class="ob-sub">选完诊断会按对应年级抽题。</div>
         <div class="ob-grades">${[1,2,3,4,5,6,7,8,9].map(g =>
           `<button data-grade="${g}">${g} 年级</button>`).join('')}</div>
         <button class="ob-back" id="ob-back">‹ 上一步</button>
@@ -1999,7 +2484,7 @@
           年级：<b>${s.grade} 年级</b><br>
           学科：<b>${esc(s.subject)}</b>
         </div>
-        <button class="ob-close ob-enter" id="ob-enter">进入地图 ✓</button>
+        <button class="ob-close ob-enter" id="ob-enter">开始第一次诊断 ✓</button>
         <button class="ob-back" id="ob-back">‹ 上一步</button>`;
       obBox.querySelector('#ob-enter').onclick = applyOnboard;
       obBox.querySelector('#ob-back').onclick = () => { obState.step = 3; renderOnboard(); };
@@ -2015,13 +2500,6 @@
     renderOnboard();
     onboard.classList.add('show');
   }
-  function updateGradeBtn() {
-    document.getElementById('btn-grade').textContent =
-      profile && profile.grade ? '我的年级：' + profile.grade + ' 年级' : '我的年级';
-  }
-  document.getElementById('btn-grade').onclick = openOnboard;   // 「重新选择」入口
-  if (!profile) openOnboard();
-  updateGradeBtn();
 
   // ---------- 桌面端面板拖拽调宽 ----------
   const PANEL_W_KEY = 'cnk12_panel_w';
@@ -2063,22 +2541,35 @@
   }
 
   // ---------- 启动 ----------
-  if (window.innerWidth < 860 && !isMobile()) panel.classList.add('hidden');
-  if (isMobile()) { sheetState = 'collapsed'; panel.classList.remove('hidden'); }
-  resize();
-  // 落地视图：移动端不再全图 fitView——无 profile 定位到 7 年级道法区域（scale≈0.9），有 profile 定位到其年级学科区域
-  if (isMobile()) focusGradeMobile(profile && profile.grade ? profile.grade : 7, profile && profile.subject);
-  else if (profile && profile.grade) focusGradeSubject(profile.grade, profile.subject);
-  else fitView();
+  let mapInited = false;
+  function initMapView() {
+    mapInited = true;
+    if (window.innerWidth < 860 && !isMobile()) panel.classList.add('hidden');
+    if (isMobile()) { sheetState = 'collapsed'; panel.classList.remove('hidden'); }
+    resize();
+    if (isMobile()) focusGradeMobile(profile && profile.grade ? profile.grade : 7, profile && profile.subject);
+    else if (profile && profile.grade) focusGradeSubject(profile.grade, profile.subject);
+    else fitView();
+    enterT0 = performance.now(); enterDone = false;   // 入场生长动画
+  }
   updateStats();
-  enterT0 = performance.now(); enterDone = false;   // 入场 stagger 点亮，只播一次
-  requestDraw();
+  updatePlanBadge();
+  switchTab('diag');   // 主入口 = 诊断
+  if (!profile) openOnboard();
 
-  // 自动化验收辅助：按 id 取节点屏幕坐标
+  // 自动化验收辅助
   window.__cnkTest = {
     posOf: (id) => { const t = topicById.get(id); return t ? worldToScreen(t._x, t._y) : null; },
     quiz: () => quiz,
     isMember,
+    switchTab,
+    selectTopic,
+    openCourse,
+    plan: () => plan2,
+    coaching: () => coaching,
+    pack: (id) => resPackByTopic.get(id),
+    rotAngle: () => rotAngle,
+    currentTab: () => currentTab,
   };
 })();
 </script>

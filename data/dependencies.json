@@ -1738,7 +1738,7 @@
    "topicId": "cn_yw_jl_14",
    "prerequisiteId": "cn_yw_jl_13",
    "strength": "hard",
-   "reason": "实词解决'词的意思'，虚词和句式解决'句子的结构'，两者合起来才能读通文言"
+   "reason": "必须先掌握'之''其'等字的实词义，才能分辨它们作虚词时无实义，进而识别'之'在宾语前置中的标志作用——实词是虚词与句式的前提"
   },
   {
    "topicId": "cn_yw_jl_16",
@@ -1900,13 +1900,13 @@
    "topicId": "cn_yw_wx_19",
    "prerequisiteId": "cn_yw_wx_18",
    "strength": "hard",
-   "reason": "诵读疏通之后是精确理解——翻译是文言学习的硬功夫"
+   "reason": "必须先能断句、读通大意，才谈得上逐字落实的'留删补换调'——读通是译准的前提"
   },
   {
    "topicId": "cn_yw_wx_20",
    "prerequisiteId": "cn_yw_wx_19",
    "strength": "hard",
-   "reason": "翻译解决'懂'，鉴赏解决'好在哪里'——文言学习的完整闭环"
+   "reason": "翻译解决'懂'，鉴赏解决'好在哪里'——没译准的鉴赏都是空谈，必须先字字落实再品析内容"
   },
   {
    "topicId": "cn_yw_wx_22",
@@ -2200,7 +2200,7 @@
    "topicId": "cn_yw_wx_19",
    "prerequisiteId": "cn_yw_wx_16",
    "strength": "soft",
-   "reason": "古诗词的语感有助于文言文断句与词义推断"
+   "reason": "古诗词意象与节奏训练出的语感，是文言断句找停顿、词义推断找语境的直接底子"
   },
   {
    "topicId": "cn_yw_wx_21",
@@ -2230,7 +2230,7 @@
    "topicId": "cn_yw_wx_30",
    "prerequisiteId": "cn_yw_wx_20",
    "strength": "soft",
-   "reason": "初中课内文言的鉴赏经验，迁移到课外史传论说"
+   "reason": "初中课内文言练出的翻译与鉴赏方法，是高中课外史传文独立阅读的直接迁移对象"
   },
   {
    "topicId": "cn_yw_wx_31",
@@ -2428,25 +2428,25 @@
    "topicId": "cn_yw_jl_13",
    "prerequisiteId": "cn_yw_jl_15",
    "strength": "soft",
-   "reason": "背诵积累的古诗文，是文言实词语感的来源"
+   "reason": "背熟的古诗文是实词词义的活语料库——课外生词多半能在背过的篇目里找到旧相识，先会背才谈得上迁移"
   },
   {
    "topicId": "cn_yw_wx_18",
    "prerequisiteId": "cn_yw_jl_15",
    "strength": "hard",
-   "reason": "没有背诵打底，文言文断句和文意疏通寸步难行"
+   "reason": "没有背诵积累的语感打底，断句找不到节奏、疏通文意没有词库——背诵是文言入门的第一块砖"
   },
   {
    "topicId": "cn_yw_wx_19",
    "prerequisiteId": "cn_yw_jl_13",
    "strength": "hard",
-   "reason": "文言翻译的准确度，取决于实词积累的厚度"
+   "reason": "翻译'换'字诀的准确度取决于实词库存——每个实词义项都是翻译时的一块砖，实词不足则字字落实落空"
   },
   {
    "topicId": "cn_yw_wx_20",
    "prerequisiteId": "cn_yw_jl_14",
    "strength": "soft",
-   "reason": "虚词句式通了，才能腾出手来鉴赏内容"
+   "reason": "虚词和句式通了，阅读时才不会把脑力耗在句法上，才能腾出注意力概括内容、品味写法"
   },
   {
    "topicId": "cn_yw_sy_06",
@@ -2590,7 +2590,7 @@
    "topicId": "cn_yw_wx_30",
    "prerequisiteId": "cn_yw_jl_16",
    "strength": "soft",
-   "reason": "文学文化常识，是高中文言史传阅读的背景板"
+   "reason": "史传文满是官职变动、干支纪年、敬谦称谓，文化常识是读懂人物履历与处境的背景板"
   },
   {
    "topicId": "cn_yw_sb_19",
