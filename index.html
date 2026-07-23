@@ -77,13 +77,18 @@
   #mastery-stats .s-yes { color: var(--green-bright); }
   #mastery-stats .s-no { color: var(--bad); }
   @media (max-width: 767px) {
-    #chips { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; padding-bottom: 2px;
+    body[data-tab="map"] header { display: none; }   /* 图谱 tab 收起标题行，把高度让给 canvas */
+    #chips { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; flex: 1 1 100%; max-width: 100%; padding-bottom: 2px;
       -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%);
       mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%); }
-    #map-toolbar { gap: 5px; padding: 6px 8px; }
+    #map-toolbar { gap: 5px; padding: 5px 8px; }
     #map-toolbar .tbtn { min-height: 30px; padding: 5px 9px; font-size: 12px; }
     #search { min-height: 30px; flex: 1 1 120px; font-size: 12px; }
     #mastery-stats { display: none; }
+    #legend { padding: 5px 9px; }
+    #legend .lg-body { display: none; }
+    #legend.open .lg-body { display: block; margin-top: 6px; }
+    #legend-toggle { display: inline; }
   }
   #map-main { flex: 1; display: flex; min-height: 0; position: relative; }
   #canvas-wrap { flex: 1; position: relative; min-width: 0; }
@@ -97,6 +102,8 @@
     background: rgba(14,17,26,0.85); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--panel-border); line-height: 1.8;
     max-width: calc(100% - 24px); z-index: 8; }
   #legend .lg-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+  #legend-toggle { display: none; background: none; border: none; color: var(--accent); font-size: 11px;
+    cursor: pointer; padding: 0; font-family: inherit; }
   #search-results { position: absolute; top: 6px; left: 12px; z-index: 20; background: var(--panel);
     border: 1px solid var(--panel-border); border-radius: 8px; max-height: 260px; overflow-y: auto; display: none; min-width: 280px; }
   .sr-item { padding: 7px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #1e222b; }
@@ -363,22 +370,36 @@
   #cs-back { min-height: 40px; padding: 4px 12px; border-radius: 8px; border: 1px solid var(--panel-border);
     background: #0d1017; color: var(--text); font-size: 14px; cursor: pointer; flex: 0 0 auto; }
   .cs-title { font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .cs-src { font-size: 11px; color: var(--text-dim); padding: 5px 12px; background: #0d1017;
-    border-bottom: 1px solid var(--panel-border); flex: 0 0 auto; }
-  .cs-src a { color: #7fc4ff; text-decoration: none; }
-  /* 五件套条：看视频 → 领任务单 → 做课后练习（→ 课件 / 教学设计） */
-  .cs-pack { display: flex; gap: 8px; overflow-x: auto; padding: 8px 12px; background: var(--panel);
-    border-bottom: 1px solid var(--panel-border); flex: 0 0 auto; -webkit-overflow-scrolling: touch; }
-  .cs-pack:empty { display: none; }
-  .pk-item { flex: 0 0 auto; width: 128px; border: 1.5px solid var(--panel-border);
-    background: #0d1017; border-radius: 10px; padding: 7px 9px; cursor: pointer; text-align: left;
-    color: var(--text); font-family: inherit; }
-  .pk-item.active { border-color: var(--accent); background: #122031; }
-  .pk-item .pk-type { font-size: 10.5px; font-weight: 700; color: #7fc4ff; }
-  .pk-item .pk-title { font-size: 11.5px; line-height: 1.4; margin-top: 2px; display: -webkit-box;
-    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .pk-item .pk-fmt { font-size: 10px; color: var(--text-dim); margin-top: 3px; }
-  #cs-frame { flex: 1; border: none; background: #fff; min-height: 0; }
+  /* 原生课程页（L4：平台反嵌套，不嵌 iframe） */
+  .cs-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 14px 20px; min-height: 0; }
+  .cs-cover { position: relative; border-radius: 14px; overflow: hidden; background: #101725;
+    border: 1px solid #23406b; min-height: 150px; display: flex; align-items: flex-end; cursor: pointer; }
+  .cs-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.55; }
+  .cs-play { position: relative; width: 100%; border: none; background: linear-gradient(transparent, rgba(8,12,22,0.92) 45%);
+    color: #fff; font-size: 16px; font-weight: 800; padding: 54px 14px 14px; cursor: pointer; text-align: left; font-family: inherit; }
+  .cs-play span { display: block; font-size: 11px; font-weight: 400; color: var(--text-dim); margin-top: 3px; }
+  .cs-meta { margin: 12px 2px 4px; }
+  .cs-meta-t { font-size: 15.5px; font-weight: 800; line-height: 1.5; }
+  .cs-meta-s { font-size: 11.5px; color: var(--text-dim); margin-top: 4px; line-height: 1.6; }
+  .cs-pack-t { font-size: 12px; font-weight: 700; color: #7fc4ff; margin: 16px 2px 8px; }
+  .cs-pk { display: flex; align-items: center; gap: 10px; background: var(--panel);
+    border: 1px solid var(--panel-border); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
+  .cs-pk-label { flex: 0 0 auto; font-size: 10.5px; font-weight: 700; color: #7fc4ff; background: #122031;
+    border: 1px solid #28527c; border-radius: 999px; padding: 3px 8px; }
+  .cs-pk-m { flex: 1; min-width: 0; }
+  .cs-pk-t { font-size: 13px; font-weight: 600; line-height: 1.5; }
+  .cs-pk-f { font-size: 10.5px; color: var(--text-dim); margin-top: 2px; }
+  .cs-pk-open { flex: 0 0 auto; min-height: 38px; border-color: #3a5a8c; color: #7fc4ff; background: #122031; }
+  .cs-tip { font-size: 11.5px; color: var(--text-dim); line-height: 1.7; background: #12151c;
+    border: 1px dashed var(--panel-border); border-radius: 10px; padding: 10px 12px; margin-top: 12px; }
+  /* 答题导航（上一题/下一题） */
+  .quiz-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
+  .quiz-nav .quiz-next { width: auto; flex: 1; margin-top: 0; }
+  .quiz-prev { min-height: 46px; padding: 6px 16px; }
+  .quiz-auto { font-size: 11px; color: var(--text-dim); }
+  /* 诊断结果悬浮按钮 */
+  .float-cta { position: fixed; left: 14px; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    z-index: 46; max-width: 612px; margin: 0 auto; box-shadow: 0 8px 28px rgba(0,0,0,0.55); }
   .cs-bottom { display: flex; gap: 10px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
     background: var(--panel); border-top: 1px solid var(--panel-border); flex: 0 0 auto; }
   .cs-bottom .tbtn { flex: 1; min-height: 46px; font-size: 14px; font-weight: 700; }
@@ -466,11 +487,14 @@
           <div id="tooltip"></div>
           <div id="search-results"></div>
           <div id="legend">
-            <span class="lg-dot" style="background:var(--green)"></span>已掌握 &nbsp;
-            <span class="lg-dot" style="background:transparent;border:2px solid var(--bad);width:6px;height:6px"></span>还不会 &nbsp;
-            <span class="lg-dot" style="background:#8a8f9a"></span>未标记<br>
-            图谱缓慢自转，悬停/触摸即停 · 点选节点可追溯先修链<br>
-            滚轮/双指缩放 · 拖拽平移 · 纵轴 = 年级（下 1 → 上 12）
+            <button id="legend-toggle" type="button">图例 ▾</button>
+            <div class="lg-body">
+              <span class="lg-dot" style="background:var(--green)"></span>已掌握 &nbsp;
+              <span class="lg-dot" style="background:transparent;border:2px solid var(--bad);width:6px;height:6px"></span>还不会 &nbsp;
+              <span class="lg-dot" style="background:#8a8f9a"></span>未标记<br>
+              双指缩放 · 单指拖拽 · 点选节点追溯先修链<br>
+              纵轴 = 年级（下 1 → 上 12）· 顶部 chips 切换学科
+            </div>
           </div>
           <div id="loading">正在加载数据…</div>
         </div>
@@ -513,9 +537,7 @@
     <button id="cs-back">‹ 返回</button>
     <div class="cs-title" id="cs-title"></div>
   </div>
-  <div class="cs-src">课程资源来自国家中小学智慧教育平台 · <a id="cs-ext" href="#" target="_blank" rel="noopener noreferrer">加载异常？在浏览器打开 ↗</a></div>
-  <div class="cs-pack" id="cs-pack"></div>
-  <iframe id="cs-frame" title="国家中小学智慧教育平台课时" allowfullscreen></iframe>
+  <div class="cs-body" id="cs-body"></div>
   <div class="cs-bottom">
     <button class="tbtn" id="cs-quiz">配套练习 · 测一测</button>
     <button class="tbtn" id="cs-checkin">看完打卡 ✓</button>
@@ -753,6 +775,7 @@
   function switchTab(name) {
     if (!TAB_NAMES[name]) return;
     currentTab = name;
+    document.body.dataset.tab = name;
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + name).classList.add('active');
@@ -858,7 +881,7 @@
   let lastTick = 0;
   let enterT0 = -1, enterDone = false;
   let inertia = null;
-  function rotActive() { return mapVisible && !hoverPause && !touchPause && !focusTween && !inertia; }
+  function rotActive() { return mapVisible && !isMobile() && !hoverPause && !touchPause && !focusTween && !inertia; }
   function animActive() {
     return mapVisible && (!enterDone || !!inertia || !!focusTween || selectedId != null
       || highlightEdges.size > 0 || rotActive());
@@ -910,6 +933,7 @@
     requestDraw();
   }
 
+  let lastFitW = 0;
   function resize() {
     if (!mapVisible && !mapInited) return;
     dpr = window.devicePixelRatio || 1;
@@ -919,6 +943,11 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     renderBackground();
     applySheetState();
+    // 移动端：视口宽度变化（横竖屏切换）时重新 fit 当前学科，平移缩放不被 tab 切换重置
+    if (isMobile() && mobileSubject && Math.abs(W - lastFitW) > 50) {
+      lastFitW = W;
+      fitSubjectMobile(mobileSubject);
+    }
     requestDraw();
   }
   window.addEventListener('resize', () => { if (mapVisible) resize(); });
@@ -960,8 +989,26 @@
     ty = H / 2 - cy * scale;
   }
 
+  // 移动端单学科 fit-to-view：学科列宽适配视口宽度，不横向溢出；内容矮于视口则垂直居中，否则顶端对齐
+  function fitSubjectMobile(subject) {
+    const list = topics.filter(t => t.subject === subject);
+    if (!list.length || !W || !H) return;
+    const xs = list.map(t => t._x), ys = list.map(t => t._y);
+    const minX = Math.min(...xs) - 74, maxX = Math.max(...xs) + 74;
+    scale = W / (maxX - minX);
+    scale = Math.min(2.2, Math.max(0.5, scale));
+    tx = W / 2 - ((minX + maxX) / 2) * scale;
+    const minY = Math.min(...ys) - 40, maxY = Math.max(...ys) + 40;
+    if ((maxY - minY) * scale <= H) {
+      ty = H / 2 - ((minY + maxY) / 2) * scale;
+    } else {
+      ty = H - 12 - maxY * scale;
+    }
+  }
+
   // ---------- 状态 ----------
   const activeSubjects = new Set(subjects);
+  let mobileSubject = null;   // 移动端：单学科模式，chips 单选切换
   let selectedId = null, hoverId = null;
   let highlightSet = new Set(), highlightEdges = new Set();
   let searchMatches = new Set();
@@ -978,27 +1025,44 @@
     now = now || performance.now();
     ctx.clearRect(0, 0, W, H);
     ctx.drawImage(bgCanvas, 0, 0, W, H);
-    // 年级网格线（随世界旋转）
+    // 年级网格线：移动端画屏幕水平线 + 左缘悬浮标签；桌面端画随世界旋转的线
     ctx.font = '11px sans-serif';
+    const gradeAnchorX = isMobile() && mobileSubject && subjX.get(mobileSubject) != null ? subjX.get(mobileSubject) : 0;
     for (let g = 1; g <= 12; g++) {
-      const [x0, y0] = worldToScreen(-600, g * ROW_H);
-      const [x1, y1] = worldToScreen(5200, g * ROW_H);
-      ctx.strokeStyle = g % 3 === 1 ? 'rgba(80,92,120,0.16)' : 'rgba(80,92,120,0.08)';
-      ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
-      const [lx, ly] = worldToScreen(-70, g * ROW_H);
-      ctx.fillStyle = '#5a6373';
-      ctx.textAlign = 'right';
-      ctx.fillText(g + ' 年级', lx, ly - 4);
-      ctx.textAlign = 'left';
+      if (isMobile()) {
+        const [, sy] = worldToScreen(gradeAnchorX, g * ROW_H);
+        if (sy < -20 || sy > H + 20) continue;
+        ctx.strokeStyle = g % 3 === 1 ? 'rgba(80,92,120,0.20)' : 'rgba(80,92,120,0.10)';
+        ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
+        const label = g + ' 年级';
+        const lw = ctx.measureText(label).width + 10;
+        ctx.fillStyle = 'rgba(10,12,20,0.72)';
+        ctx.fillRect(4, sy - 15, lw, 15);
+        ctx.fillStyle = '#8a94a8';
+        ctx.fillText(label, 9, sy - 4);
+      } else {
+        const [x0, y0] = worldToScreen(-600, g * ROW_H);
+        const [x1, y1] = worldToScreen(5200, g * ROW_H);
+        ctx.strokeStyle = g % 3 === 1 ? 'rgba(80,92,120,0.16)' : 'rgba(80,92,120,0.08)';
+        ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+        const [lx, ly] = worldToScreen(-70, g * ROW_H);
+        ctx.fillStyle = '#5a6373';
+        ctx.textAlign = 'right';
+        ctx.fillText(g + ' 年级', lx, ly - 4);
+        ctx.textAlign = 'left';
+      }
     }
-    ctx.font = 'bold 13px sans-serif';
-    for (const s of subjects) {
-      if (!activeSubjects.has(s)) continue;
-      const [sx, sy] = worldToScreen(subjX.get(s), 12 * ROW_H + 70);
-      ctx.fillStyle = COLORS[s];
-      ctx.textAlign = 'center';
-      ctx.fillText(s, sx, sy);
-      ctx.textAlign = 'left';
+    // 学科列标题：桌面端画在世界顶部；移动端由 chips 承担，不画
+    if (!isMobile()) {
+      ctx.font = 'bold 13px sans-serif';
+      for (const s of subjects) {
+        if (!activeSubjects.has(s)) continue;
+        const [sx, sy] = worldToScreen(subjX.get(s), 12 * ROW_H + 70);
+        ctx.fillStyle = COLORS[s];
+        ctx.textAlign = 'center';
+        ctx.fillText(s, sx, sy);
+        ctx.textAlign = 'left';
+      }
     }
 
     // 入场生长动画：节点按年级从低到高 stagger 点亮（每次进入图谱播一次）
@@ -1721,7 +1785,7 @@
   function startNodeQuiz(topicId, returnTo) {
     const qs = quizByTopic.get(topicId);
     if (!qs || !qs.length) { toast('该知识点题库建设中'); return; }
-    quiz = { mode: 'node', topicId, returnTo: returnTo || 'map', items: buildQuizItems(qs), idx: 0, picked: null, results: [], scored: false };
+    quiz = { mode: 'node', topicId, returnTo: returnTo || 'map', items: buildQuizItems(qs), idx: 0, answers: {}, scored: false };
     showQuizScreen();
     renderQuiz();
   }
@@ -1735,7 +1799,7 @@
       const arr = quizByTopic.get(t.id);
       return arr[Math.floor(Math.random() * arr.length)];
     });
-    quiz = { mode: 'quick', grade, subject: subj, returnTo: 'diag', items: buildQuizItems(qs), idx: 0, picked: null, results: [], scored: false };
+    quiz = { mode: 'quick', grade, subject: subj, returnTo: 'diag', items: buildQuizItems(qs), idx: 0, answers: {}, scored: false };
     showQuizScreen();
     renderQuiz();
   }
@@ -1751,34 +1815,37 @@
       else { switchTab('map'); selectTopic(topicId); }
     }
   }
+  let quizTimer = null;
   function renderQuiz() {
     if (!quiz) return;
     if (quiz.idx >= quiz.items.length) { renderQuizResult(); return; }
+    clearTimeout(quizTimer); quizTimer = null;
     const item = quiz.items[quiz.idx];
     const it = topicById.get(item.topicId);
-    const answered = quiz.picked !== null;
+    const ans = quiz.answers[quiz.idx];          // 已答题保留选中态，可返回修改
+    const answered = !!ans;
     let optsHtml;
     if (item.type === 'choice') {
       optsHtml = item.options.map((o, i) => {
         let cls = 'quiz-opt';
         if (answered) {
           if (o.correct) cls += ' correct';
-          else if (quiz.picked === i) cls += ' wrong';
+          else if (ans.picked === i) cls += ' wrong';
         }
-        return `<button class="${cls}" data-i="${i}" ${answered ? 'disabled' : ''}>${esc(o.text)}</button>`;
+        return `<button class="${cls}" data-i="${i}">${esc(o.text)}</button>`;
       }).join('');
     } else {
       const jbtn = (val, label) => {
         let cls = 'quiz-opt judge';
         if (answered) {
           if (item.answer === val) cls += ' correct';
-          else if (quiz.picked === val) cls += ' wrong';
+          else if (ans.picked === val) cls += ' wrong';
         }
-        return `<button class="${cls}" data-v="${val ? 1 : 0}" ${answered ? 'disabled' : ''}>${label}</button>`;
+        return `<button class="${cls}" data-v="${val ? 1 : 0}">${label}</button>`;
       };
       optsHtml = `<div class="quiz-judge">${jbtn(true, '✓ 对')}${jbtn(false, '✗ 错')}</div>`;
     }
-    const ok = answered && (item.type === 'choice' ? item.options[quiz.picked].correct : quiz.picked === item.answer);
+    const ok = answered && ans.ok;
     const title = quiz.mode === 'node'
       ? `测一测：<span style="color:${it._color}">${esc(it.name)}</span>`
       : `快速诊断 · ${quiz.grade} 年级 ${esc(quiz.subject)}`;
@@ -1788,43 +1855,56 @@
       <div class="quiz-q">${esc(item.q)}</div>
       <div class="quiz-opts">${optsHtml}</div>
       ${answered ? `<div class="quiz-fb ${ok ? 'ok' : 'bad'}">${ok ? '✓ 回答正确' : '✗ 回答错误'}</div>
-        <div class="quiz-explain">${esc(item.explain)}</div>
-        <button class="tbtn quiz-next" id="quiz-next">${quiz.idx + 1 < quiz.items.length ? '下一题 ›' : '查看结果 ›'}</button>` : ''}
+        <div class="quiz-explain">${esc(item.explain)}</div>` : ''}
+      <div class="quiz-nav">
+        ${quiz.idx > 0 ? '<button class="tbtn quiz-prev" id="quiz-prev">‹ 上一题</button>' : '<span></span>'}
+        ${answered ? `<button class="tbtn quiz-next" id="quiz-next">${quiz.idx + 1 < quiz.items.length ? '下一题 ›' : '查看结果 ›'}</button>` : '<span class="quiz-auto">作答后自动进入下一题</span>'}
+      </div>
       <button class="diag-exit" id="quiz-exit">‹ 退出答题</button>
       <div style="height:20px"></div>`;
-    quizBody.parentElement.scrollTop = 0;
     quizBody.querySelector('#quiz-exit').onclick = exitQuiz;
     quizBody.querySelectorAll('.quiz-opt').forEach(btn => btn.onclick = () => {
-      if (quiz.picked !== null) return;
-      let ok2, answerText;
+      let ok2, answerText, picked;
       if (item.type === 'choice') {
-        const i = +btn.dataset.i;
-        quiz.picked = i;
-        ok2 = item.options[i].correct;
-        answerText = item.options[i].text;
+        picked = +btn.dataset.i;
+        ok2 = item.options[picked].correct;
+        answerText = item.options[picked].text;
       } else {
-        const v = btn.dataset.v === '1';
-        quiz.picked = v;
-        ok2 = (v === item.answer);
-        answerText = v ? '对' : '错';
+        picked = btn.dataset.v === '1';
+        ok2 = (picked === item.answer);
+        answerText = picked ? '对' : '错';
       }
-      quiz.results.push({ item, ok: ok2, answerText });
+      quiz.answers[quiz.idx] = { item, ok: ok2, answerText, picked };
+      const cur = quiz.idx;
       renderQuiz();
+      // 300ms+ 正误反馈后自动进入下一题
+      quizTimer = setTimeout(() => {
+        if (quiz && quiz.idx === cur && quiz.answers[cur]) {
+          quiz.idx++;
+          renderQuiz();
+        }
+      }, 550);
     });
+    const pv = quizBody.querySelector('#quiz-prev');
+    if (pv) pv.onclick = () => { clearTimeout(quizTimer); quiz.idx--; renderQuiz(); };
     const nx = quizBody.querySelector('#quiz-next');
-    if (nx) nx.onclick = () => { quiz.idx++; quiz.picked = null; renderQuiz(); };
+    if (nx) nx.onclick = () => { clearTimeout(quizTimer); quiz.idx++; renderQuiz(); };
+  }
+  function quizResults() {   // 按题号顺序汇总作答
+    return quiz.items.map((it, i) => quiz.answers[i]).filter(Boolean);
   }
   function renderQuizResult() {
-    const total = quiz.results.length;
-    const okCount = quiz.results.filter(r => r.ok).length;
+    const results = quizResults();
+    const total = results.length;
+    const okCount = results.filter(r => r.ok).length;
     if (quiz.mode === 'node') {
       const t = topicById.get(quiz.topicId);
       const allOk = total > 0 && okCount === total;
       if (!quiz.scored) {
         quiz.scored = true;
-        forceMastery(quiz.topicId, allOk ? 'yes' : 'no');
+        forceMastery(quiz.topicId, allOk ? 'yes' : 'no');   // 交卷自动写入掌握度
       }
-      const wrong = quiz.results.filter(r => !r.ok);
+      const wrong = results.filter(r => !r.ok);
       const wrongHtml = wrong.map(r => {
         const ansTxt = r.item.type === 'choice' ? esc(r.item.options.find(o => o.correct).text) : (r.item.answer ? '对' : '错');
         return `<div class="quiz-wr">
@@ -1838,11 +1918,11 @@
         <h2 style="color:${t._color}">测一测结果：${esc(t.name)}</h2>
         <div class="quiz-score" style="color:${allOk ? 'var(--green-bright)' : 'var(--bad)'}">${okCount} / ${total}</div>
         ${allOk
-          ? `<div class="quiz-fb ok">全部答对，已标记为已掌握 ✓</div>`
-          : `<div class="quiz-fb bad">有 ${wrong.length} 道题答错，已标记为「还不会」</div>
+          ? `<div class="quiz-fb ok">全部答对，已自动标记为已掌握 ✓</div>`
+          : `<div class="quiz-fb bad">有 ${wrong.length} 道题答错，已自动标记为「还不会」</div>
              <h3>错题回顾</h3>${wrongHtml}
              <button class="tbtn quiz-entry" id="qr-diag">帮我找原因 ›</button>
-             ${course ? `<button class="tbtn quiz-entry" id="qr-course">站内看课 ›</button>` : ''}`}
+             ${course ? `<button class="tbtn quiz-entry" id="qr-course">看配套课程 ›</button>` : ''}`}
         <button class="tbtn quiz-next" id="qr-retest">再测一次（题目与选项重新打乱）</button>
         <button class="diag-exit" id="qr-back">‹ 返回</button>
         <div style="height:20px"></div>`;
@@ -1869,9 +1949,9 @@
       };
       return;
     }
-    // ---- 快速诊断结果：按知识点分组 ----
+    // ---- 快速诊断结果：按知识点分组，交卷自动写入掌握度 ----
     const byTopic = new Map();
-    for (const r of quiz.results) {
+    for (const r of results) {
       if (!byTopic.has(r.item.topicId)) byTopic.set(r.item.topicId, { ok: 0, total: 0 });
       const e = byTopic.get(r.item.topicId);
       e.total++;
@@ -1879,6 +1959,12 @@
     }
     const okIds = [...byTopic.entries()].filter(([, e]) => e.ok === e.total).map(([id]) => id);
     const badIds = [...byTopic.entries()].filter(([, e]) => e.ok < e.total).map(([id]) => id);
+    if (!quiz.scored) {
+      quiz.scored = true;
+      for (const id of okIds) forceMastery(id, 'yes');
+      for (const id of badIds) forceMastery(id, 'no');
+      toast(`结果已自动写入图谱：${okIds.length} 个已掌握 / ${badIds.length} 个还不会`);
+    }
     // 记录最近一次诊断（复测入口用）
     try {
       localStorage.setItem('cnk12_lastdiag', JSON.stringify({
@@ -1896,38 +1982,30 @@
     quizBody.innerHTML = `
       <h2>诊断结果（${quiz.grade} 年级 · ${esc(quiz.subject)}）</h2>
       <div class="quiz-score" style="color:${badIds.length ? 'var(--bad)' : 'var(--green-bright)'}">${okCount} / ${total} 题答对</div>
-      <div class="quiz-meta">涉及 ${byTopic.size} 个知识点。诊断结果可以直接变成今天要打卡的动作清单——每项都有动作、用时和验收标准。</div>
-      ${badIds.length
-        ? `<button class="big-cta" id="qr-plan">生成今日打卡清单（${badIds.length} 个薄弱点）›</button>`
-        : `<div class="quiz-fb ok" style="margin:10px 0">全部答对，太扎实了！可以去图谱挑战更高年级的内容。</div>`}
-      <button class="ghost-cta" id="qr-mark">先把结果标记到图谱</button>
+      <div class="quiz-meta">涉及 ${byTopic.size} 个知识点，结果已自动写入图谱掌握度。诊断结果可以直接变成今天要打卡的动作清单——每项都有动作、用时和验收标准。</div>
       <div class="qd-group-t ok">✓ 答对的知识点（${okIds.length}）</div>
       ${okIds.map(itemHtml).join('') || '<div class="quiz-meta">无</div>'}
       <div class="qd-group-t bad">✗ 答错的知识点（${badIds.length}）</div>
       ${badIds.map(itemHtml).join('') || '<div class="quiz-meta">无</div>'}
       <button class="ghost-cta" id="qr-again" style="margin-top:12px">重新抽题，再诊断一次 ›</button>
       <button class="diag-exit" id="qr-exit">‹ 返回诊断</button>
-      <div style="height:20px"></div>`;
+      <div style="height:96px"></div>
+      ${badIds.length
+        ? `<button class="big-cta float-cta" id="qr-plan">生成今日打卡清单（${badIds.length} 个薄弱点）›</button>`
+        : `<button class="big-cta float-cta" id="qr-gomap">去图谱挑战新内容 ›</button>`}`;
     quizBody.parentElement.scrollTop = 0;
     quizBody.querySelector('#qr-exit').onclick = () => { quiz = null; hideQuizScreen(); switchTab('diag'); };
     quizBody.querySelector('#qr-again').onclick = () => startQuickQuiz(quiz.grade, quiz.subject);
-    quizBody.querySelector('#qr-mark').onclick = () => {
-      for (const id of okIds) forceMastery(id, 'yes');
-      for (const id of badIds) forceMastery(id, 'no');
-      toast(`已标记：${okIds.length} 个已掌握 / ${badIds.length} 个还不会`);
-      switchTab('map');
-      quiz = null;
-      hideQuizScreen();
-    };
     const qp = quizBody.querySelector('#qr-plan');
     if (qp) qp.onclick = () => {
-      for (const id of badIds) forceMastery(id, 'no');
       const ids = buildPlanIds();
       quiz = null;
       hideQuizScreen();
       buildTodayPlan(ids);
       switchTab('plan');
     };
+    const qg = quizBody.querySelector('#qr-gomap');
+    if (qg) qg.onclick = () => { quiz = null; hideQuizScreen(); switchTab('map'); };
     quizBody.querySelectorAll('.next-item').forEach(el => el.onclick = () => {
       quiz = null;
       hideQuizScreen();
@@ -2151,14 +2229,13 @@
     planBody.querySelector('#pl-rediag').onclick = () => { diagFlow = { step: 'subject' }; switchTab('diag'); };
   }
 
-  // ---------- 站内看课（R3：iframe 内嵌官方课时 + 自家外壳 UI） ----------
+  // ---------- 原生课程页（L4：国家平台有反嵌套保护，不再用 iframe；元数据渲染 + 新窗口打开官方页） ----------
   const courseScreen = document.getElementById('course-screen');
-  const csFrame = document.getElementById('cs-frame');
+  const csBody = document.getElementById('cs-body');
   const csTitle = document.getElementById('cs-title');
-  const csExt = document.getElementById('cs-ext');
   const csQuizBtn = document.getElementById('cs-quiz');
   const csCheckin = document.getElementById('cs-checkin');
-  let csCtx = null;   // { topicId, planKey }
+  let csCtx = null;   // { topicId, planKey, lesson, url, title }
   const WATCH_KEY = 'cnk12_watch';
   let watchLog = {};
   try { watchLog = JSON.parse(localStorage.getItem(WATCH_KEY) || '{}') || {}; } catch (e) { watchLog = {}; }
@@ -2166,7 +2243,7 @@
 
   // 五件套呈现顺序：看视频 → 领任务单 → 做课后练习 → 课件 → 教学设计
   const PACK_ORDER = [['video', '看视频'], ['taskSheet', '领任务单'], ['exercise', '做课后练习'], ['courseware', '课件'], ['lessonPlan', '教学设计']];
-  // 合规：标了 requiresAuth 的资源一律不直链文件本体，统一跳课时 playUrl 页
+  // 合规：标了 requiresAuth 的资源一律不直链文件本体，统一打开课时 playUrl 页
   function packEntryUrl(lesson, item) {
     if (!item) return lesson.playUrl || null;
     if (item.requiresAuth) return lesson.playUrl || null;
@@ -2177,53 +2254,74 @@
     if (!m) return '';
     return (m[1] ? m[1] + '时' : '') + (m[2] ? m[2] + '分' : '') + (m[3] ? m[3] + '秒' : '');
   }
-  function renderPackStrip() {
-    const box = document.getElementById('cs-pack');
-    const lesson = csCtx && csCtx.lesson;
-    if (!lesson || !lesson.pack) { box.innerHTML = ''; return; }
+  function fmtSize(b) {
+    if (!b) return '';
+    return b >= 1048576 ? (b / 1048576).toFixed(0) + 'MB' : Math.max(1, Math.round(b / 1024)) + 'KB';
+  }
+  function openExternal(u) {
+    if (!u) { toast('该资源暂无可用链接'); return; }
+    window.open(u, '_blank', 'noopener,noreferrer');
+  }
+  function renderCourseBody() {
+    const lesson = csCtx.lesson;
+    const playUrl = csCtx.url;
+    const video = lesson && lesson.pack && Array.isArray(lesson.pack.video) && lesson.pack.video[0];
+    const thumb = video && video.thumb;
     const entries = [];
-    for (const [key, label] of PACK_ORDER) {
-      const items = Array.isArray(lesson.pack[key]) ? lesson.pack[key] : [];
-      for (const it of items) entries.push({ label, it });
+    if (lesson && lesson.pack) {
+      for (const [key, label] of PACK_ORDER) {
+        const items = Array.isArray(lesson.pack[key]) ? lesson.pack[key] : [];
+        for (const it of items) entries.push({ label, it });
+      }
     }
-    if (!entries.length) { box.innerHTML = ''; return; }
-    box.innerHTML = entries.map((e, i) => `
-      <button class="pk-item ${i === csCtx.packSel ? 'active' : ''}" data-i="${i}" type="button">
-        <div class="pk-type">${e.label}</div>
-        <div class="pk-title">${esc(e.it.title || lesson.lessonTitle || '官方资源')}</div>
-        <div class="pk-fmt">${esc(e.it.format || '')}${e.it.duration ? ' · ' + fmtDur(e.it.duration) : ''}</div>
-      </button>`).join('');
-    box.querySelectorAll('.pk-item').forEach(btn => btn.onclick = () => {
+    const metaBits = [];
+    if (video && video.duration) metaBits.push(fmtDur(video.duration));
+    if (video && video.format) metaBits.push(video.format);
+    if (video && video.sizeBytes) metaBits.push(fmtSize(video.sizeBytes));
+    csBody.innerHTML = `
+      <div class="cs-cover" id="cs-cover">
+        ${thumb ? `<img src="${esc(thumb)}" alt="" onerror="this.remove()">` : ''}
+        <button class="cs-play" id="cs-play" type="button">▶ 播放视频课程<span>在国家中小学智慧教育平台打开（新窗口）</span></button>
+      </div>
+      <div class="cs-meta">
+        <div class="cs-meta-t">${esc(csCtx.title)}</div>
+        <div class="cs-meta-s">${metaBits.length ? metaBits.join(' · ') + ' · ' : ''}课程资源来自国家中小学智慧教育平台</div>
+      </div>
+      ${entries.length ? `<div class="cs-pack-t">本课五件套 · 按顺序使用</div>` : ''}
+      ${entries.map((e, i) => `
+        <div class="cs-pk">
+          <span class="cs-pk-label">${e.label}</span>
+          <div class="cs-pk-m">
+            <div class="cs-pk-t">${esc(e.it.title || csCtx.title)}</div>
+            <div class="cs-pk-f">${[e.it.format, e.it.duration ? fmtDur(e.it.duration) : '', e.it.sizeBytes ? fmtSize(e.it.sizeBytes) : ''].filter(Boolean).join(' · ')}</div>
+          </div>
+          <button class="tbtn cs-pk-open" data-i="${i}" type="button">打开</button>
+        </div>`).join('')}
+      <div class="cs-tip">国家平台有反嵌套保护，无法站内播放——点「打开」会在新窗口进入官方页面，看完回来点下方「看完打卡」。</div>`;
+    csBody.querySelector('#cs-play').onclick = () => openExternal(packEntryUrl(lesson, video) || playUrl);
+    csBody.querySelector('#cs-cover').onclick = (e) => {
+      if (e.target.closest('#cs-play')) return;
+      openExternal(packEntryUrl(lesson, video) || playUrl);
+    };
+    csBody.querySelectorAll('.cs-pk-open').forEach(btn => btn.onclick = () => {
       const e = entries[+btn.dataset.i];
-      const u = packEntryUrl(lesson, e.it);
-      if (!u) { toast('该资源需在国家中小学智慧教育平台页面内查看'); return; }
-      csCtx.packSel = +btn.dataset.i;
-      csCtx.url = u;
-      csFrame.src = u;
-      csExt.href = u;
-      csTitle.textContent = e.it.title || csCtx.title;
-      box.querySelectorAll('.pk-item').forEach(x => x.classList.remove('active'));
-      btn.classList.add('active');
+      openExternal(packEntryUrl(lesson, e.it) || playUrl);
     });
   }
   function openCourse(topicId, url, title, planKey) {
-    if (!url) return;
-    // 匹配五件套课时：优先按 playUrl 精确匹配，否则取该知识点的第一个课时；无数据时优雅降级为旧行为
+    // 匹配五件套课时：优先按 playUrl 精确匹配，否则取该知识点的第一个课时；无数据时优雅降级为单课程卡
     const lessons = (topicId && resPackByTopic.get(topicId)) || [];
-    const lesson = lessons.find(l => l && l.playUrl === url) || lessons[0] || null;
-    csCtx = { topicId, planKey: planKey || null, lesson, url, title: title || '官方课时', packSel: 0 };
+    const lesson = lessons.find(l => l && l.playUrl === url) || lessons[0]
+      || (url ? { playUrl: url, lessonTitle: title, pack: null } : null);
+    csCtx = { topicId, planKey: planKey || null, lesson, url: (lesson && lesson.playUrl) || url, title: title || (lesson && lesson.lessonTitle) || '官方课时' };
     csTitle.textContent = csCtx.title;
-    csExt.href = url;
-    csFrame.src = url;
     csQuizBtn.style.display = (topicId && quizByTopic.has(topicId)) ? '' : 'none';
-    renderPackStrip();
+    renderCourseBody();
     updateCheckinBtn();
     courseScreen.classList.add('show');
   }
   function closeCourse() {
     courseScreen.classList.remove('show');
-    csFrame.src = 'about:blank';   // 停掉播放器
-    document.getElementById('cs-pack').innerHTML = '';
     csCtx = null;
   }
   function updateCheckinBtn() {
@@ -2398,8 +2496,16 @@
   });
   document.addEventListener('click', (e) => { if (!srBox.contains(e.target) && e.target !== searchInput) srBox.style.display = 'none'; });
 
-  // ---------- 学科筛选 chips ----------
+  // ---------- 学科筛选 chips（桌面多选开关；移动端单选 = 切换当前学科并 fit-to-view） ----------
   const chipsBox = document.getElementById('chips');
+  const chipEls = new Map();
+  function syncChips() {
+    for (const [s, chip] of chipEls) {
+      const on = activeSubjects.has(s);
+      chip.classList.toggle('on', on);
+      chip.classList.toggle('off', !on);
+    }
+  }
   for (const s of subjects) {
     const chip = document.createElement('div');
     chip.className = 'chip on';
@@ -2407,13 +2513,33 @@
     const count = topics.filter(t => t.subject === s).length;
     chip.innerHTML = `<span class="dot" style="background:${COLORS[s]}"></span>${s} ${count}`;
     chip.onclick = () => {
-      if (activeSubjects.has(s)) { activeSubjects.delete(s); chip.classList.add('off'); chip.classList.remove('on'); }
-      else { activeSubjects.add(s); chip.classList.remove('off'); chip.classList.add('on'); }
+      if (isMobile()) {
+        mobileSubject = s;
+        activeSubjects.clear();
+        activeSubjects.add(s);
+        selectedId = null; highlightSet.clear(); highlightEdges.clear();
+        closePanelMobileKeep();
+        fitSubjectMobile(s);
+      } else {
+        if (activeSubjects.has(s)) { activeSubjects.delete(s); } else { activeSubjects.add(s); }
+      }
+      syncChips();
       updateStats();
       requestDraw();
     };
+    chipEls.set(s, chip);
     chipsBox.appendChild(chip);
   }
+  function closePanelMobileKeep() {   // 切学科时收起抽屉、清空选中
+    panelView = 'empty'; diagRootId = null;
+    panelBody.innerHTML = EMPTY_HINT_HTML;
+    if (isMobile()) { sheetState = 'collapsed'; applySheetState(); }
+  }
+  // 图例收起/展开（移动端默认收起成小条）
+  document.getElementById('legend-toggle').onclick = () => {
+    const lg = document.getElementById('legend');
+    lg.classList.toggle('open');
+  };
 
   // ---------- 首次使用引导（分步：角色 → 年级 → 学科 → 进入） ----------
   const onboard = document.getElementById('onboard');
@@ -2545,9 +2671,17 @@
   function initMapView() {
     mapInited = true;
     if (window.innerWidth < 860 && !isMobile()) panel.classList.add('hidden');
-    if (isMobile()) { sheetState = 'collapsed'; panel.classList.remove('hidden'); }
+    if (isMobile()) {
+      sheetState = 'collapsed'; panel.classList.remove('hidden');
+      // 移动端单学科模式：默认当前档案学科（否则第一个学科），chips 单选切换
+      mobileSubject = (profile && profile.subject && subjects.includes(profile.subject)) ? profile.subject : subjects[0];
+      activeSubjects.clear();
+      activeSubjects.add(mobileSubject);
+      syncChips();
+      rotAngle = 0;
+    }
     resize();
-    if (isMobile()) focusGradeMobile(profile && profile.grade ? profile.grade : 7, profile && profile.subject);
+    if (isMobile()) fitSubjectMobile(mobileSubject);
     else if (profile && profile.grade) focusGradeSubject(profile.grade, profile.subject);
     else fitView();
     enterT0 = performance.now(); enterDone = false;   // 入场生长动画
@@ -2559,7 +2693,13 @@
 
   // 自动化验收辅助
   window.__cnkTest = {
-    posOf: (id) => { const t = topicById.get(id); return t ? worldToScreen(t._x, t._y) : null; },
+    posOf: (id) => {   // 返回视口坐标（含 canvas 在页面中的偏移，便于自动化点按）
+      const t = topicById.get(id);
+      if (!t) return null;
+      const [x, y] = worldToScreen(t._x, t._y);
+      const r = canvas.getBoundingClientRect();
+      return [x + r.left, y + r.top];
+    },
     quiz: () => quiz,
     isMember,
     switchTab,
@@ -2568,6 +2708,10 @@
     plan: () => plan2,
     coaching: () => coaching,
     pack: (id) => resPackByTopic.get(id),
+    visibleSubjects: () => [...activeSubjects],
+    mobileSubject: () => mobileSubject,
+    viewSize: () => [W, H],
+    scale: () => scale,
     rotAngle: () => rotAngle,
     currentTab: () => currentTab,
   };
