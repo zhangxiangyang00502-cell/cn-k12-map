@@ -1,0 +1,153 @@
+<!doctype html><html lang=en><head><title>国家中小学智慧教育平台</title><link rel="shortcut icon" href=/favicon.ico type=image/x-icon><link rel=stylesheet href=/icon/iconfont.css><script>window.__global_env="ncet-xedu";window.__global_config={}</script><meta charset=utf-8><meta http-equiv=x-ua-compatible content="ie=edge"><meta name=viewport content="width=1368"><meta name=description content=""><style>body.preload-theme-dark:not(.theme-dark):not(.theme-default) {
+      background-color: #2A3632;
+    }</style><script>if (window.location.search.indexOf('in_app') !== -1) {
+      document.title = '智慧中小学'
+    }
+    // 初始化暗黑主题
+    function initThemDark(ele, query) {
+      const themeItem = sessionStorage.getItem('x-edu-theme');
+      if (query['x-edu-theme'] == 'dark' || themeItem === 'dark') {
+        ele.classList.add('preload-theme-dark');
+        sessionStorage.setItem('x-edu-theme', 'dark');
+      }
+    }
+
+    // 处理暗黑主题色预加载
+    function preDarkTheme() {
+      const ele = document.querySelector('body');
+      if (!ele) {
+        return setTimeout(() => {
+          preDarkTheme()
+        }, 60)
+      }
+
+      const queryArr = location.search.slice(1).split('&');
+      const query = {};
+      queryArr.forEach((item) => {
+        const info = item.split('=');
+        query[info[0]] = info[1];
+      });
+
+      initThemDark(ele, query);
+    }
+    preDarkTheme(); // 预加载主题颜色</script><script>/* 获取证书查询页域名 */
+    const getCertHost = () => {
+      var _host = location.host
+      var _map = {
+        'zs.basic.smartedu.cn': 'h5-zs.basic.smartedu.cn',
+        'zs-zxxtest.ykt.eduyun.cn': 'h5-e-certificate-web-test.ykt.eduyun.cn',
+      }
+      var userAgent = navigator.userAgent.toLowerCase()
+      var isMobile = /mobile|android|iphone|ipod|phone|ipad/.test(userAgent)
+      // mobile && 屏幕宽度 < 1024 使用 h5
+      if ((isMobile && screen.width < 1024) && _map[_host]) {
+        return _map[_host]
+      }
+      return null
+    }
+
+    if (window.location.hostname === 'www.zxx.edu.cn') {
+      window.location.assign(window.location.href.replace(window.location.hostname, 'basic.smartedu.cn'))
+    }
+    // 强师域名跳转特殊要求
+    if (window.location.host === 'zs.basic.smartedu.cn' || window.location.host === 'zs-zxxtest.ykt.eduyun.cn'
+      || window.localStorage.getItem('_cert_debug_')) {
+      var _host = getCertHost()
+      if (window.location.pathname === '/') {
+        window.location.href = `https://${_host || location.host}/certificate/search`
+      } else if (_host) {
+        window.location.host = _host
+      }
+    }</script><script>if (window.location.protocol !== 'https:') {
+      window.location.protocol = 'https:'
+    }</script><script>if (navigator.userAgent.indexOf('SmartCanWebView') > -1  && !window.__MICRO_APP_ENVIRONMENT__) {
+      document.writeln('<script type="text/javascript" src="/JsBridge.js"><\/script>')
+    }</script><script>window.__global_env = window.__global_env || 'ncet-xedu'
+    // if (window.__global_env === 'ncet-xedu-beta') {
+    //   window.__global_env = 'ncet-xedu'
+    // }
+    window.__global_config = {
+      cs: {
+        cdn: {},
+        esp: {}
+      }
+    }</script><script>(function () {
+        if (location.search.indexOf('isThirdLogin=true') > -1) {
+          localStorage.setItem('isThirdLogin', true)
+        }
+        if (location.pathname === '/') {
+          var _state = new URLSearchParams(location.search).get('state')
+          if (_state) {
+            try {
+              var _url = atob(_state)
+              if (_url.indexOf('http') === 0) {
+                location.replace(_url)
+              }
+            } catch (e) {
+            }
+          }
+        }
+      })()</script><script src=https://topic.ykt.cbern.com.cn/web/ncet-xedu/config/site.js></script><link href=https://topic.ykt.cbern.com.cn/web/ncet-xedu/config/theme.css rel=stylesheet type=text/css><script>(function () {
+        var _paths = [
+          '/accountInfo',
+          '/home',
+          '/teacherTrainingNav/train/catalogue',
+          '/training/[^/]+/catalogue',
+          '/verifyCode',
+          '/areaAdmin',
+          '/logout',
+          '/personal',
+          '/multiplexPersonal',
+          '/publicLive',
+          '/user',
+          '/myPaper',
+          '/productFeedback',
+          '/yearQualityCourse',
+          '/practice/analysis',
+          '/syncClassroom/classActivity',
+          '/teacherTrainingNav',
+          '/jiaoshi'
+        ]
+        // 频道预览模式
+        window.isPreview = window.location.host.indexOf('basic.smartedu.cn') === -1 && window.top !== window.self && (location.href.indexOf('preview=1') > -1 || localStorage.getItem('preview') === '1')
+        if (isPreview) {
+          localStorage.setItem('preview', '1')
+        }
+        if (!_paths.some((t) => new RegExp(t, 'i').test(location.pathname))) {
+          if (window.top != window.self
+            && (!window.__siteConfig || !window.__siteConfig.iframeAllowHosts || !window.__siteConfig.iframeAllowHosts.some((host) => window.document.referrer && window.document.referrer.indexOf(host) > -1))
+            && window.self.location.href.indexOf('isInNingXia=1') == -1
+            && !window.isPreview) {
+            try {
+              window.top.location = window.self.location
+            } catch (e) {
+              document.write('')
+              setTimeout(function () {
+                document.write('')
+              }, 1000)
+              throw new Error('iframe security error')
+            }
+          }
+        }
+      })()</script><script>/*@cc_on window.location.href="/upgrade.html" @*/</script><script>(function () {
+        var shouldJump = false
+        var userAgent = navigator.userAgent.toLowerCase()
+        var isSafari = userAgent.indexOf('safari') > -1 && userAgent.indexOf('chrome') === -1
+        if (isSafari) {
+          var version = userAgent.match(/version\/([\d.]+)/)[1]
+          var macOS = userAgent.indexOf('mac os x') > -1
+          if (macOS && parseInt(version, 10) < 13) {
+            shouldJump = true
+          }
+        }
+        var isIE11 = !!userAgent.match(/trident.*rv\:11\./)
+        if (isIE11) {
+          shouldJump = true
+        }
+        if (shouldJump) {
+          location.href = '/upgrade.html'
+        }
+      })()</script><script src=/icon/iconfont.js></script><style>.video-js .vjs-audio-bg .vjs-audio-bg-logo-background,
+    .vjs-default-skin .vjs-audio-bg .vjs-audio-bg-logo-background {
+      background-image: url(/fish/video/icon_active.gif) !important;
+    }</style></head><body><div id=root-x-edu-web></div><script src=/js/chunk-fish-70d6d158.js></script><script src=/js/chunk-uc-4d4ca6ab.js></script><script src=/js/chunk-react-3842c9f4.js></script><script src=/js/chunk-vendors-1dff91af.js></script><script src=/js/app-821043c1.js></script></body></html>

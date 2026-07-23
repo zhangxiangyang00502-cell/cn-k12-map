@@ -1,0 +1,1037 @@
+{
+ "resources": [
+  {
+   "topicId": "cn_df_snym_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "奏响中学序曲（李媚晨）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=4db92b6b-f8ec-4f6b-d293-cafa572ebb33&chapterId=8da6679d-46f9-49e0-b095-6fc5c0a01552&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_snym_02",
+   "items": [
+    {
+     "type": "course",
+     "title": "规划初中生活（许欧阳）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=cf785659-0452-6d53-6908-dcc116d4855d&chapterId=aafd15e4-1a19-40bf-80a3-ea4250b28907&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_snym_03",
+   "items": [
+    {
+     "type": "course",
+     "title": "认识自己（戈佩玉）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=06e6ad00-a445-36d2-eceb-c5128abb1cce&chapterId=71119ef4-5e5a-4014-a2cb-dfe73168e4b0&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_snym_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "做更好的自己（张丽）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=c210c1b0-e91c-5b07-9d70-25be1b510f93&chapterId=9d7a1508-44be-45b4-a121-104cde5cb4cf&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_snym_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "做有梦想的少年（丁丽敏）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=b052d96b-a2ee-8faa-6fd2-6c29019e9393&chapterId=2988320c-9e55-4508-a46e-e61d25761ccf&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_snym_06",
+   "items": [
+    {
+     "type": "course",
+     "title": "学习成就梦想（王红）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=497a1fe4-d898-696f-c0c7-e2e56a2964c8&chapterId=ba5eb77a-2cdd-40f7-b94a-19a24b9c835e&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_czsk_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "家的意味（王芊）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f670ad2a-f8f2-7d4d-72d7-eac62f3c0e95&chapterId=3f9e1784-8276-45a1-9856-c19b2e425daf&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_czsk_03",
+   "items": [
+    {
+     "type": "course",
+     "title": "走近老师（王辉）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=0ec8b6dc-2e3a-c6f7-cebe-4d578b7e0b45&chapterId=555f312a-8de0-4981-ace5-1b0b3b871717&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_czsk_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "珍惜师生情谊（王辉）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=872f0398-8dbd-31e1-0522-e014b82e2f63&chapterId=147c08c9-e977-4e57-922a-3faecac1beb0&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_czsk_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "友谊的真谛（李茗熹）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=beb62de5-9e2d-31ca-fd97-78eff0ed550b&chapterId=0ed871bf-a734-444a-beee-6751c9f2c487&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_czsk_06",
+   "items": [
+    {
+     "type": "course",
+     "title": "交友的智慧（李茗熹）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=35948fc6-bba6-72e4-fae6-1ce13ac974e5&chapterId=f79ffb76-54ba-44cf-8ee8-47c92fabb0a1&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_czsk_07",
+   "items": [
+    {
+     "type": "course",
+     "title": "集体生活成就我（冯乐）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=17f82399-bf45-6ec2-eedd-03a01d299a76&chapterId=759d366b-3e1c-45a8-bf5e-0c2eb964fcd4&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    },
+    {
+     "type": "course",
+     "title": "共建美好集体（冯乐）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=e262ebe7-15a0-c765-b4db-738aa0a7de4c&chapterId=c7bb7f27-5e95-49b9-a988-6db3c1c10279&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zasm_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "认识生命（戈佩玉）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=32a7f4f1-625b-cc53-28c6-7d92954cf865&chapterId=e216f3be-be83-47df-9625-f806fdadd741&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zasm_02",
+   "items": [
+    {
+     "type": "course",
+     "title": "敬畏生命（戈佩玉）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=736a6fd2-04fd-c4b6-51c9-783245a56d96&chapterId=a30fc5e9-50b9-4401-a525-6ed7301f384a&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zasm_03",
+   "items": [
+    {
+     "type": "course",
+     "title": "增强安全意识（张丽）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=d6cd727b-bef2-8a9b-68a7-a78817c14a8d&chapterId=2316a8b1-c357-4889-a661-8b93af507136&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zasm_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "提高防护能力（张丽）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=ca94f759-d691-6e62-762a-e183a13de872&chapterId=18373ee9-988e-4878-bf8d-73a698894038&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zasm_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "爱护身体（蔡正清）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=fbfeca7f-e9eb-b911-29c9-eadb40bb9880&chapterId=4f8ecf91-0d79-4328-abda-6c7c9af26617&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zasm_06",
+   "items": [
+    {
+     "type": "course",
+     "title": "滋养心灵（蔡正清）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=9acc6fb7-f0fb-0573-f8af-4ddf168a23d9&chapterId=e5c97424-a617-4048-a7d1-95faf5816536&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zhmr_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "探问人生目标（丁丽敏）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=2a34365f-3b46-3b83-d3fd-78c83aaf8511&chapterId=aa319771-cf57-4732-9202-e003e742216d&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    },
+    {
+     "type": "course",
+     "title": "树立正确的人生目标（丁丽敏）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=2fa24c20-c97b-837a-dfc3-a5cbdf657cec&chapterId=935b3f96-22f4-45fb-baa5-8cc0f19aab84&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zhmr_02",
+   "items": [
+    {
+     "type": "course",
+     "title": "拥有积极的人生态度（王红）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=7bed5690-f22e-bec5-4086-65baf0719ce5&chapterId=e7a2c02a-b954-4acb-9656-c5be0814cd7e&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zhmr_03",
+   "items": [
+    {
+     "type": "course",
+     "title": "正确对待顺境和逆境（王红）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=33b5e1e4-f903-41a5-eb48-8220ebbcefbb&chapterId=12d024df-4a8c-495a-80a5-e600051af1de&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zhmr_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "在劳动中创造人生价值（沈安恬）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=1b44b212-8c87-397b-d9fc-602b7b12706a&chapterId=9b8e1563-35ca-49ee-8489-0e13072e812c&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zhmr_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "在奉献中成就精彩人生（沈安恬）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=cbbf3edd-7461-afb0-e32f-b1b6822c8069&chapterId=388b8d57-d477-4049-ae01-9846d8f09c92&teachingmaterialId=d350d7ac-8166-4b30-88d4-1fe48457f8e8&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zxqc_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "青春的邀约（孟婷）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=ad634529-3823-d2b3-6b02-ac00a2459ee0&chapterId=8d995c9f-52a7-4985-b8cf-3ceed2714cb6&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zxqc_02",
+   "items": [
+    {
+     "type": "course",
+     "title": "男生女生（孟婷）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=0f0abe32-69b0-7d96-7002-413b189a2503&chapterId=ad078d1e-b423-488a-904d-8cc57b32b3df&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zxqc_03",
+   "items": [
+    {
+     "type": "course",
+     "title": "学会自我保护（孟婷）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=be7d9a03-b00e-424e-0f1f-a61b9d2a7ebc&chapterId=0d7d6e96-ae96-482d-8e04-e9bded8a4962&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zxqc_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "揭开情绪的面纱（赵学芹）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=bdfced9e-7deb-af8c-97ee-151e8b9ed3ac&chapterId=a76ffaed-a4c2-4888-8cce-4ba38b593f93&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zxqc_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "学会管理情绪（赵学芹）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=dc940a07-c5fc-6761-aa64-1f428ced5821&chapterId=69dec662-812e-49c3-8490-833425e7b149&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zxqc_06",
+   "items": [
+    {
+     "type": "course",
+     "title": "品味美好情感（赵学芹）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=0893e304-ec1b-e092-3505-63c5d173a014&chapterId=bf775669-6fc7-4492-a1cf-26b5eb4f20a2&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_hfql_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "人须有自尊（丁丽敏）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=7f4a60b2-7342-8376-3179-21f6879ae752&chapterId=0967c774-797a-4a23-9557-df28bc47f5d9&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_hfql_02",
+   "items": [
+    {
+     "type": "course",
+     "title": "做自尊的人（丁丽敏）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=a8db943b-2845-5d4a-2a53-d05660648a3d&chapterId=b37eb1c6-62e9-4a3c-a38b-efe2c76b0ef4&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_hfql_03",
+   "items": [
+    {
+     "type": "course",
+     "title": "人要有自信（王红）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=71d72487-cf30-b381-5f97-d8408a1283aa&chapterId=c69658c7-45ec-423a-9714-ca4f82f06b5c&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_hfql_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "做自信的人（王红）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=4699da71-83cf-2864-64c0-a15857f4a9b6&chapterId=79946454-371a-47e4-9dfa-45633782642b&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_hfql_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "人要自强（沈安恬）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=4a07ad57-ac91-1d11-20a2-26ee229eb7ba&chapterId=8c04b9b0-a366-4246-b512-210cc53194d8&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_hfql_06",
+   "items": [
+    {
+     "type": "course",
+     "title": "做自强不息的中国人（沈安恬）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=102005e3-8293-5cdc-140b-764d1b95eb53&chapterId=82311c4e-e4a7-4d4b-84d5-6414064cab3f&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_ccwh_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "历久弥新的思想理念（都艳红）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=6f393f22-d447-008f-52ce-5f3ee61d1db6&chapterId=14257923-3e9e-465b-98c7-0e38b8eba8ce&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_ccwh_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "做中华人文精神的弘扬者（陶正阳）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=cc7d35e4-e160-1dfd-c823-934f61ff19dd&chapterId=c1c1fd28-8a96-449b-bd09-77f212d8979c&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_ccwh_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "薪火相传的传统美德（刘清翠）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=7dceb9b2-157b-77bc-6d1c-d8531ba71f68&chapterId=8a16adb9-6e58-457e-a7c8-82e35410297a&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_ccwh_06",
+   "items": [
+    {
+     "type": "course",
+     "title": "做中华传统美德的践行者（刘清翠）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=80deec94-6569-81aa-c1b5-b01183133274&chapterId=e5a55e62-f2bd-45ba-b4a7-71420676b6ad&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_fzsh_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "日益完善的法律体系（陈敏行）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=a9549f4a-8d9c-b42b-86dd-95dee98fc131&chapterId=21df89f4-76aa-4617-8dae-9aa56e65593e&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_fzsh_02",
+   "items": [
+    {
+     "type": "course",
+     "title": "法律保障生活（陈敏行）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=56baadd1-df5d-76d2-66a5-69f712a3aa44&chapterId=e9adb7ec-43e1-4910-a5db-301351f7de96&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_fzsh_03",
+   "items": [
+    {
+     "type": "course",
+     "title": "认识民法典（王辰）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=80655b3a-b796-02d2-a924-fef5463acc02&chapterId=6e853aa8-768b-49ae-82ad-8f805842a721&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_fzsh_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "保护人身权（王辰）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=6399dc20-7efc-8495-3bf8-f374da3d1ac2&chapterId=88820ab0-6957-44db-814e-d7c913a9d0d8&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_fzsh_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "保障财产权（王辰）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=d3d693b8-e8b9-bd33-c37e-d1ccaaae14cd&chapterId=8e2dc6ce-2e6c-4179-8c76-f1142c999874&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_fzsh_06",
+   "items": [
+    {
+     "type": "course",
+     "title": "法不可违（陈姿璇）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=75e3d8e8-fd24-eed8-5cb3-f37fd56d47cb&chapterId=2232fc4e-264a-49b2-bc6a-e6cf09d742cd&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_fzsh_07",
+   "items": [
+    {
+     "type": "course",
+     "title": "犯罪与刑罚（陈姿璇）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=b687c288-583e-38a7-806f-bb409da8a6a1&chapterId=0164aeb0-b1b3-4b12-809a-2ae4ff2f1bc3&teachingmaterialId=0950ee38-88ea-4da9-8da9-bafb9dade3e1&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zjsh_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "认识社会生活（曹蓓）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=84dd39ec-27fb-f838-7cd6-937dd0fe5312&chapterId=482073f7-31c7-4158-bd8e-e64ad591f953&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zjsh_02",
+   "items": [
+    {
+     "type": "course",
+     "title": "我们都是社会的一员（曹蓓）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=7b7f66b3-af27-0bec-82a3-6ff4f765fe2a&chapterId=74f1f6f8-ede7-44c6-b6c9-f333e053c127&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zjsh_03",
+   "items": [
+    {
+     "type": "course",
+     "title": "人的社会化（方翔）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=2584a6ab-40da-cf29-7467-f50fa9a58ede&chapterId=49388b28-197b-42ea-bfa9-fad0a695cb67&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zjsh_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "养成亲社会行为（方翔）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=637a380b-825f-580d-a318-aa8de92c6ecc&chapterId=868b7742-7c17-44cc-b021-4c9d8c4a9797&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zjsh_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "网络改变世界（俞隆）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=0668fa60-09e3-c75a-e20f-9a7d145b8140&chapterId=a118af58-080f-4b20-b59a-cc07d4975e46&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_whzx_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "维护秩序靠规则（林丽君）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=259a5c44-4ddf-5602-f93f-b4e2683f9cf4&chapterId=ac01b51f-6c0d-4531-a50b-c078e19f3e26&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_whzx_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "诚实守信（吴晓影）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=0c909742-669b-446f-113f-668b038eb563&chapterId=c84724f0-e6da-460e-a3e5-10c0706af85f&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_whzx_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "友善待人（任佩如）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=29f14a9b-e72e-e207-c9b1-61af77bc29ca&chapterId=485a40db-56fc-4bb2-ae39-a4d6dbf4cd5a&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_whzx_06",
+   "items": [
+    {
+     "type": "course",
+     "title": "树立法治观念（肖秋程）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=33bc329a-8463-31fe-b2e4-4d6401c0edaf&chapterId=eee49889-8f9b-474d-a90c-7e1a150f0604&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_whzx_07",
+   "items": [
+    {
+     "type": "course",
+     "title": "学会依法办事（肖秋程）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=9f4df81c-c1ea-fadb-9d98-149219aa4566&chapterId=2ac24090-ca3e-47f7-ae25-62a05d50f6db&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_ydzr_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "珍视自由（高冰倩）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=8bccc1f7-732a-9b7e-0c49-1cdcba2c03bc&chapterId=ff91e6c7-95d7-4a4f-bbe4-a8021f536a5c&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_ydzr_02",
+   "items": [
+    {
+     "type": "course",
+     "title": "践行平等（高冰倩）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=ebb60174-fa76-7464-65fb-03f714e986c4&chapterId=3411cc5e-afbc-461e-ac33-cbeac617f4d7&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_whgy_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "全面推进国防和军队现代化（李娜）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f06d524c-813b-f8b5-f486-271e808dbe5f&chapterId=83299686-6cce-454d-bbf8-28b253d4bf12&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_whgy_06",
+   "items": [
+    {
+     "type": "course",
+     "title": "维护国家安全（沈颖）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=099245ea-d9e4-b980-e9a4-862d1abea6c4&chapterId=e3ff427d-f68d-4553-8de4-74a73a1beacb&teachingmaterialId=a7269cde-d3a4-452b-8013-2e3a44d4382e&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_xfzs_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "党领导人民制定宪法（黄展莎）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=d704689f-634f-4317-dbc4-349935af6818&chapterId=010419c5-c9e7-4f57-8ec5-ab8b27208b2f&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_xfzs_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "依宪治国（杜海超）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=3a1e48de-36ee-3226-ad2c-d2a515f4282f&chapterId=445be500-1011-4249-9dbe-99e0330654a3&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_xfzs_06",
+   "items": [
+    {
+     "type": "course",
+     "title": "尊崇宪法（杜海超）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=291aad0c-a646-a7d3-49d0-e132846b7507&chapterId=37d91520-3b0b-4cc1-82a4-1029ccc2e79d&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_qlyw_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "公民基本权利（许宇婷）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=d5308177-6ffa-d8b5-8b51-ad3adaa9f204&chapterId=b40e76b8-bd8e-4be7-a8f7-e83956faaf70&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_qlyw_02",
+   "items": [
+    {
+     "type": "course",
+     "title": "公民基本义务（许宇婷）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=a740bc29-169a-a99c-f98f-35eb5a2872e6&chapterId=f9ea531e-1eae-4dd0-80a1-519ef10fc4e3&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_qlyw_03",
+   "items": [
+    {
+     "type": "course",
+     "title": "权利与义务相统一（陈荣恩）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=2c12a581-ae58-40be-043d-2b9f77bc4f35&chapterId=d10c9701-c0e4-4977-8b8f-34aeda954ea9&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_qlyw_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "依法行使权利（陈荣恩）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=d3e97f3a-bc61-5077-1136-22af1e2c78ab&chapterId=40e844a3-77ca-4e65-bd39-59153e6f91ae&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_qlyw_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "依法履行义务（陈荣恩）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=5dfcc3d5-2d39-a522-9112-d9d1a7f00115&chapterId=4c7275c9-6124-4e14-b152-427ca15f9227&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_gjzd_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "人民代表大会制度（刘凤仪）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=3ff9c27b-83dc-631b-a07b-d38cfca39464&chapterId=69f144e9-ab51-432c-a054-b2cb20a2b1f8&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_gjzd_02",
+   "items": [
+    {
+     "type": "course",
+     "title": "中国共产党领导的多党合作和政治协商制度（刘凤仪）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=73fba53d-bc47-5364-8a32-52578a50320a&chapterId=f689dc55-b226-4e4c-8162-5e78de823673&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_gjzd_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "公有制为主体、多种所有制经济共同发展（高慧敏）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=07399067-b327-13fd-205d-88558a4745c8&chapterId=0fa56821-ef29-4a11-af82-876c0cea3ddd&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_gjzd_05",
+   "items": [
+    {
+     "type": "course",
+     "title": "按劳分配为主体、多种分配方式并存（高慧敏）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=393344f9-5c05-c780-788d-df886fc07239&chapterId=75c10de1-b9b6-4e4f-8e9d-3eccfa339fc9&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_gjzd_06",
+   "items": [
+    {
+     "type": "course",
+     "title": "社会主义市场经济体制（高慧敏）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=a1840440-a283-9b48-5c7c-bb0e6f67433c&chapterId=133da12d-eb22-4834-b37c-c576b21a960e&teachingmaterialId=02d175b7-a0d7-4ae2-8e52-d946bf8f73f4&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_wmdsjj_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "开放互动的世界（徐亭）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=8ae7e4a9-7c96-5f65-017c-97a24426031b&chapterId=cc599157-54ba-31c4-964c-26c36974f431&teachingmaterialId=bec0aa15-d286-4f1b-98cc-143b91c00af5&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_wmdsjj_04",
+   "items": [
+    {
+     "type": "course",
+     "title": "推动和平与发展（谢黎敏）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=8ae7e4ad-7c77-78f0-017c-77e4c199017f&chapterId=6105f966-ebe1-3d25-b31b-6b5e26cf547f&teachingmaterialId=bec0aa15-d286-4f1b-98cc-143b91c00af5&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    },
+    {
+     "type": "course",
+     "title": "谋求互利共赢（吴捷）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=8ae7e4b2-83ef-1de3-0183-f3367d740dcf&chapterId=38ddc7d0-2323-3cf8-8774-3b0825bf5f24&teachingmaterialId=bec0aa15-d286-4f1b-98cc-143b91c00af5&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_sjwt_01",
+   "items": [
+    {
+     "type": "course",
+     "title": "中国担当（吴一凡）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=8ae7e48f-842c-12fc-0184-32203ca900f1&chapterId=b1c99046-cfbc-3300-bd68-8712e24bcd2b&teachingmaterialId=bec0aa15-d286-4f1b-98cc-143b91c00af5&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    },
+    {
+     "type": "course",
+     "title": "中国担当（王燕）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=8ae7e4a5-83f9-d175-0183-ff6e1b820c2c&chapterId=b1c99046-cfbc-3300-bd68-8712e24bcd2b&teachingmaterialId=bec0aa15-d286-4f1b-98cc-143b91c00af5&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_sjwt_03",
+   "items": [
+    {
+     "type": "course",
+     "title": "与世界深度互动（陈磊）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=8ae7e49a-7c9c-cef9-017c-9db591a90327&chapterId=b681da8a-76be-3603-b8a8-446304f23c53&teachingmaterialId=bec0aa15-d286-4f1b-98cc-143b91c00af5&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_df_zxwl_03",
+   "items": [
+    {
+     "type": "course",
+     "title": "多彩的职业（郑秀秀）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=8ae7e4b0-7c38-6741-017c-3b9791f2020c&chapterId=46a85d41-fbd9-30f1-832e-ad2a23195713&teachingmaterialId=bec0aa15-d286-4f1b-98cc-143b91c00af5&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_yw_jl_16",
+   "items": [
+    {
+     "type": "course",
+     "title": "文学文化常识和名著阅读（袁海荣）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=80f51f52-5a26-4aaa-801e-4e1b2658bcc9&chapterId=806327ea-9f7e-3517-b4f5-299c44d97c6c&teachingmaterialId=285ab940-e8a7-4b39-972c-3d77aabd4dab&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_yw_sy_15",
+   "items": [
+    {
+     "type": "course",
+     "title": "口语交际（杨新颖）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=8137571e-7bd7-48be-acae-fdf6eab7c4d0&chapterId=04da22b5-0e4c-3676-ba39-0934d4e9f5f6&teachingmaterialId=117306e1-40c4-4106-bebb-b01a34927951&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    },
+    {
+     "type": "course",
+     "title": "口语交际《走进他们的童年岁月》（丁黎黎）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=946cd26a-ed22-4c4c-9dad-e41a5cbc5a74&chapterId=04da22b5-0e4c-3676-ba39-0934d4e9f5f6&teachingmaterialId=117306e1-40c4-4106-bebb-b01a34927951&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    },
+    {
+     "type": "course",
+     "title": "口语交际（刘惠红）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f9c9b8f0-8f00-480f-8df0-0a5451a3a7b9&chapterId=a8588551-7875-3569-af0b-63ad3f7b6033&teachingmaterialId=117306e1-40c4-4106-bebb-b01a34927951&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    },
+    {
+     "type": "course",
+     "title": "口语交际-怎么表演课本剧（韩沐霏）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=c37e4f3a-fa54-4265-b730-78d1e0447562&chapterId=a8588551-7875-3569-af0b-63ad3f7b6033&teachingmaterialId=117306e1-40c4-4106-bebb-b01a34927951&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_yw_wx_24",
+   "items": [
+    {
+     "type": "course",
+     "title": "修改润色（孙伟）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=8ae7e4a5-83f4-8557-0183-f5e84b8c05ba&chapterId=67f6218b-3e3d-3793-9346-fb3d2261f2bb&teachingmaterialId=285ab940-e8a7-4b39-972c-3d77aabd4dab&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  },
+  {
+   "topicId": "cn_yw_zs_18",
+   "items": [
+    {
+     "type": "course",
+     "title": "第五单元起始课（陈媛媛）",
+     "url": "https://basic.smartedu.cn/syncClassroom/classActivity?activityId=87cc8f98-fde8-4967-864a-020c63ca86dd&chapterId=7f89ff77-35bb-3255-a60d-af27af355d62&teachingmaterialId=5f325e4e-50ac-4bf0-948d-00e1adf9b69d&fromPrepare=0&classHourId=lesson_1",
+     "source": "国家中小学智慧教育平台",
+     "note": "人教社官方视频课"
+    }
+   ]
+  }
+ ]
+}
