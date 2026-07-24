@@ -852,6 +852,18 @@
     background: var(--teal-soft); border-radius: 999px; padding: 4px 12px; margin: 12px 0 8px; }
   .ss-speaker.parent { color: #8A6D1F; background: #FDF3D7; }
   .ss-coach { font-size: var(--fs-body); line-height: var(--lh-body); font-weight: 600; margin-bottom: 14px; }
+  .ss-hint { font-size: 13px; line-height: 20px; color: var(--text-dim); background: var(--input-bg);
+    border-radius: var(--r-tag); padding: 8px 12px; margin: 8px 0 12px; }
+  .me-mode-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .me-mode-chip.on { border-color: var(--accent); color: var(--accent-deep); background: var(--teal-soft); }
+  .rp-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .rp-head h2 { flex: 1 1 auto; }
+  .rp-share { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--panel-border);
+    background: var(--panel); color: var(--accent-deep); cursor: pointer; display: flex; align-items: center;
+    justify-content: center; padding: 0; }
+  .rp-share svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round; }
+  .rp-links { display: flex; flex-wrap: wrap; gap: 4px 18px; justify-content: center; margin-top: 4px; }
   .ss-tag { font-size: var(--fs-aux); line-height: var(--lh-aux); color: var(--text-dim); margin: 2px 0 8px; }
   .ss-big-q { font-size: 17px; line-height: 1.8; font-weight: 600; margin-bottom: 14px; }
   .ss-big-q.child { font-size: 21px; line-height: 1.75; }
@@ -3032,8 +3044,14 @@
         <div class="m-s">每个断点配导学卡 + 变式训练 + 回忆卡 + 产出任务，断哪环就补哪环</div>
         <button class="big-cta" id="report-unlock" style="margin-top:0">早鸟价开通 ›</button>
       </div>`;
+    const sessMinutes = SESSION_MODES[sessionModeKey()].minutes;
     quizBody.innerHTML = `
-      <h2>体检报告 · ${quiz.grade} 年级${quiz.subject ? ` ${esc(quiz.subject)}` : ' · 全科'}</h2>
+      <div class="rp-head">
+        <h2>体检报告 · ${quiz.grade} 年级${quiz.subject ? ` ${esc(quiz.subject)}` : ' · 全科'}</h2>
+        <button class="rp-share" id="qr-poster" aria-label="生成海报分享" title="生成海报分享">
+          <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-7"/></svg>
+        </button>
+      </div>
       <div class="quiz-meta">${okCount} / ${total} 题答对 · 涉及 ${byTopic.size} 个知识点 · 结果已自动写入图谱掌握度</div>
       <div class="rp-block" id="report-portrait"><div class="rp-t">孩子画像</div><div class="rp-portrait">${portraitHtml}</div></div>
       <div class="rp-block" id="report-overview"><div class="rp-t">掌握度总览 · ${quiz.subject ? '本学科' : '全部'} ${subjTopics.length} 个知识点</div>
@@ -3046,13 +3064,14 @@
       </div>
       ${bpIds.length && !quiz.guest ? `<div class="rp-block" id="report-chains"><div class="rp-t">断点可视化 · 最弱的 ${bpIds.length} 环（红色 = 断的那环）</div>${chainHtml}</div>` : ''}
       ${memberWall}
-      <button class="tbtn" id="qr-poster" style="width:100%;min-height:44px;margin-bottom:10px">生成海报，分享给同款家长 ›</button>
       ${quiz.guest
         ? `<button class="big-cta float-cta" id="qr-guest-done">开始第一天 ›</button>`
-        : `${badIds.length
-            ? `<button class="big-cta float-cta" id="qr-plan">生成今日打卡清单（${badIds.length} 个薄弱点）›</button>`
-            : `<button class="big-cta float-cta" id="qr-gomap-cta">去图谱挑战新内容 ›</button>`}
-           <button class="text-link" id="qr-gomap">去图谱看看 ›</button>`}
+        : `<button class="big-cta float-cta" id="qr-start">开始今天的 ${sessMinutes} 分钟 ›</button>
+           <div class="rp-links">
+             ${badIds.length ? `<button class="text-link" id="qr-plan">生成今日打卡清单（${badIds.length} 个薄弱点）›</button>` : ''}
+             <button class="text-link" id="qr-retake">重新测一次 ›</button>
+             <button class="text-link" id="qr-gomap">去图谱看看 ›</button>
+           </div>`}
       <div style="height:96px"></div>`;
     // Loop B：诊断海报数据（年级 / 测了几个 / 薄弱 TOP3 / 是否全对）
     const reportPosterData = {
@@ -3070,6 +3089,14 @@
       hideQuizScreen();
       switchTab('today');
     };
+    const qs = quizBody.querySelector('#qr-start');
+    if (qs) qs.onclick = () => {   // v63 单 CTA：报告 → 直接开始今天的会话
+      quiz = null;
+      hideQuizScreen();
+      startSession();
+    };
+    const qrt = quizBody.querySelector('#qr-retake');
+    if (qrt) qrt.onclick = () => startQuickQuiz(quiz.grade || ((profile && profile.grade) || 7), quiz.subject || undefined);
     const qp = quizBody.querySelector('#qr-plan');
     if (qp) qp.onclick = () => requireMember(() => {   // 付费墙：生成今日打卡清单
       const ids = buildPlanIds();
@@ -3078,8 +3105,6 @@
       buildTodayPlan(ids);
       switchTab('today');
     });
-    const qg2 = quizBody.querySelector('#qr-gomap-cta');
-    if (qg2) qg2.onclick = () => { quiz = null; hideQuizScreen(); openMap(); };
     const qg = quizBody.querySelector('#qr-gomap');
     if (qg) qg.onclick = () => { quiz = null; hideQuizScreen(); openMap(); };
     const ru2 = quizBody.querySelector('#report-unlock');
@@ -3281,7 +3306,10 @@
       recall: recallTopics.map(t => ({ topicId: t.id, item: randItem(t.id) })),
       learnTopicId: learnTopic ? learnTopic.id : null,
       practice: picked.map(q => ({ topicId: q.topicId, item: buildQuizItems([q])[0] })),
-      avgBefore: avg, phase: 'intro', qIdx: 0, answered: false,
+      // v63：删 intro 幕，开始即第一题（忆→学→练按排程）
+      avgBefore: avg,
+      phase: recallTopics.length ? 'recall' : (learnTopic ? 'learn' : (picked.length ? 'practice' : 'settle')),
+      qIdx: 0, answered: false,
     };
   }
 
@@ -3306,31 +3334,32 @@
   }
   function sessionStepsTotal(s) { return s.recall.length + (s.learnTopicId ? 1 : 0) + s.practice.length + 1; }
   function sessionStepsDone(s) {
-    if (s.phase === 'intro' || s.phase === 'recall-intro') return 0;
     if (s.phase === 'recall') return s.qIdx;
     if (s.phase === 'learn') return s.recall.length;
-    if (s.phase === 'practice-intro') return s.recall.length + (s.learnTopicId ? 1 : 0);
     if (s.phase === 'practice') return s.recall.length + (s.learnTopicId ? 1 : 0) + s.qIdx;
     return sessionStepsTotal(s) - 1;   // settle
   }
   function sessionStageTxt(s) {
-    if (s.phase === 'recall' || s.phase === 'recall-intro') return `忆 · 回忆旧题${s.phase === 'recall' ? ` ${s.qIdx + 1} / ${s.recall.length}` : ''}`;
+    if (s.phase === 'recall') return `忆 · 回忆旧题 ${s.qIdx + 1} / ${s.recall.length}`;
     if (s.phase === 'learn') return '学 · 导学卡';
-    if (s.phase === 'practice' || s.phase === 'practice-intro') return `练 · 新题${s.phase === 'practice' ? ` ${s.qIdx + 1} / ${s.practice.length}` : ''}`;
+    if (s.phase === 'practice') return `练 · 新题 ${s.qIdx + 1} / ${s.practice.length}`;
     if (s.phase === 'settle') return '结算';
     return '';
   }
   function sessionNext() {
     const s = session;
     if (!s) return;
-    const afterRecall = () => s.learnTopicId ? 'learn' : (s.practice.length ? 'practice-intro' : 'settle');
-    if (s.phase === 'intro') s.phase = s.recall.length ? 'recall-intro' : afterRecall();
-    else if (s.phase === 'recall-intro') { s.phase = 'recall'; s.qIdx = 0; }
-    else if (s.phase === 'recall') {
-      if (s.qIdx + 1 < s.recall.length) s.qIdx++; else s.phase = afterRecall();
-    } else if (s.phase === 'learn') s.phase = s.practice.length ? 'practice-intro' : 'settle';
-    else if (s.phase === 'practice-intro') { s.phase = 'practice'; s.qIdx = 0; }
-    else if (s.phase === 'practice') {
+    const afterRecall = () => {
+      if (s.learnTopicId) return 'learn';
+      if (s.practice.length) return 'practice';
+      return 'settle';
+    };
+    if (s.phase === 'recall') {
+      if (s.qIdx + 1 < s.recall.length) s.qIdx++;
+      else { const p = afterRecall(); s.phase = p; if (p === 'practice') s.qIdx = 0; }
+    } else if (s.phase === 'learn') {
+      if (s.practice.length) { s.phase = 'practice'; s.qIdx = 0; } else s.phase = 'settle';
+    } else if (s.phase === 'practice') {
       if (s.qIdx + 1 < s.practice.length) s.qIdx++; else s.phase = 'settle';
     }
     s.answered = false;
@@ -3366,37 +3395,9 @@
   function renderSession() {
     const s = session;
     if (!s) return;
-    const m = SESSION_MODES[s.mode];
     const child = s.mode === 'child';
     let inner = '';
-    if (s.phase === 'intro') {
-      inner = `${ssChrome(s)}
-      <div class="ss-intro">
-        <div class="ss-kicker">今天的 ${m.minutes} 分钟</div>
-        <h2 id="ss-mode-name">${m.name}</h2>
-        <div class="ss-mode-desc">${m.desc}</div>
-        <div class="ss-mode-row">${Object.values(SESSION_MODES).map(x =>
-          `<button class="ss-mode-chip ${x.key === s.mode ? 'on' : ''}" data-mode="${x.key}">${x.name}<br><span style="font-size:11px;font-weight:400">${x.range}</span></button>`).join('')}</div>
-        <div class="ss-plan-line">${s.recall.length ? `忆 ${s.recall.length} 题 → ` : ''}${s.learnTopicId ? '学 1 张卡' : ''}${s.practice.length ? ` → 练 ${s.practice.length} 题` : ''}${s.subject ? ` · 专项：${esc(s.subject)}` : ''}</div>
-        <button class="big-cta" id="ss-go">开始 ›</button>
-      </div>`;
-    } else if (s.phase === 'recall-intro') {
-      inner = `${ssChrome(s)}
-      <div class="ss-intro" style="padding-top:16vh">
-        <div class="ss-speaker parent">给爸爸妈妈</div>
-        <div class="ss-coach">${child
-          ? '接下来是回忆题：爸爸妈妈读题，孩子口头答。答完点「看答案」核对，然后由你判对错。'
-          : '让孩子自己读题，凭记忆答，想不起来就点「想不起来」——想不起来本身就是信号。'}</div>
-        <button class="big-cta" id="ss-go">开始回忆 ›</button>
-      </div>`;
-    } else if (s.phase === 'practice-intro') {
-      inner = `${ssChrome(s)}
-      <div class="ss-intro" style="padding-top:16vh">
-        <div class="ss-speaker">给孩子</div>
-        <div class="ss-coach">现在轮到孩子：用刚听的规律解决新题。</div>
-        <button class="big-cta" id="ss-go">开始练 ›</button>
-      </div>`;
-    } else if (s.phase === 'learn') {
+    if (s.phase === 'learn') {
       const t = topicById.get(s.learnTopicId);
       const pack = packByTopic.get(s.learnTopicId);
       const coach = coaching[s.learnTopicId] || {};
@@ -3422,6 +3423,7 @@
           : '';
         inner = `${ssChrome(s)}
         <div class="ss-speaker parent">给爸爸妈妈</div>
+        ${s.qIdx === 0 ? `<div class="ss-hint">${s.phase === 'recall' ? '爸妈读题，孩子口头答；答完点「看答案」，对错由你判。' : '轮到孩子了：爸妈读题，孩子用刚听讲的规律口头答。'}</div>` : ''}
         ${tag}
         <div class="ss-big-q child">${esc(item.q)}</div>
         ${optsHtml}
@@ -3437,6 +3439,7 @@
           : `<div class="quiz-judge"><button class="quiz-opt judge" data-v="1">✓ 对</button><button class="quiz-opt judge" data-v="0">✗ 错</button></div>`;
         inner = `${ssChrome(s)}
         <div class="ss-speaker">给孩子</div>
+        ${s.qIdx === 0 ? `<div class="ss-hint">${s.phase === 'recall' ? '凭记忆答，想不起来就点「想不起来」——想不起来本身就是信号。' : '用刚听讲的规律解决新题。'}</div>` : ''}
         ${tag}
         <div class="ss-big-q">${esc(item.q)}</div>
         <div class="quiz-opts">${optsHtml}</div>
@@ -3467,11 +3470,6 @@
     if (closeBtn) closeBtn.onclick = closeSession;
     const goBtn = sessionBody.querySelector('#ss-go');
     if (goBtn) goBtn.onclick = sessionNext;
-    sessionBody.querySelectorAll('.ss-mode-chip').forEach(chip => chip.onclick = () => {
-      setSessionModeKey(chip.dataset.mode);   // 记忆选择
-      session = buildSession({ subject: session.subject, topicIds: session.focusIds });
-      renderSession();
-    });
     const unlockBtn = sessionBody.querySelector('#ss-unlock');
     if (unlockBtn) unlockBtn.onclick = openMemberModal;
     if (s.phase === 'learn') markCheckinDayOnce();
@@ -3696,35 +3694,15 @@
         <div class="note">已掌握 <b>${cY}</b> · 在进步 <b>${cM}</b> · 还不会 <b>${cN}</b>（共测 ${markedAll.length} 个）</div>
       </div>`;
 
-    // 专项过滤器：有断点的学科优先，按断点数排序
-    const weakBySubj = new Map();
-    for (const t of topics) {
-      if (mv(t.id) !== null && mv(t.id) < 0.67) weakBySubj.set(t.subject, (weakBySubj.get(t.subject) || 0) + 1);
-    }
-    const focusSubjects = (weakBySubj.size ? [...weakBySubj.entries()].sort((a, b) => b[1] - a[1]).map(e => e[0])
-      : subjects.filter(s => topics.some(t => t.subject === s && quizByTopic.has(t.id)))).slice(0, 6);
-
     const ld = lastDiag();
     todayBody.innerHTML = `
       <div class="td-hero" style="min-height:0;padding-bottom:4px">${helloHtml()}</div>
       <button class="big-cta td-start" id="td-start">开始今天的 ${mode.minutes} 分钟 ›</button>
-      <button class="text-link" id="td-focus-link" style="display:block;margin:2px auto 0">想专攻一科？</button>
-      <div id="td-focus-picker" style="display:none;justify-content:center">
-        ${focusSubjects.map(s => `<button class="tbtn td-focus-chip" data-s="${esc(s)}">${esc(s)}</button>`).join('')}
-      </div>
       ${masteryCardHtml}
       ${planSectionHtml()}
       <button class="ghost-cta" id="td-retest">阶段复测（全科诊断）›</button>`;
 
     todayBody.querySelector('#td-start').onclick = () => startSession();
-    const fl = todayBody.querySelector('#td-focus-link');
-    const fp = todayBody.querySelector('#td-focus-picker');
-    fl.onclick = () => {
-      const open = fp.style.display === 'none';
-      fp.style.display = open ? 'flex' : 'none';
-      fl.textContent = open ? '收起 ▴' : '想专攻一科？';
-    };
-    fp.querySelectorAll('.td-focus-chip').forEach(chip => chip.onclick = () => startSession({ subject: chip.dataset.s }));
     const rtBtn = todayBody.querySelector('#td-retest');
     if (rtBtn) rtBtn.onclick = () => startQuickQuiz((ld && ld.grade) || (profile && profile.grade) || 7);
     bindPlanSection();
@@ -4129,11 +4107,22 @@
       else if (s === 'no') no++;
     }
     const gradeTxt = profile && profile.grade ? profile.grade + ' 年级' : '未设置';
+    // v63：年龄模式自动化（按年级定档），手动切换收进「我的」
+    let modeSaved = null;
+    try { modeSaved = localStorage.getItem(SESSION_MODE_KEY); } catch (e) {}
+    const effMode = SESSION_MODES[sessionModeKey()];
+    const modeOpts = [['', '自动（按年级）'], ['child', '亲子 · 1–3'], ['companion', '陪伴 · 4–6'], ['self', '自主 · 7–9']];
     meBody.innerHTML = `
       <div class="card">
         <h3>学习档案</h3>
         <div class="me-row"><span class="k">年级</span><span class="v">${gradeTxt}</span></div>
         <div class="me-row"><span class="k"></span><button class="tbtn" id="me-profile">修改档案</button></div>
+      </div>
+      <div class="card" id="me-mode">
+        <h3>学习模式</h3>
+        <div class="c-sub">当前：<b>${effMode.name}</b>${modeSaved ? '' : '（按年级自动）'}——${effMode.desc}</div>
+        <div class="me-mode-row">${modeOpts.map(([k, label]) =>
+          `<button class="tbtn me-mode-chip ${(modeSaved || '') === k ? 'on' : ''}" data-mode="${k}">${label}</button>`).join('')}</div>
       </div>
       <div class="card" id="me-member-card">
         <h3>小满伴学会员</h3>
@@ -4167,6 +4156,13 @@
       </div>
       <div class="madeby">小满即安 出品</div>`;
     meBody.querySelector('#me-profile').onclick = openOnboard;
+    meBody.querySelectorAll('.me-mode-chip').forEach(chip => chip.onclick = () => {
+      const k = chip.dataset.mode;
+      if (k) setSessionModeKey(k);
+      else { try { localStorage.removeItem(SESSION_MODE_KEY); } catch (e) {} }
+      renderMeTab();
+      toast(k ? `已切换为${SESSION_MODES[k].name}，下次会话生效` : '已恢复按年级自动定档');
+    });
     meBody.querySelector('#me-member').onclick = openMemberModal;
     meBody.querySelector('#me-gomap').onclick = () => switchTab('map');
     meBody.querySelector('#me-clear').onclick = () => {
