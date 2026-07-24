@@ -740,6 +740,70 @@
   .rp-member .m-t b { color: var(--gold-text); }
   .rp-member .m-s { font-size: 12px; color: var(--text-dim); margin: 6px 0 10px; line-height: 1.6; }
 
+  /* ================= v50 结构层：三 tab / 沉浸流 / 成长页 / 新客全屏 ================= */
+  /* 新客全屏流程：隐藏整个 app chrome（tab 栏、header），只留全屏流程层 */
+  body.guest #app { display: none; }
+  /* 图谱全屏打开（非 tab）：隐藏 tab 栏，返回按钮在图谱工具栏里 */
+  body[data-tab="map"] #tabbar { display: none; }
+  #map-back { flex: 0 0 auto; font-weight: 700; }
+  /* 今日页顶部 2px 细进度条，随滚动前进 */
+  #td-progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 60;
+    background: transparent; pointer-events: none; display: none; }
+  body[data-tab="today"]:not(.guest) #td-progress { display: block; }
+  #td-progress i { display: block; height: 100%; width: 0;
+    background: linear-gradient(90deg, #16C7B7, #F5C542); transition: width .15s ease-out; }
+  /* 焦点：触屏不出"默认选中框"，仅键盘导航 :focus-visible 显示聚焦样式 */
+  button:focus { outline: none; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- 今日沉浸流 ---------- */
+  .td-hero { min-height: 40vh; display: flex; flex-direction: column; justify-content: center; padding: 16px 2px 10px; }
+  .td-hero .td-hi { font-size: 30px; font-weight: 800; letter-spacing: .5px; }
+  .td-hero .td-streak { margin-top: 10px; }
+  .coach-big { font-size: 21px; line-height: 1.85; font-weight: 800; letter-spacing: .3px; margin-top: 18px; }
+  .coach-big b { color: var(--accent-deep); }
+  .td-sec-title { display: flex; align-items: baseline; justify-content: space-between; padding: 26px 2px 12px; }
+  .td-sec-title h2 { font-size: 17px; font-weight: 800; letter-spacing: .3px; }
+  .td-sec-title span { font-size: 12px; color: var(--text-dim); }
+  .todo-overdue { font-size: 10px; color: var(--bad); border: 1px solid var(--red-soft-border);
+    background: var(--red-soft); border-radius: 999px; padding: 1px 7px; margin-left: 6px; font-weight: 700; }
+  .td-settle { text-align: center; padding: 38px 18px 34px; }
+  .td-settle .st-label { font-size: 12px; font-weight: 700; color: var(--gold-text); letter-spacing: 2px; }
+  .td-settle .st-pct { font-size: 46px; font-weight: 800; color: var(--accent-deep); margin-top: 8px;
+    font-variant-numeric: tabular-nums; }
+  .td-settle .st-pct small { font-size: 18px; color: var(--text-dim); }
+  .td-settle .st-flame { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px;
+    font-size: 13px; color: #8A6D1F; background: #FDF3D7; border-radius: 999px; padding: 5px 12px; font-weight: 600; }
+  .td-settle .st-tomorrow { font-size: 12.5px; color: var(--text-dim); margin-top: 14px; line-height: 1.9; }
+  .text-link { background: none; border: none; color: var(--text-dim); font-size: 13px; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 3px; font-family: inherit; padding: 8px; min-height: 36px; }
+  .text-link:hover { color: var(--accent-deep); }
+
+  /* ---------- 成长页 ---------- */
+  .gr-card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 18px;
+    padding: 16px; margin-bottom: 12px; box-shadow: var(--card-shadow); }
+  .gr-card h3 { font-size: 14px; font-weight: 800; margin-bottom: 10px; }
+  .gr-card .gr-sub { font-size: 12px; color: var(--text-dim); line-height: 1.7; }
+  .gr-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; }
+  .gr-row .s { flex: 0 0 72px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gr-row .bar { flex: 1; display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--input-bg); }
+  .gr-row .bar i { display: block; height: 100%; }
+  .gr-row .n { flex: 0 0 auto; font-size: 11.5px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .gr-curve { width: 100%; height: 150px; display: block; }
+  .gr-cal { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-top: 4px; }
+  .gr-cal i { aspect-ratio: 1; border-radius: 5px; background: var(--input-bg); display: block; }
+  .gr-cal i.on { background: linear-gradient(135deg, #16C7B7, #12B0A1); box-shadow: 0 2px 6px rgba(22,199,183,.3); }
+  .gr-cal i.today { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .gr-star { display: block; width: 100%; text-align: left; cursor: pointer; font-family: inherit;
+    background: linear-gradient(150deg, #10182B, #1A2947); color: #F4F7FF; border: none; border-radius: 18px;
+    padding: 18px; margin-bottom: 12px; box-shadow: 0 8px 28px rgba(16,24,43,.35); }
+  .gr-star .st-t { font-size: 16px; font-weight: 800; }
+  .gr-star .st-s { font-size: 12px; color: rgba(230,238,255,.62); margin-top: 5px; line-height: 1.6; }
+  .gr-week { display: flex; gap: 8px; margin-bottom: 4px; }
+  .gr-week .w { flex: 1; background: var(--input-bg); border-radius: 12px; padding: 9px 4px; text-align: center; }
+  .gr-week .n { font-size: 19px; font-weight: 800; color: var(--accent-deep); font-variant-numeric: tabular-nums; }
+  .gr-week .l { font-size: 10.5px; color: var(--text-dim); margin-top: 2px; }
+
   /* ---------- 减少动态效果：全部特效关闭 ---------- */
   @media (prefers-reduced-motion: reduce) {
     .view.active { animation: none; }
@@ -756,18 +820,16 @@
   </header>
 
   <div id="views">
-    <!-- 今日 tab（默认主入口：教练视角任务） -->
+    <!-- 今日 tab（默认主入口：沉浸式任务流） -->
     <section id="view-today" class="view scroll-view"><div class="scroll-inner" id="today-body"></div></section>
 
-    <!-- 诊断 tab -->
-    <section id="view-diag" class="view scroll-view"><div class="scroll-inner" id="diag-body"></div></section>
+    <!-- 成长 tab（掌握度总览 / 周曲线 / streak 日历 / 知识星空入口 / 周报） -->
+    <section id="view-growth" class="view scroll-view"><div class="scroll-inner" id="growth-body"></div></section>
 
-    <!-- 计划 tab -->
-    <section id="view-plan" class="view scroll-view"><div class="scroll-inner" id="plan-body"></div></section>
-
-    <!-- 图谱 tab -->
+    <!-- 图谱（非 tab：成长页「知识星空」全屏打开，自带返回按钮） -->
     <section id="view-map" class="view">
       <div id="map-toolbar">
+        <button class="tbtn" id="map-back">‹ 返回</button>
         <input id="search" type="text" placeholder="搜索知识点名称…" autocomplete="off">
         <div id="chips"></div>
         <span id="mastery-stats"></span>
@@ -808,17 +870,9 @@
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/></svg>
       今日
     </button>
-    <button class="tab-btn" data-tab="diag">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
-      诊断
-    </button>
-    <button class="tab-btn" data-tab="plan">
-      <svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 5.5l1.2 1.2L7.5 4.5M4 11.5l1.2 1.2 2.3-2.2M4 17.5l1.2 1.2 2.3-2.2"/></svg>
-      计划<span class="tab-badge" id="plan-badge"></span>
-    </button>
-    <button class="tab-btn" data-tab="map">
-      <svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.4"/><circle cx="12" cy="6" r="2.4"/><circle cx="18.5" cy="15" r="2.4"/><path d="M7.4 16.2l3.2-8M13.9 7.6l3.4 5.6"/></svg>
-      图谱
+    <button class="tab-btn" data-tab="growth">
+      <svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M5 16l4-6 4 3 6-9"/><circle cx="19" cy="4" r="1.6"/></svg>
+      成长
     </button>
     <button class="tab-btn" data-tab="me">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.4-3.6 4.2-5.4 7.5-5.4s6.1 1.8 7.5 5.4"/></svg>
@@ -826,6 +880,7 @@
     </button>
   </nav>
 </div>
+<div id="td-progress"><i></i></div>
 
 <div id="quiz-screen"><div id="quiz-body"></div></div>
 
@@ -1038,9 +1093,23 @@
   }
   let masteryMeta = {};   // { id: { ts, err, wrongs } }
   try { masteryMeta = JSON.parse(localStorage.getItem(MASTERY_META_KEY) || '{}') || {}; } catch (e) { masteryMeta = {}; }
+  // 每日掌握度快照（成长页周曲线数据源；saveMastery 时顺带记录，同日覆盖）——必须在首次 saveMastery 调用前初始化
+  const SNAPSHOT_KEY = 'cnk12_mastery_daily';
+  let masterySnaps = {};
+  try { masterySnaps = JSON.parse(localStorage.getItem(SNAPSHOT_KEY) || '{}') || {}; } catch (e) { masterySnaps = {}; }
+  function recordSnapshot() {
+    let sum = 0, n = 0;
+    for (const id of Object.keys(mastery)) {
+      const v = mv(id);
+      if (v !== null && topicById.has(id)) { sum += v; n++; }
+    }
+    if (!n) return;
+    masterySnaps[todayStr()] = Math.round(sum / n * 100);
+    try { localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(masterySnaps)); } catch (e) {}
+  }
   let profile = null;
   try { profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null'); } catch (e) { profile = null; }
-  function saveMastery() { try { localStorage.setItem(MASTERY_KEY, JSON.stringify(mastery)); } catch (e) {} }
+  function saveMastery() { try { localStorage.setItem(MASTERY_KEY, JSON.stringify(mastery)); } catch (e) {} recordSnapshot(); }
   function saveMasteryMeta() { try { localStorage.setItem(MASTERY_META_KEY, JSON.stringify(masteryMeta)); } catch (e) {} }
   if (migrated) saveMastery();
   function saveProfile() { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) {} }
@@ -1188,33 +1257,47 @@
     if (REDUCED_MOTION) return;
     if (mState(id) === 'yes' && prevState !== 'yes') { litPulse.set(id, performance.now()); requestDraw(); }
   }
+  // ⑥ 新客全屏流程：隐藏 tab 栏与 header，?from=video 直达（短视频引流）
+  const FROM_VIDEO = new URLSearchParams(location.search).get('from') === 'video';
+  function enterGuestMode() { document.body.classList.add('guest'); }
+  function exitGuestMode() { document.body.classList.remove('guest'); }
+  function isGuest() { return document.body.classList.contains('guest'); }
+  const guestCtx = { grade: 7, subject: '语文', wrongIds: [], fixedId: null };
 
-  // ---------- Tab 管理 ----------
-  const TAB_NAMES = { today: '今日', diag: '诊断', plan: '计划', map: '图谱', me: '我的' };
+  // ---------- Tab 管理（v50：今日 / 成长 / 我的 三 tab；图谱改为全屏覆盖层，非 tab） ----------
+  const TAB_NAMES = { today: '今日', growth: '成长', me: '我的' };
   let currentTab = null;
   let mapVisible = false;
+  let mapReturnTab = 'growth';   // 图谱覆盖层返回去向
   function switchTab(name) {
+    if (name === 'map') { openMap(); return; }   // 旧调用点全部兼容：图谱 = 全屏打开
     if (!TAB_NAMES[name]) return;
     currentTab = name;
     document.body.dataset.tab = name;
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + name).classList.add('active');
-    if (name === 'map') {
-      mapVisible = true;
-      if (!mapInited) initMapView();
-      resize();
-      requestDraw();
-    } else {
-      mapVisible = false;
-      if (rafId != null) { cancelAnimationFrame(rafId); rafId = null; }
-      lastTick = 0;
-      if (name === 'today') renderTodayTab();
-      else if (name === 'diag') renderDiagTab();
-      else if (name === 'plan') renderPlanTab();
-      else if (name === 'me') renderMeTab();
-    }
+    mapVisible = false;
+    if (rafId != null) { cancelAnimationFrame(rafId); rafId = null; }
+    lastTick = 0;
+    if (name === 'today') renderTodayTab();
+    else if (name === 'growth') renderGrowthTab();
+    else if (name === 'me') renderMeTab();
   }
+  function openMap() {
+    if (currentTab !== 'map') mapReturnTab = currentTab || 'growth';
+    currentTab = 'map';
+    document.body.dataset.tab = 'map';
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-map').classList.add('active');
+    mapVisible = true;
+    if (!mapInited) initMapView();
+    resize();
+    requestDraw();
+  }
+  function closeMap() { switchTab(mapReturnTab && TAB_NAMES[mapReturnTab] ? mapReturnTab : 'growth'); }
+  document.getElementById('map-back').onclick = closeMap;
   document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 
   // ---------- Canvas（Marble 美学：深空底 + 慢速自转 + 生长入场） ----------
@@ -1459,8 +1542,7 @@
   let searchMatches = new Set();
   let panelView = 'empty';   // 'empty' | 'detail' | 'diag' | 'next'
   let diagRootId = null;
-  let quiz = null;           // 答题会话 { mode:'node'|'quick', returnTo, topicId?, grade?, subject?, items, idx, picked, results, scored }
-  let diagFlow = { step: 'subject' };   // 诊断 tab 流程：subject | grade | say
+  let quiz = null;           // 答题会话 { mode:'node'|'quick'|'first3', returnTo, topicId?, grade?, subject?, guest?, items, idx, picked, results, scored }
 
   function visible(t) { return activeSubjects.has(t.subject); }
   function isMobile() { return window.innerWidth < 768; }
@@ -2021,9 +2103,9 @@
     panelBody.querySelector('#btn-diag').onclick = () => { panelView = 'diag'; diagRootId = selectedId; renderPanel(); };
     panelBody.querySelector('#btn-addplan').onclick = () => requireMember(() => {   // 付费墙：生成清单
       const ids = buildPlanIds();
-      if (!ids.length) { toast('先把不会的知识点标记「还不会」，或到「诊断」tab 做一次诊断'); return; }
+      if (!ids.length) { toast('先把不会的知识点标记「还不会」，或做一次快速诊断'); return; }
       buildTodayPlan(ids);
-      switchTab('plan');
+      switchTab('today');
     });
     const bq = panelBody.querySelector('#btn-quiz');
     if (bq) bq.onclick = () => startNodeQuiz(selectedId, 'map');   // 测一测免费
@@ -2463,7 +2545,6 @@
     renderQuiz();
   }
   function startQuickQuiz(grade, subject) {
-    diagFlow = { step: 'subject' };   // 答题结束后回诊断 tab 是首页（hero 按是否诊断过收起）
     const subj = subject || '道德与法治';
     const pool = topics.filter(t => t.subject === subj
       && t.gradeRangeStart <= grade && t.gradeRangeEnd >= grade && quizByTopic.has(t.id));
@@ -2473,7 +2554,7 @@
       const arr = quizByTopic.get(t.id);
       return arr[Math.floor(Math.random() * arr.length)];
     });
-    quiz = { mode: 'quick', grade, subject: subj, returnTo: 'diag', items: buildQuizItems(qs), idx: 0, answers: {}, scored: false };
+    quiz = { mode: 'quick', grade, subject: subj, returnTo: isGuest() ? 'guest' : 'today', guest: isGuest(), items: buildQuizItems(qs), idx: 0, answers: {}, scored: false };
     showQuizScreen();
     renderQuiz();
   }
@@ -2509,10 +2590,10 @@
     }
     quiz = null;
     hideQuizScreen();
-    if (mode === 'first3') { switchTab('today'); return; }
+    if (mode === 'first3') { if (isGuest()) exitGuestMode(); switchTab('today'); return; }
     if (mode === 'node') {
-      if (returnTo === 'plan') { switchTab('plan'); }
-      else if (returnTo === 'today') { switchTab('today'); }
+      if (returnTo === 'guest') { renderGuestBridge(); return; }
+      if (returnTo === 'plan' || returnTo === 'today') { switchTab('today'); }
       else if (returnTo === 'course') { /* 课程层仍在下方，无需切换 */ }
       else { switchTab('map'); selectTopic(topicId); }
     }
@@ -2520,6 +2601,7 @@
   let quizTimer = null;
   function renderQuiz() {
     if (!quiz) return;
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();   // v50：跳题后清焦点，避免上一题残留聚焦样式
     if (quiz.idx >= quiz.items.length) { renderQuizResult(); return; }
     clearTimeout(quizTimer); quizTimer = null;
     const item = quiz.items[quiz.idx];
@@ -2633,6 +2715,7 @@
       }).join('');
       const mNow = mv(quiz.topicId);
       const course = courseOf(quiz.topicId);
+      const isGuestNode = quiz.returnTo === 'guest';
       quizBody.innerHTML = `
         <h2 style="color:${t._color}">测一测结果：${esc(t.name)}</h2>
         <div class="quiz-score" style="color:${allOk ? 'var(--green-bright)' : 'var(--bad)'}">${okCount} / ${total}</div>
@@ -2643,11 +2726,17 @@
              <h3>错题回顾</h3>${wrongHtml}
              <button class="tbtn quiz-entry" id="qr-diag">帮我找原因 ›</button>
              ${course ? `<button class="tbtn quiz-entry" id="qr-course">看配套课程 ›</button>` : ''}`}
-        <button class="tbtn quiz-next" id="qr-retest">再测一次（题目与选项重新打乱）</button>
-        <button class="diag-exit" id="qr-back">‹ 返回</button>
+        ${isGuestNode
+          ? `<button class="big-cta" id="qr-guest-next" style="margin-top:14px">继续 ›</button>`
+          : `<button class="tbtn quiz-next" id="qr-retest">再测一次（题目与选项重新打乱）</button>
+             <button class="diag-exit" id="qr-back">‹ 返回</button>`}
         <div style="height:20px"></div>`;
-      quizBody.querySelector('#qr-retest').onclick = () => startNodeQuiz(quiz.topicId, quiz.returnTo);
-      quizBody.querySelector('#qr-back').onclick = exitQuiz;
+      const gn = quizBody.querySelector('#qr-guest-next');
+      if (gn) gn.onclick = () => renderGuestBridge();
+      const qr2 = quizBody.querySelector('#qr-retest');
+      if (qr2) qr2.onclick = () => startNodeQuiz(quiz.topicId, quiz.returnTo);
+      const qb2 = quizBody.querySelector('#qr-back');
+      if (qb2) qb2.onclick = exitQuiz;
       rollNumber(quizBody.querySelector('#m-roll'), (mPrev || 0) * 100, (mNow || 0) * 100);   // v40：旧值 → 新值滚动
       const qd = quizBody.querySelector('#qr-diag');
       if (qd) qd.onclick = () => {
@@ -2695,6 +2784,10 @@
       const wrong = results.filter(r => !r.ok);
       const wrongTopics = [...new Map(wrong.map(r => [r.item.topicId, topicById.get(r.item.topicId)])).values()]
         .filter(Boolean).sort((a, b) => a.gradeRangeStart - b.gradeRangeStart);
+      // v50 新客：记录上下文，供断点补完后的桥接页统计
+      guestCtx.grade = grade; guestCtx.subject = subject;
+      guestCtx.wrongIds = wrongTopics.map(t => t.id);
+      guestCtx.fixedId = null;
       // 一句击中人的话：优先归到没打通的直接先修上
       let punch;
       if (wrongTopics.length) {
@@ -2717,12 +2810,42 @@
         <div class="quiz-meta">${okCount} / ${total} 题答对 · 结果已写入图谱掌握度</div>
         <div class="fq-punch">${punch}</div>
         <div class="fq-bp"><div class="bp-t">迷你断点卡</div>${bpRows}</div>
-        <button class="big-cta" id="fq-fulldiag">做完整诊断（2 分钟）看全部断点 ›</button>
-        <button class="ghost-cta" id="fq-skip">先随便逛逛 ›</button>
+        ${wrongTopics.length
+          ? `<button class="big-cta" id="fq-fix">立即补这个断点 ›</button>`
+          : `<button class="big-cta" id="fq-fulldiag">做完整诊断（2 分钟）看全部断点 ›</button>`}
         <div style="height:20px"></div>`;
       quizBody.parentElement.scrollTop = 0;
-      quizBody.querySelector('#fq-fulldiag').onclick = () => startQuickQuiz(grade, subject);
-      quizBody.querySelector('#fq-skip').onclick = () => { quiz = null; hideQuizScreen(); switchTab('today'); };
+      const ffix = quizBody.querySelector('#fq-fix');
+      if (ffix) ffix.onclick = () => {
+        guestCtx.fixedId = wrongTopics[0].id;
+        startNodeQuiz(wrongTopics[0].id, 'guest');
+      };
+      const ffd = quizBody.querySelector('#fq-fulldiag');
+      if (ffd) ffd.onclick = () => startQuickQuiz(grade, subject);
+      return;
+    }
+    // ---- v50 新客桥接页：补完断点后，指向完整诊断 ----
+    function renderGuestBridge() {
+      const fixed = guestCtx.fixedId ? topicById.get(guestCtx.fixedId) : null;
+      const remaining = new Set(guestCtx.wrongIds.filter(id => id !== guestCtx.fixedId));
+      for (const id of guestCtx.wrongIds) {
+        for (const e of (prereqsOf.get(id) || [])) {
+          const pt = topicById.get(e.id);
+          if (pt && mState(e.id) !== 'yes') remaining.add(e.id);
+        }
+      }
+      if (guestCtx.fixedId) remaining.delete(guestCtx.fixedId);
+      const n = remaining.size;
+      quiz = null;
+      quizBody.innerHTML = `
+        <h2>断点补完了 ✓</h2>
+        <div class="fq-punch">${fixed ? `「<b>${esc(fixed.name)}</b>」已经练过一轮。` : ''}${n > 0
+          ? `但这可能只是冰山一角——还有 <b>${n}</b> 个疑似断点没排掉。`
+          : '这次抽样没再发现疑似断点。'}</div>
+        <button class="big-cta" id="fq-fulldiag">${n > 0 ? `做完整诊断，排掉这 ${n} 个断点 ›` : '做完整诊断（2 分钟）确认一下 ›'}</button>
+        <div style="height:20px"></div>`;
+      quizBody.parentElement.scrollTop = 0;
+      quizBody.querySelector('#fq-fulldiag').onclick = () => startQuickQuiz(guestCtx.grade, guestCtx.subject);
       return;
     }
     // ---- 完整诊断结果：一页体检报告（画像 / 总览 / 断点链 / 立即补 / 会员墙） ----
@@ -2819,27 +2942,35 @@
         </div>
         <div class="rp-ov-bar"><i class="b-ok" style="width:${pY}%"></i><i class="b-mid" style="width:${pM}%"></i><i class="b-bad" style="width:${pB}%"></i></div>
       </div>
-      ${bpIds.length ? `<div class="rp-block" id="report-chains"><div class="rp-t">断点可视化 · 最弱的 ${bpIds.length} 环（红色 = 断的那环）</div>${chainHtml}</div>` : ''}
+      ${bpIds.length && !quiz.guest ? `<div class="rp-block" id="report-chains"><div class="rp-t">断点可视化 · 最弱的 ${bpIds.length} 环（红色 = 断的那环）</div>${chainHtml}</div>` : ''}
       ${memberWall}
-      <button class="ghost-cta" id="qr-again" style="margin-top:12px">重新抽题，再诊断一次 ›</button>
-      <button class="diag-exit" id="qr-exit">‹ 返回诊断</button>
-      <div style="height:96px"></div>
-      ${badIds.length
-        ? `<button class="big-cta float-cta" id="qr-plan">生成今日打卡清单（${badIds.length} 个薄弱点）›</button>`
-        : `<button class="big-cta float-cta" id="qr-gomap">去图谱挑战新内容 ›</button>`}`;
+      ${quiz.guest
+        ? `<button class="big-cta float-cta" id="qr-guest-done">开始第一天 ›</button>`
+        : `${badIds.length
+            ? `<button class="big-cta float-cta" id="qr-plan">生成今日打卡清单（${badIds.length} 个薄弱点）›</button>`
+            : `<button class="big-cta float-cta" id="qr-gomap-cta">去图谱挑战新内容 ›</button>`}
+           <button class="text-link" id="qr-gomap">去图谱看看 ›</button>`}
+      <div style="height:96px"></div>`;
     quizBody.parentElement.scrollTop = 0;
-    quizBody.querySelector('#qr-exit').onclick = () => { quiz = null; hideQuizScreen(); switchTab('diag'); };
-    quizBody.querySelector('#qr-again').onclick = () => startQuickQuiz(quiz.grade, quiz.subject);
+    const gd = quizBody.querySelector('#qr-guest-done');
+    if (gd) gd.onclick = () => {   // v50 新客：体检报告看完，落入今日写档案
+      exitGuestMode();
+      quiz = null;
+      hideQuizScreen();
+      switchTab('today');
+    };
     const qp = quizBody.querySelector('#qr-plan');
     if (qp) qp.onclick = () => requireMember(() => {   // 付费墙：生成今日打卡清单
       const ids = buildPlanIds();
       quiz = null;
       hideQuizScreen();
       buildTodayPlan(ids);
-      switchTab('plan');
+      switchTab('today');
     });
+    const qg2 = quizBody.querySelector('#qr-gomap-cta');
+    if (qg2) qg2.onclick = () => { quiz = null; hideQuizScreen(); openMap(); };
     const qg = quizBody.querySelector('#qr-gomap');
-    if (qg) qg.onclick = () => { quiz = null; hideQuizScreen(); switchTab('map'); };
+    if (qg) qg.onclick = () => { quiz = null; hideQuizScreen(); openMap(); };
     const ru2 = quizBody.querySelector('#report-unlock');
     if (ru2) ru2.onclick = () => requireMember(() => renderQuizResult());
     quizBody.querySelectorAll('.bp-fix').forEach(el => el.onclick = () => {
@@ -2855,8 +2986,7 @@
     });
   }
 
-  // ---------- 诊断 tab（主入口：hero + 说一说 / 测一测 / 拍整卷） ----------
-  const diagBody = document.getElementById('diag-body');
+  // ---------- 诊断辅助（说一说 / 上次诊断记录） ----------
   function lastDiag() {
     try { return JSON.parse(localStorage.getItem('cnk12_lastdiag') || 'null'); } catch (e) { return null; }
   }
@@ -2897,8 +3027,9 @@
       ${mHtml} <span class="sh-m none">${t.subject} · ${gradeTxtOf(t)}</span>
     </div>`;
   }
-  function renderSay() {
-    diagBody.innerHTML = `
+  function renderSay(container) {
+    container = container || growthBody;
+    container.innerHTML = `
       <div class="card">
         <h3>说一说孩子的情况</h3>
         <div class="c-sub">用一句大白话描述，比如「文言文翻译老丢分」「作文总写跑题」。我们在 ${topics.length} 个知识点里找出最可能卡住的那几个，直接跳到图谱看怎么补。</div>
@@ -2910,11 +3041,11 @@
         <div class="say-examples">没思路？点一个试试：${SAY_EXAMPLES.map(e => `<span class="say-ex">${e}</span>`).join('')}</div>
       </div>
       <div id="say-results"></div>
-      <button class="ghost-cta" id="say-back">‹ 返回诊断首页</button>`;
-    const input = diagBody.querySelector('#say-input');
+      <button class="ghost-cta" id="say-back">‹ 返回成长页</button>`;
+    const input = container.querySelector('#say-input');
     const runMatch = () => {
       const q = input.value.trim();
-      const box = diagBody.querySelector('#say-results');
+      const box = container.querySelector('#say-results');
       if (!q) {
         box.innerHTML = `<div class="say-examples" style="margin-top:4px">先写一句孩子的情况，比如：${SAY_EXAMPLES.map(e => `<span class="say-ex">${e}</span>`).join('')}</div>`;
         bindExamples();
@@ -2923,24 +3054,23 @@
       const hits = sayMatch(q);
       box.innerHTML = hits.length
         ? `<div class="card" style="margin-top:12px"><h3>最可能卡在这 ${hits.length} 个知识点</h3><div class="c-sub" style="margin-bottom:10px">点任意一张卡片，跳到图谱看先修链和补法。</div></div>` + hits.map(sayHitCard).join('')
-        : `<div class="card" style="margin-top:12px"><h3>没直接匹配到</h3><div class="c-sub">换个说法试试，比如：${SAY_EXAMPLES.map(e => `<span class="say-ex">${e}</span>`).join('')}<br>或者直接用「测一测」随机抽题排查。</div></div>`;
+        : `<div class="card" style="margin-top:12px"><h3>没直接匹配到</h3><div class="c-sub">换个说法试试，比如：${SAY_EXAMPLES.map(e => `<span class="say-ex">${e}</span>`).join('')}<br>或者直接用「再测一次」随机抽题排查。</div></div>`;
       bindExamples();
       box.querySelectorAll('.say-hit').forEach(el => el.onclick = () => {
-        diagFlow = { step: 'subject' };   // 跳走后回到诊断 tab 仍是首页，不卡在说一说
-        switchTab('map');
+        openMap();
         selectTopic(el.dataset.id);
       });
     };
     function bindExamples() {
-      diagBody.querySelectorAll('.say-ex').forEach(el => el.onclick = () => {
+      container.querySelectorAll('.say-ex').forEach(el => el.onclick = () => {
         input.value = el.textContent;
         runMatch();
       });
     }
     bindExamples();
-    diagBody.querySelector('#say-go').onclick = runMatch;
+    container.querySelector('#say-go').onclick = runMatch;
     input.onkeydown = (e) => { if (e.key === 'Enter') runMatch(); };
-    const mic = diagBody.querySelector('#say-mic');
+    const mic = container.querySelector('#say-mic');
     if (mic) mic.onclick = () => {
       if (recog) { try { recog.stop(); } catch (e) {} return; }
       try {
@@ -2958,7 +3088,7 @@
         recog.start();
       } catch (e) { recog = null; mic.classList.remove('rec'); toast('这台浏览器不支持语音输入，直接打字就行'); }
     };
-    diagBody.querySelector('#say-back').onclick = () => { diagFlow = { step: 'subject' }; renderDiagTab(); };
+    container.querySelector('#say-back').onclick = () => renderGrowthTab();
     setTimeout(() => input.focus(), 50);
   }
   // ---------- 今日 tab（教练视角：忆 → 测练 → 学） ----------
@@ -2994,6 +3124,70 @@
     const reason = ERR_COACH[meta.err] || ERR_COACH.transfer;
     return `「${esc(weak.name)}」${reason}。今天先回忆旧题，再练新题——先回忆，后看答案。`;
   }
+  // ---------- 今日清单区（v50：计划 tab 并入今日流；过期未完成项滚入标「昨天遗留」） ----------
+  function planSectionHtml() {
+    if (!plan2 || !plan2.items || !plan2.items.length) return '';
+    const items = plan2.items;
+    const doneN = items.filter(it => it.done).length;
+    const totalMin = items.reduce((s, it) => s + (it.minutes || 0), 0);
+    const leftMin = items.filter(it => !it.done).reduce((s, it) => s + (it.minutes || 0), 0);
+    const pct = items.length ? Math.round(doneN / items.length * 100) : 0;
+    const d = plan2.date || todayStr();
+    const overdue = d < todayStr();
+    const dateTxt = d === todayStr() ? '今天' : `${+d.slice(5, 7)}月${+d.slice(8, 10)}日`;
+    const rows = items.map((it, i) => {
+      const t = topicById.get(it.id);
+      if (!t) return '';
+      const course = courseOf(it.id);
+      const hasQuiz = quizByTopic.has(it.id);
+      return `<div class="todo ${it.done ? 'done' : ''}" data-i="${i}">
+        <button class="todo-check" data-i="${i}" aria-label="打卡">${it.done ? '✓' : ''}</button>
+        <div class="todo-main">
+          <div class="todo-action">${esc(it.action)}${overdue && !it.done ? '<span class="todo-overdue">昨天遗留</span>' : ''}</div>
+          <div class="todo-sub"><span class="todo-min">约 ${it.minutes} 分钟</span> · 验收：${esc(it.criteria)}</div>
+          <div class="todo-acts">
+            ${course ? `<button class="tbtn todo-course" data-i="${i}">看课：${esc(course.title)}</button>` : ''}
+            ${hasQuiz ? `<button class="tbtn todo-quiz" data-id="${it.id}">测一测</button>` : ''}
+            <button class="tbtn todo-locate" data-id="${it.id}">图谱定位</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="card" id="td-plan-card">
+      <h3>${dateTxt}打卡清单</h3>
+      <div class="plan-meta">共 ${items.length} 项 · 全程约 ${totalMin} 分钟${doneN < items.length ? ` · 还剩约 ${leftMin} 分钟` : ''}</div>
+      <div class="prog"><div class="prog-bar" style="width:${pct}%"></div></div>
+      <div class="prog-txt">已完成 <b>${doneN}</b> / ${items.length} 项${doneN === items.length ? ' · 全部完成，记得复测确证 ✓' : ''}</div>
+      ${rows}
+    </div>`;
+  }
+  function bindPlanSection() {
+    todayBody.querySelectorAll('.todo-check').forEach(el => el.onclick = () => requireMember(() => {   // 非会员能看清单，不能打卡
+      const it = plan2.items[+el.dataset.i];
+      if (!it) return;
+      it.done = !it.done;
+      savePlan2();
+      if (it.done) {
+        markCheckinDay();
+        confetti();
+        toast(mState(it.id) === 'yes' ? '打卡 ✓' : '已打卡。验收别忘：' + it.criteria);
+      }
+      renderTodayTab();
+    }));
+    todayBody.querySelectorAll('.todo-course').forEach(el => el.onclick = () => requireMember(() => {   // 付费墙：看课
+      const it = plan2.items[+el.dataset.i];
+      const course = it && courseOf(it.id);
+      if (course) openCourse(it.id, course.url, course.title, it.id);
+    }));
+    todayBody.querySelectorAll('.todo-quiz').forEach(el => el.onclick = () => {
+      startNodeQuiz(el.dataset.id, 'today');   // 测一测免费
+    });
+    todayBody.querySelectorAll('.todo-locate').forEach(el => el.onclick = () => {
+      openMap();
+      selectTopic(el.dataset.id);
+    });
+  }
+
   function renderTodayTab() {
     const anyMastery = topics.some(t => mv(t.id) !== null);
     if (!anyMastery) {
@@ -3004,7 +3198,8 @@
           <div class="c-sub">做一组快速诊断（约 5 分钟），系统会标出孩子的薄弱点。<br>之后每天打开这里，就是一份现成的「忆 → 练 → 学」任务单。</div>
           <button class="big-cta" id="td-godiag">开始第一次诊断 ›</button>
         </div>`;
-      todayBody.querySelector('#td-godiag').onclick = () => switchTab('diag');
+      todayBody.querySelector('#td-godiag').onclick = () => startQuickQuiz((profile && profile.grade) || 7, (profile && profile.subject) || '语文');
+      requestAnimationFrame(updateTdProgress);
       return;
     }
     const weak = weakestNode();
@@ -3014,12 +3209,13 @@
     const drills = coach && Array.isArray(coach.drills) ? coach.drills : [];
     const course = weak ? courseOf(weak.id) : null;
 
-    // 掌握度小卡（v1 同款）：关注学科的平均掌握度 + 三档计数
+    // 掌握度小卡：关注学科的平均掌握度 + 三档计数（结算页大数字同源）
     const focusSubj = (profile && profile.subject) || (weak && weak.subject) || '语文';
     const subjMarked = topics.filter(t => t.subject === focusSubj && mv(t.id) !== null);
+    const avgNow = subjMarked.length ? subjMarked.reduce((s, t) => s + mv(t.id), 0) / subjMarked.length : 0;
+    const avgPct = Math.round(avgNow * 100);
     let masteryCardHtml = '';
     if (subjMarked.length) {
-      const avg = subjMarked.reduce((s, t) => s + mv(t.id), 0) / subjMarked.length;
       let cY = 0, cM = 0, cN = 0;
       for (const t of subjMarked) {
         const s = mState(t.id);
@@ -3029,15 +3225,15 @@
         <div class="td-mastery-card">
           <div class="row">
             <div class="subj">${esc(focusSubj)} · 当前掌握度</div>
-            <div class="pct" id="td-pct">${Math.round(avg * 100)}<small>%</small></div>
+            <div class="pct" id="td-pct">${avgPct}<small>%</small></div>
           </div>
-          <div class="bar"><i style="width:${Math.round(avg * 100)}%"></i></div>
+          <div class="bar"><i style="width:${avgPct}%"></i></div>
           <div class="note">已掌握 <b>${cY}</b> · 在进步 <b>${cM}</b> · 还不会 <b>${cN}</b>（共测 ${subjMarked.length} 个）</div>
         </div>`;
     }
 
     const recallHtml = queue.length ? `
-      <div class="card">
+      <div class="card" id="td-recall-card">
         <h3><span class="td-tag recall">忆</span>先回忆旧题（${queue.length}）</h3>
         <div class="c-sub">凭记忆作答，做完才给答案和解析——想不起来本身就是信号。</div>
         ${queue.map(t => `<div class="td-recall-item" data-tid="${t.id}"></div>`).join('')}
@@ -3092,13 +3288,25 @@
         </div>`;
     }
 
+    const ld = lastDiag();
+    const streak = streakInfo();
+    const tomorrowTxt = weak ? `明天继续攻「${esc(weak.name)}」，忆一忆今天练过的` : '明天来解锁一个新知识点';
+
+    // v50 沉浸流：hero（问候 + 教练话术大字）→ 忆 → 练 → 学 → 今日清单 → 阶段复测 → 结算
     todayBody.innerHTML = `
-      ${helloHtml()}
-      <div class="coach-line">${coachLine(weak)}</div>
+      <div class="td-hero">${helloHtml()}<div class="coach-big">${coachLine(weak)}</div></div>
       ${masteryCardHtml}
       ${recallHtml}
       ${drillHtml}
-      ${learnHtml}`;
+      ${learnHtml}
+      ${planSectionHtml()}
+      <button class="ghost-cta" id="td-retest">阶段复测（重做诊断）›</button>
+      <div class="td-settle" id="td-settle">
+        <div class="st-label">今日掌握度</div>
+        <div class="st-pct"><span id="st-roll">${avgPct}</span><small>%</small></div>
+        <div class="st-flame">${streak.checkedToday ? `🔥 已连续打卡 ${streak.count} 天` : streak.count ? `🔥 连续 ${streak.count} 天 · 今天打卡就续上` : '✨ 今天完成任意打卡，点亮第 1 天'}</div>
+        <div class="st-tomorrow">明天见 · ${tomorrowTxt}</div>
+      </div>`;
 
     // 忆：内联旧题回忆——先作答，提交后才揭示对错与解析
     todayBody.querySelectorAll('.td-recall-item').forEach(slot => {
@@ -3150,6 +3358,21 @@
           setErr(tid, c.dataset.err);
           fb.querySelectorAll('.err-chip').forEach(x => x.classList.toggle('on', x === c));
         });
+        // v50 沉浸流：答完自动滑到下一题；忆区全答完 → 彩带 + 滑到结算页
+        setTimeout(() => {
+          const next = todayBody.querySelector('.td-recall-item:not([data-done])');
+          if (next) {
+            next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else if (queue.length) {
+            confetti();
+            const settle = todayBody.querySelector('#td-settle');
+            if (settle) settle.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const marked = topics.filter(t => t.subject === focusSubj && mv(t.id) !== null);
+            const newAvg = marked.length ? marked.reduce((s, t) => s + mv(t.id), 0) / marked.length : 0;
+            const rollEl = todayBody.querySelector('#st-roll');
+            if (rollEl) rollNumber(rollEl, avgPct, Math.round(newAvg * 100));
+          }
+        }, 600);
       });
     });
 
@@ -3168,76 +3391,150 @@
     if (pmBtn && weak) pmBtn.onclick = () => { switchTab('map'); selectTopic(weak.id); };
     const puBtn = todayBody.querySelector('#td-pack-unlock');
     if (puBtn) puBtn.onclick = () => requireMember(() => renderTodayTab());
+    const rtBtn = todayBody.querySelector('#td-retest');
+    if (rtBtn) rtBtn.onclick = () => startQuickQuiz((ld && ld.grade) || (profile && profile.grade) || 7, (ld && ld.subject) || (profile && profile.subject) || '语文');
+    bindPlanSection();
+    requestAnimationFrame(updateTdProgress);
   }
 
-  function renderDiagTab() {
-    const ld = lastDiag();
-    const planN = plan2 && plan2.items ? plan2.items.filter(it => !it.done).length : 0;
-    if (diagFlow.step === 'say') { renderSay(); return; }
-    if (diagFlow.step === 'grade') {
-      const subj = diagFlow.subject || '道德与法治';
-      const grades = [...new Set(topics.filter(t => t.subject === subj && quizByTopic.has(t.id))
-        .flatMap(t => { const gs = []; for (let g = t.gradeRangeStart; g <= Math.min(t.gradeRangeEnd, 12); g++) gs.push(g); return gs; }))].sort((a, b) => a - b);
-      const gradeBtn = (g) => {
-        const n = topics.filter(t => t.subject === subj
-          && t.gradeRangeStart <= g && t.gradeRangeEnd >= g && quizByTopic.has(t.id)).length;
-        return `<button class="qd-btn" data-g="${g}" ${n ? '' : 'disabled'}>${g} 年级<span class="qd-soon">${n ? `共 ${n} 个知识点，随机抽 ${Math.min(10, n)} 题` : '题库建设中'}</span></button>`;
-      };
-      diagBody.innerHTML = `
-        <div class="card">
-          <h3>选年级 · ${esc(subj)}</h3>
-          <div class="c-sub">从该年级全部知识点里跨节点随机抽题，逐题作答后按知识点分组出结果。</div>
-          <div class="qd-grid">${grades.map(gradeBtn).join('')}</div>
-        </div>
-        <button class="ghost-cta" id="dg-back">‹ 返回选学科</button>`;
-      diagBody.querySelector('#dg-back').onclick = () => { diagFlow = { step: 'subject' }; renderDiagTab(); };
-      diagBody.querySelectorAll('.qd-btn:not(:disabled)').forEach(btn => btn.onclick = () => {
-        startQuickQuiz(+btn.dataset.g, subj);   // 诊断答题免费
-      });
-      return;
+  // v50 今日页顶部 2px 进度条：随滚动推进
+  const viewToday = document.getElementById('view-today');
+  const tdProgressBar = document.querySelector('#td-progress i');
+  function updateTdProgress() {
+    if (!viewToday || !tdProgressBar) return;
+    const max = viewToday.scrollHeight - viewToday.clientHeight;
+    const p = max > 0 ? Math.min(1, viewToday.scrollTop / max) : 0;
+    tdProgressBar.style.width = (p * 100).toFixed(1) + '%';
+  }
+  viewToday.addEventListener('scroll', updateTdProgress, { passive: true });
+
+  // ---------- 成长 tab（v50 新页：掌握度总览 + 周曲线 + 打卡日历 + 星空入口 + 再测一次 + 周报） ----------
+  const growthBody = document.getElementById('growth-body');
+  function drawGrowthCurve(canvas, days) {
+    if (!canvas) return;
+    const pts = days.map(d => masterySnaps[d] == null ? null : masterySnaps[d]);
+    const valid = pts.filter(v => v !== null);
+    if (valid.length < 2) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = 640, H = 200, padL = 34, padR = 12, padT = 14, padB = 22;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, W, H);
+    const xs = i => padL + (W - padL - padR) * i / (days.length - 1);
+    const ys = v => padT + (H - padT - padB) * (1 - v / 100);
+    ctx.strokeStyle = 'rgba(20,24,38,.08)'; ctx.lineWidth = 1;
+    for (const gv of [0, 50, 100]) {
+      ctx.beginPath(); ctx.moveTo(padL, ys(gv)); ctx.lineTo(W - padR, ys(gv)); ctx.stroke();
+      ctx.fillStyle = 'rgba(20,24,38,.4)'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+      ctx.fillText(gv + '%', padL - 5, ys(gv) + 3);
     }
-    diagBody.innerHTML = `
-      ${ld ? `<div class="hero-mini">孩子卡在哪，今天干什么，一看就懂 · 上次诊断：${ld.grade} 年级 ${esc(ld.subject)} · ${ld.ok}/${ld.total} 题答对</div>`
-        : `<div class="hero">
-          <div class="hero-slogan">孩子卡在哪，今天干什么，一看就懂</div>
-          <p>拍一拍孩子的薄弱点，或直接说一说：比如「文言文翻译老丢分」，我们告诉你卡在哪、今天怎么补。</p>
-          <div class="entry-grid">
-            <button class="entry-card primary" id="en-say"><span class="e-t">说一说</span><span class="e-s">讲一句孩子的情况，直接定位知识点</span></button>
-            <button class="entry-card" id="en-quiz"><span class="e-t">测一测</span><span class="e-s">随机抽 10 道题，跨知识点测一遍</span></button>
-            <button class="entry-card disabled" disabled><span class="e-badge">即将上线</span><span class="e-t">拍整卷</span><span class="e-s">拍照识别整张试卷错题</span></button>
-          </div>
-        </div>`}
-      ${planN ? `<div class="card"><div class="lastdiag">
-          <div class="ld-t">今日清单进行中：<b>${planN}</b> 项待打卡</div>
-          <button class="tbtn" id="dg-goplan" style="min-height:38px">去看看 ›</button>
-        </div></div>` : ''}
-      <div class="card" id="card-subject">
-        <h3>${ld ? '再测一次：选学科' : '测一测：先选学科'}</h3>
-        <div class="c-sub">「道德与法治」「语文」题库已按 2024 版新教材填好，其他学科建设中。</div>
-        <div class="qd-grid">${subjects.map(s => {
-          const ok = quizSubjects.has(s);
-          return `<button class="qd-btn" data-s="${esc(s)}" ${ok ? '' : 'disabled'} ${ok ? `style="border-color:${COLORS[s]};color:${COLORS[s]}"` : ''}>${esc(s)}${ok ? '' : '<span class="qd-soon">题库建设中</span>'}</button>`;
-        }).join('')}</div>
-      </div>
-      ${ld ? `<div class="card"><div class="lastdiag">
-          <div class="ld-t">也可以直接<b>说一说</b>孩子的情况，不用做题</div>
-          <button class="tbtn" id="dg-say2" style="min-height:38px">去说一说 ›</button>
-        </div></div>` : `<div class="card">
-        <h3>诊断完了会怎样？</h3>
-        <div class="c-sub">① 按知识点分组出结果，分清「真会」和「以为会了」<br>② 一键生成今日打卡清单：每项 = 动作 + 预计分钟 + 验收标准<br>③ 薄弱点自动关联官方课时，看完打卡<br>④ 完成后随时可以复测，确证真掌握</div>
-      </div>`}`;
-    const gp = diagBody.querySelector('#dg-goplan');
-    if (gp) gp.onclick = () => switchTab('plan');
-    const es = diagBody.querySelector('#en-say');
-    if (es) es.onclick = () => { diagFlow = { step: 'say' }; renderDiagTab(); };
-    const eq = diagBody.querySelector('#en-quiz');
-    if (eq) eq.onclick = () => { const c = diagBody.querySelector('#card-subject'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
-    const es2 = diagBody.querySelector('#dg-say2');
-    if (es2) es2.onclick = () => { diagFlow = { step: 'say' }; renderDiagTab(); };
-    diagBody.querySelectorAll('.qd-btn:not(:disabled)').forEach(btn => btn.onclick = () => {
-      diagFlow = { step: 'grade', subject: btn.dataset.s };
-      renderDiagTab();
+    ctx.beginPath();
+    let started = false;
+    pts.forEach((v, i) => {
+      if (v === null) return;
+      if (!started) { ctx.moveTo(xs(i), ys(v)); started = true; } else ctx.lineTo(xs(i), ys(v));
     });
+    ctx.strokeStyle = '#0e9f8a'; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.stroke();
+    pts.forEach((v, i) => {
+      if (v === null) return;
+      ctx.beginPath(); ctx.arc(xs(i), ys(v), 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#0e9f8a'; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+    });
+    ctx.fillStyle = 'rgba(20,24,38,.45)'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(days[0].slice(5), xs(0), H - 6);
+    ctx.fillText(days[days.length - 1].slice(5), xs(days.length - 1), H - 6);
+  }
+  function renderGrowthTab() {
+    const ld = lastDiag();
+    // ① 掌握度总览：有标记的学科逐个三档分段条
+    const marked = topics.filter(t => mv(t.id) !== null);
+    const bySubj = new Map();
+    for (const t of marked) {
+      if (!bySubj.has(t.subject)) bySubj.set(t.subject, []);
+      bySubj.get(t.subject).push(t);
+    }
+    const ovRows = [...bySubj.entries()].map(([s, arr]) => {
+      let y = 0, m = 0, n = 0;
+      for (const t of arr) {
+        const st = mState(t.id);
+        if (st === 'yes') y++; else if (st === 'mid') m++; else n++;
+      }
+      const tot = Math.max(1, arr.length);
+      return `<div class="gr-row">
+        <div class="gr-row-t"><b style="color:${COLORS[s] || 'var(--ink)'}">${esc(s)}</b><span>已掌握 ${y} · 在进步 ${m} · 薄弱 ${n}（已测 ${arr.length}）</span></div>
+        <div class="rp-ov-bar"><i class="b-ok" style="width:${Math.round(y / tot * 100)}%"></i><i class="b-mid" style="width:${Math.round(m / tot * 100)}%"></i><i class="b-bad" style="width:${Math.round(n / tot * 100)}%"></i></div>
+      </div>`;
+    }).join('');
+
+    // ② 周变化曲线（近 14 天快照）
+    const days = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      days.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'));
+    }
+    const snapCount = days.filter(d => masterySnaps[d] != null).length;
+
+    // ③ 近 30 天打卡日历
+    const calCells = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      calCells.push(`<i class="${checkinDays[key] ? 'on' : ''}${key === todayStr() ? ' today' : ''}" title="${key}"></i>`);
+    }
+
+    // ⑥ 周报（近 7 天）
+    const weekAgo = Date.now() - 7 * 86400000;
+    let newYes = 0, reviewed = 0;
+    const domCount = new Map();
+    for (const [id, meta] of Object.entries(masteryMeta)) {
+      if (!meta || !meta.ts || meta.ts < weekAgo) continue;
+      const t = topicById.get(id);
+      if (!t) continue;
+      reviewed++;
+      if (mState(id) === 'yes') {
+        newYes++;
+        const dm = t.domain || '综合';
+        domCount.set(dm, (domCount.get(dm) || 0) + 1);
+      }
+    }
+    const bestDom = [...domCount.entries()].sort((a, b) => b[1] - a[1])[0];
+
+    growthBody.innerHTML = `
+      <div class="gr-card" id="gr-overview">
+        <h3>掌握度总览</h3>
+        ${marked.length ? ovRows : '<div class="c-sub">还没有测评记录——做一组诊断，这里就会出现每个学科的掌握度。</div>'}
+      </div>
+      <div class="gr-card" id="gr-curve-card">
+        <h3>近两周掌握度曲线</h3>
+        ${snapCount < 2 ? '<div class="c-sub">再学一天，明天就能看到曲线。</div>' : ''}
+        <canvas class="gr-curve" id="gr-curve"></canvas>
+      </div>
+      <div class="gr-card" id="gr-cal-card">
+        <h3>打卡日历 · 近 30 天</h3>
+        <div class="gr-cal">${calCells.join('')}</div>
+      </div>
+      <button class="gr-star" id="gr-star">
+        <div class="gs-t">知识星空</div>
+        <div class="gs-s">打开全屏图谱，看 ${topics.length} 个知识点的连接与掌握度 ›</div>
+      </button>
+      <div class="gr-card">
+        <h3>再测一次</h3>
+        <div class="c-sub" style="margin-bottom:10px">重做一组诊断，更新掌握度；也可以直接说一说孩子的情况。</div>
+        <div class="td-actions">
+          <button class="tbtn" id="gr-retest">再测一次 ›</button>
+          <button class="tbtn" id="gr-say">说一说 ›</button>
+        </div>
+      </div>
+      <div class="gr-card gr-week" id="gr-week">
+        <h3>本周战报</h3>
+        <div class="c-sub">新掌握 <b>${newYes}</b> 个知识点 · 复习/练习 <b>${reviewed}</b> 个${bestDom ? ` · 进步最大领域：<b>${esc(bestDom[0])}</b>` : ''}</div>
+      </div>`;
+    drawGrowthCurve(growthBody.querySelector('#gr-curve'), days);
+    growthBody.querySelector('#gr-star').onclick = () => openMap();
+    growthBody.querySelector('#gr-retest').onclick = () => startQuickQuiz((ld && ld.grade) || (profile && profile.grade) || 7, (ld && ld.subject) || (profile && profile.subject) || '语文');
+    growthBody.querySelector('#gr-say').onclick = () => renderSay(growthBody);
   }
 
   // ---------- 今日打卡清单（R2：诊断输出 = 可执行计划） ----------
@@ -3306,97 +3603,8 @@
     const capped = ids.slice(0, PLAN_CAP);
     plan2 = { date: todayStr(), items: capped.map(toPlanItem) };
     savePlan2();
-    updatePlanBadge();
     if (ids.length > PLAN_CAP) toast(`今日清单已生成 ${PLAN_CAP} 项；其余 ${ids.length - PLAN_CAP} 个已排队，明天继续`);
     else toast(`今日清单已生成：${capped.length} 项，做完一项勾一项`);
-  }
-  function updatePlanBadge() {
-    const badge = document.getElementById('plan-badge');
-    const n = plan2 && plan2.items ? plan2.items.filter(it => !it.done).length : 0;
-    badge.textContent = n;
-    badge.classList.toggle('show', n > 0);
-  }
-
-  const planBody = document.getElementById('plan-body');
-  function renderPlanTab() {
-    if (!plan2 || !plan2.items || !plan2.items.length) {
-      planBody.innerHTML = `
-        <div class="hero">
-          <h2>还没有今日清单</h2>
-          <p>清单来自诊断：先测出孩子哪里不会，系统按「先补基础、再学新知」排成可打卡的动作。</p>
-        </div>
-        <button class="big-cta" id="pl-godiag">先做一次诊断 ›</button>`;
-      planBody.querySelector('#pl-godiag').onclick = () => switchTab('diag');
-      return;
-    }
-    const items = plan2.items;
-    const doneN = items.filter(it => it.done).length;
-    const totalMin = items.reduce((s, it) => s + (it.minutes || 0), 0);
-    const leftMin = items.filter(it => !it.done).reduce((s, it) => s + (it.minutes || 0), 0);
-    const pct = items.length ? Math.round(doneN / items.length * 100) : 0;
-    const d = plan2.date || todayStr();
-    const dateTxt = d === todayStr() ? '今天' : `${+d.slice(5, 7)}月${+d.slice(8, 10)}日`;
-    const rows = items.map((it, i) => {
-      const t = topicById.get(it.id);
-      if (!t) return '';
-      const course = courseOf(it.id);
-      const hasQuiz = quizByTopic.has(it.id);
-      return `<div class="todo ${it.done ? 'done' : ''}" data-i="${i}">
-        <button class="todo-check" data-i="${i}" aria-label="打卡">${it.done ? '✓' : ''}</button>
-        <div class="todo-main">
-          <div class="todo-action">${esc(it.action)}</div>
-          <div class="todo-sub"><span class="todo-min">约 ${it.minutes} 分钟</span> · 验收：${esc(it.criteria)}</div>
-          <div class="todo-acts">
-            ${course ? `<button class="tbtn todo-course" data-i="${i}">看课：${esc(course.title)}</button>` : ''}
-            ${hasQuiz ? `<button class="tbtn todo-quiz" data-id="${it.id}">测一测</button>` : ''}
-            <button class="tbtn todo-locate" data-id="${it.id}">图谱定位</button>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-    planBody.innerHTML = `
-      <div class="card">
-        <h3>${dateTxt}打卡清单</h3>
-        <div class="plan-meta">共 ${items.length} 项 · 全程约 ${totalMin} 分钟${doneN < items.length ? ` · 还剩约 ${leftMin} 分钟` : ''}</div>
-        <div class="prog"><div class="prog-bar" style="width:${pct}%"></div></div>
-        <div class="prog-txt">已完成 <b>${doneN}</b> / ${items.length} 项${doneN === items.length ? ' · 全部完成，记得复测确证 ✓' : ''}</div>
-      </div>
-      ${rows}
-      <div class="plan-foot">
-        <button class="big-cta" id="pl-retest">${doneN === items.length ? '全部完成，来一次复测 ›' : '复测（重做诊断）›'}</button>
-        <button class="ghost-cta" id="pl-rediag">换一批题目，重新诊断</button>
-      </div>`;
-    planBody.querySelectorAll('.todo-check').forEach(el => el.onclick = () => requireMember(() => {   // 非会员能看清单，不能打卡
-      const it = plan2.items[+el.dataset.i];
-      if (!it) return;
-      it.done = !it.done;
-      savePlan2();
-      updatePlanBadge();
-      if (it.done) {
-        markCheckinDay();
-        confetti();
-        toast(mState(it.id) === 'yes' ? '打卡 ✓' : '已打卡。验收别忘：' + it.criteria);
-      }
-      renderPlanTab();
-    }));
-    planBody.querySelectorAll('.todo-course').forEach(el => el.onclick = () => requireMember(() => {   // 付费墙：看课
-      const it = plan2.items[+el.dataset.i];
-      const course = it && courseOf(it.id);
-      if (course) openCourse(it.id, course.url, course.title, it.id);
-    }));
-    planBody.querySelectorAll('.todo-quiz').forEach(el => el.onclick = () => {
-      startNodeQuiz(el.dataset.id, 'plan');   // 测一测免费
-    });
-    planBody.querySelectorAll('.todo-locate').forEach(el => el.onclick = () => {
-      switchTab('map');
-      selectTopic(el.dataset.id);
-    });
-    planBody.querySelector('#pl-retest').onclick = () => {
-      const ld = lastDiag();
-      if (ld) startQuickQuiz(ld.grade, ld.subject);   // 复测免费
-      else switchTab('diag');
-    };
-    planBody.querySelector('#pl-rediag').onclick = () => { diagFlow = { step: 'subject' }; switchTab('diag'); };
   }
 
   // ---------- 原生课程页（L4：国家平台有反嵌套保护，不再用 iframe；元数据渲染 + 新窗口打开官方页） ----------
@@ -3519,8 +3727,7 @@
       if (it) {
         it.done = true;
         savePlan2();
-        updatePlanBadge();
-        if (currentTab === 'plan') renderPlanTab();
+        if (currentTab === 'today') renderTodayTab();
         toast('已打卡，计划清单同步勾选 ✓');
         updateCheckinBtn();
         return;
@@ -3738,8 +3945,8 @@
       startFirst3(profile.grade, profile.subject);
       return;
     }
-    switchTab('diag');
-    toast(`档案已保存。先做一次「诊断」，看看 ${obState.grade} 年级${obState.subject}哪里需要补。`);
+    switchTab('growth');
+    toast(`档案已保存。先做一次「再测一次」，看看 ${obState.grade} 年级${obState.subject}哪里需要补。`);
   }
   function renderOnboard() {
     const s = obState;
@@ -3853,9 +4060,12 @@
     enterT0 = performance.now(); enterDone = false;   // 入场生长动画
   }
   updateStats();
-  updatePlanBadge();
-  switchTab('today');   // 主入口 = 今日（教练任务页）
-  if (!profile) startFirst3();   // 新用户零选择直接 3 道快诊断题（不再是选学科选年级）
+  if (!profile || FROM_VIDEO) {   // v50 新客/视频落地：全屏流程，无 tab 栏
+    enterGuestMode();
+    startFirst3();
+  } else {
+    switchTab('today');   // 主入口 = 今日（教练任务页）
+  }
 
   // 自动化验收辅助
   window.__cnkTest = {
@@ -3881,6 +4091,10 @@
     scale: () => scale,
     rotAngle: () => rotAngle,
     currentTab: () => currentTab,
+    startQuickQuiz,
+    openMap,
+    closeMap,
+    isGuest,
   };
 })();
 </script>
