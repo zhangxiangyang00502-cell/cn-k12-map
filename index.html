@@ -79,6 +79,15 @@
   #tabbar { flex: 0 0 auto; display: flex; border-top: 1px solid var(--panel-border);
     background: var(--tabbar-bg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
     padding-bottom: env(safe-area-inset-bottom, 0px); z-index: 30; transition: background .2s ease; }
+  /* v65：主动作悬浮圆钮——成长/我的/星图常驻（今日页有顶部大按钮，会话/诊断/guest 不显示） */
+  #fab-start { position: fixed; right: 18px; bottom: 80px; z-index: 29; width: 58px; height: 58px; border-radius: 50%;
+    border: none; background: var(--accent); color: #fff; font-size: 11px; font-weight: 800;
+    display: none; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+    box-shadow: 0 6px 18px rgba(22,199,183,.45); cursor: pointer; }
+  #fab-start .fp { font-size: 14px; line-height: 1; }
+  body[data-tab="growth"] #fab-start, body[data-tab="me"] #fab-start, body[data-tab="map"] #fab-start { display: flex; }
+  body.guest #fab-start, body.in-session #fab-start { display: none !important; }
+  body[data-tab="map"] #fab-start { bottom: 24px; }   /* 星图页无 tabbar，再低一点 */
   .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 3px; min-height: var(--tabbar-h); background: none; border: none; color: var(--text-dim);
     font-size: 11px; font-weight: 600; cursor: pointer; position: relative; font-family: inherit;
@@ -968,6 +977,7 @@
       我的
     </button>
   </nav>
+  <button id="fab-start" aria-label="开始今天的学习"><span class="fp">▶</span>开始</button>
 </div>
 <div id="td-progress"><i></i></div>
 
@@ -1221,21 +1231,76 @@
   if (migrated) saveMastery();
   function saveProfile() { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) {} }
   function mv(id) { const v = mastery[id]; return (typeof v === 'number' && isFinite(v)) ? v : null; }
-  // 三档显示：≥0.67 已掌握 / 0.34-0.66 在进步 / <0.34 还不会
-  function mState(id) { const v = mv(id); return v === null ? null : v >= 0.67 ? 'yes' : v >= 0.34 ? 'mid' : 'no'; }
-  // 答题驱动：答对 +0.34 封顶 1，答错 -0.5 封底 0
+  // v65 证据累积制：meta.pos/neg = 连续同向证据计数；旧数据无计数字段时按现值追认（≥0.67 视为已确认掌握，<0.34 视为已确认薄弱）
+  function evidenceOf(id) {
+    const m = masteryMeta[id];
+    if (m && (m.pos != null || m.neg != null)) return { pos: m.pos || 0, neg: m.neg || 0 };
+    const v = mv(id);
+    if (v !== null && v >= 0.67) return { pos: 2, neg: 0 };
+    if (v !== null && v < 0.34) return { pos: 0, neg: 2 };
+    return { pos: 0, neg: 0 };
+  }
+  // 三档显示：≥0.67 已掌握 / 0.34-0.66 在进步 / <0.34 还不会；v65 起单一证据不定档——
+  // 高值需 2 次正向证据才点亮，低值需 2 次同向错证才打红，不足时归入「在进步」
+  function mState(id) {
+    const v = mv(id);
+    if (v === null) return null;
+    const ev = evidenceOf(id);
+    if (v >= 0.67) return ev.pos >= 2 ? 'yes' : 'mid';
+    if (v >= 0.34) return 'mid';
+    return ev.neg >= 2 ? 'no' : 'mid';
+  }
+  // 待确认（UI 不新增概念，仅文案提示）：'weak' 单次错待定 / 'yes' 单次对待定
+  function pendingConfirm(id) {
+    const v = mv(id);
+    if (v === null) return null;
+    const ev = evidenceOf(id);
+    if (v < 0.34 && ev.neg < 2) return 'weak';
+    if (v >= 0.67 && ev.pos < 2) return 'yes';
+    return null;
+  }
+  // v65 变式追问队列：首次答错排一道同节点变式——会话内题池允许就插当前会话，否则进下次会话忆区前排
+  const FOLLOWUP_KEY = 'cnk12_followups';
+  let followups = [];
+  try { followups = JSON.parse(localStorage.getItem(FOLLOWUP_KEY) || '[]') || []; } catch (e) { followups = []; }
+  function saveFollowups() { try { localStorage.setItem(FOLLOWUP_KEY, JSON.stringify(followups.slice(-20))); } catch (e) {} }
+  function dropFollowup(id) { const i = followups.indexOf(id); if (i >= 0) { followups.splice(i, 1); saveFollowups(); } }
+  function enqueueFollowup(id) {
+    if (session && (session.phase === 'recall' || session.phase === 'practice')) {   // 会话内：插到当前题之后
+      const arr = session.phase === 'recall' ? session.recall : session.practice;
+      const pool = quizByTopic.get(id) || [];
+      const used = new Set(arr.map(x => x.item.q));
+      const cand = pool.filter(q => !used.has(q.q));
+      if (cand.length) {
+        arr.splice(session.qIdx + 1, 0, { topicId: id, item: buildQuizItems([cand[Math.floor(Math.random() * cand.length)]])[0], followup: true });
+        return;
+      }
+    }
+    if (!followups.includes(id)) { followups.push(id); saveFollowups(); }
+  }
+  // 答题驱动：答对 +0.34 封顶 1，答错 -0.5 封底 0；证据计数控制定档（见 mState）
   function applyAnswer(id, correct, err) {
     if (id == null || !topicById.has(id)) return;
     const prevState = mState(id);   // v40：点亮脉冲要前后对照
+    const meta = masteryMeta[id] || {};
+    const ev = evidenceOf(id);   // 旧数据追认（在改动前取）
+    meta.pos = ev.pos; meta.neg = ev.neg;
     const cur = mv(id);
     const v = cur === null ? (correct ? 0.34 : 0)
       : correct ? Math.min(1, cur + 0.34) : Math.max(0, cur - 0.5);
     mastery[id] = Math.round(v * 100) / 100;
-    const meta = masteryMeta[id] || {};
     meta.ts = Date.now();
-    if (!correct) { meta.err = err || meta.err || 'transfer'; meta.wrongs = (meta.wrongs || 0) + 1; }
+    if (correct) {
+      meta.pos++; meta.neg = 0;
+      dropFollowup(id);   // 追问答对 → 归在进步，撤销追问排队
+    } else {
+      meta.neg++; meta.pos = 0;
+      meta.err = err || meta.err || 'transfer'; meta.wrongs = (meta.wrongs || 0) + 1;
+    }
     masteryMeta[id] = meta;
     saveMastery(); saveMasteryMeta();
+    if (!correct && meta.neg === 1) enqueueFollowup(id);   // 首次答错 → 待确认 + 自动排变式追问
+    if (!correct && meta.neg >= 2) dropFollowup(id);       // 再错确认薄弱 → 追问使命完成
     noteLit(id, prevState);
     updateStats();
     requestDraw();
@@ -1406,6 +1471,7 @@
   function closeMap() { switchTab(mapReturnTab && TAB_NAMES[mapReturnTab] ? mapReturnTab : 'growth'); }
   document.getElementById('map-back').onclick = closeMap;
   document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
+  document.getElementById('fab-start').onclick = () => startSession();   // v65：与今日页大按钮完全一致
 
   // ---------- Canvas（Marble 美学：深空底 + 慢速自转 + 生长入场） ----------
   const wrap = document.getElementById('canvas-wrap');
@@ -2133,7 +2199,9 @@
       return s ? `<div style="margin-bottom:6px"><b style="font-size:12px">${s.title}</b><div style="font-size:12px;color:var(--text-dim);line-height:1.6">${s.summary}</div></div>` : '';
     }).join('');
     const mBadge = m === 'yes' ? `<span class="badge m-yes">已掌握 ✓ ${Math.round(mVal * 100)}%</span>`
-                 : m === 'mid' ? `<span class="badge m-mid">在进步 ${Math.round(mVal * 100)}%</span>`
+                 : m === 'mid' ? (pendingConfirm(selectedId)
+                     ? `<span class="badge m-mid">再确认一下 · ${Math.round(mVal * 100)}%</span>`
+                     : `<span class="badge m-mid">在进步 ${Math.round(mVal * 100)}%</span>`)
                  : m === 'no' ? `<span class="badge m-no">还不会 ${Math.round(mVal * 100)}%</span>` : '';
     // coaching 卡（ask/pattern/variants/drills 来自 data/coaching.json；无数据时不渲染此卡）
     // 会员且有补给包时 drills 并入补给包区（合并去重），此处不再重复渲染
@@ -2819,6 +2887,13 @@
         answerText = picked ? '对' : '错';
       }
       quiz.answers[quiz.idx] = { item, ok: ok2, answerText, picked };
+      // v65 证据累积：错题节点当场追问 1 道同节点变式再定薄弱（仅诊断流，总题量封顶 15 防流失）
+      if (!ok2 && (quiz.mode === 'quick' || quiz.mode === 'first3') && quiz.items.length < 15) {
+        const pool = quizByTopic.get(item.topicId) || [];
+        const used = new Set(quiz.items.map(x => x.q));
+        const cand = pool.filter(q => !used.has(q.q));
+        if (cand.length) quiz.items.push(buildQuizItems([cand[Math.floor(Math.random() * cand.length)]])[0]);
+      }
       const cur = quiz.idx;
       renderQuiz();
       // 300ms+ 正误反馈后自动进入下一题
@@ -3313,7 +3388,11 @@
     const recallPool = topics.filter(t => inScope(t) && quizByTopic.has(t.id) && mv(t.id) !== null
       && (mv(t.id) < 0.67 || (masteryMeta[t.id] && masteryMeta[t.id].ts && now - masteryMeta[t.id].ts > 86400000)));
     recallPool.sort((a, b) => mv(a.id) - mv(b.id) || ((masteryMeta[a.id] || {}).ts || 0) - ((masteryMeta[b.id] || {}).ts || 0));
-    const recallTopics = recallPool.slice(0, mode.recallN);
+    // v65：待确认追问节点（上次首错）插忆区最前排，最多 2 个、不占常规名额
+    const fuTopics = followups.map(id => topicById.get(id))
+      .filter(t => t && inScope(t) && quizByTopic.has(t.id)).slice(0, 2);
+    const recallTopics = fuTopics.concat(recallPool.filter(t => !followups.includes(t.id)))
+      .slice(0, mode.recallN + fuTopics.length);
     // 学练：掌握度最弱节点，优先有补给包的；专项（topicIds）里未测节点也算断点
     let learnPool = topics.filter(t => inScope(t)
       && (mv(t.id) !== null ? mv(t.id) < 0.67 : !!(opts.topicIds && opts.topicIds.length)));
@@ -3365,6 +3444,7 @@
     renderSession();
   }
   function closeSession() {
+    clearSsTimer();   // v65
     session = null;
     sessionScreen.classList.remove('show');
     document.body.classList.remove('in-session');
@@ -3434,6 +3514,7 @@
   function renderSession() {
     const s = session;
     if (!s) return;
+    clearSsTimer();   // v65：重渲（跳题/回改/手动操作）一律先清自动跳题定时器
     const child = s.mode === 'child';
     let inner = '';
     if (s.phase === 'learn') {
@@ -3527,10 +3608,16 @@
           ansBtn.textContent = open ? '收起答案' : '看答案（给爸妈判分）';
         };
         const judge = (ok2) => {
+          if (s.answered) return;   // v65：防连点重复记分
+          s.answered = true;
           applyAnswer(cur.topicId, ok2, ok2 ? undefined : 'transfer');
           markCheckinDay();
           if (ok2) confetti();
-          sessionNext();
+          // 即时反馈后短延迟自动进下一题（与诊断同节奏）
+          const wrap = sessionBody.querySelector('.ss-judge-btns');
+          if (wrap) wrap.innerHTML = `<div class="quiz-fb ${ok2 ? 'ok' : 'bad'}" style="margin-top:6px">${ok2 ? '✓ 答对了' : '✗ 没答对——已记下，安排再见'} · 掌握度 ${Math.round((mv(cur.topicId) || 0) * 100)}%</div>`;
+          clearSsTimer();
+          ssTimer = setTimeout(() => { ssTimer = null; sessionNext(); }, 700);
         };
         sessionBody.querySelector('#ss-ok').onclick = () => judge(true);
         sessionBody.querySelector('#ss-bad').onclick = () => judge(false);
@@ -3539,6 +3626,13 @@
         const commit = (ok2, pickedHtml) => {
           if (s.answered) return;
           s.answered = true;
+          let advanced = false;   // v65：自动跳与手动下一题/点击继续只生效一次
+          const goNext = () => {
+            if (advanced) return;
+            advanced = true;
+            clearSsTimer();
+            sessionNext();
+          };
           const mPrev = mv(cur.topicId);
           applyAnswer(cur.topicId, ok2, ok2 ? undefined : 'transfer');
           markCheckinDay();
@@ -3553,9 +3647,16 @@
             setErr(cur.topicId, c.dataset.err);
             fb.querySelectorAll('.err-chip').forEach(x => x.classList.toggle('on', x === c));
           });
-          fb.querySelector('#ss-next').onclick = sessionNext;
+          fb.querySelector('#ss-next').onclick = goNext;
           const forget = sessionBody.querySelector('#ss-forget');
           if (forget) forget.style.display = 'none';
+          // v65：忆/练与诊断同节奏——答对 600ms 自动跳；答错给思路解析，放宽到 1.8s，期间点解析卡立即继续
+          clearSsTimer();
+          ssTimer = setTimeout(goNext, ok2 ? 600 : 1800);
+          fb.addEventListener('click', (e) => {
+            if (e.target.closest('.err-chip') || e.target.closest('#ss-next')) return;   // 标错因不触发跳题
+            goNext();
+          });
         };
         sessionBody.querySelectorAll('.quiz-opt').forEach(btn => btn.onclick = () => {
           if (s.answered) return;
@@ -3601,6 +3702,8 @@
     }
   }
   let sessionLearnMarked = false;   // 学区卡读过一次即算打卡（同一会话只记一次）
+  let ssTimer = null;               // v65：忆/练自动跳题定时器（与诊断 quizTimer 同节奏）
+  function clearSsTimer() { if (ssTimer) { clearTimeout(ssTimer); ssTimer = null; } }
   function markCheckinDayOnce() { if (!sessionLearnMarked) { sessionLearnMarked = true; markCheckinDay(); } }
 
   // ---------- 今日 tab（v60：首屏只剩一个主按钮「开始今天的 15 分钟」） ----------
@@ -4709,6 +4812,7 @@
     weekWins,
     showPoster,
     renderSession,
+    applyAnswer, mv, mState, pendingConfirm,   // v65：状态机验收用
   };
 })();
 </script>
