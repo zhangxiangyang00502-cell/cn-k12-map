@@ -38,7 +38,7 @@
   .view { position: absolute; inset: 0; display: none; }
   .view.active { display: block; }
   #view-map.active { display: flex; flex-direction: column; }
-  .scroll-view { overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 16px 28px; }
+  .scroll-view { overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 16px 28px; overscroll-behavior: contain; }
   .scroll-inner { max-width: 680px; margin: 0 auto; }
 
   /* ---------- 底部四 tab ---------- */
@@ -173,6 +173,12 @@
   .ask-card .ask-q { font-size: 13.5px; line-height: 1.7; font-weight: 600; }
   .ask-card .ask-pattern { font-size: 12px; color: var(--text-dim); line-height: 1.7; margin-top: 8px;
     border-top: 1px dashed #1e3a52; padding-top: 8px; }
+  .ask-cta { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .ask-mv { font-size: 12px; color: var(--text-dim); }
+  .ask-mv.yes { color: var(--green-bright); }
+  .ask-mv.mid { color: #e0b34a; }
+  .ask-mv.no { color: var(--bad); }
+  .ask-quiz-btn { flex: 1; min-width: 150px; min-height: 40px; border-color: var(--accent); color: var(--accent); }
   .ask-card .ask-sec { font-size: 11px; color: #5FDCD0; font-weight: 700; margin: 12px 0 6px;
     border-top: 1px dashed #1e3a52; padding-top: 10px; }
   .var-item { background: #0b1523; border: 1px solid #16304a; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
@@ -198,6 +204,8 @@
   .pack-src { font-size: 11px; color: var(--text-dim); margin-top: 10px; border-top: 1px dashed #1e3a52; padding-top: 8px; }
   .pack-output { background: #0b1523; border: 1px solid #2f6b31; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
   .po-text { font-size: 12.5px; line-height: 1.7; font-weight: 600; }
+  .po-when { font-size: 12px; line-height: 1.7; color: var(--text-dim); margin-top: 6px; }
+  .po-when b { color: #9fc7ea; }
   .po-done { width: 100%; min-height: 40px; margin-top: 8px; border-color: var(--green-bright); color: var(--green-bright); }
   .po-done.done { background: #12291a; }
   /* 回忆卡翻面 */
@@ -213,6 +221,23 @@
   .flip-back .ff-tag { color: var(--green-bright); }
   .ff-text { font-size: 13px; line-height: 1.7; flex: 1; }
   .ff-hint { font-size: 11px; color: var(--text-dim); text-align: right; margin-top: 6px; }
+  /* 作文补给包 */
+  .zw-tree, .zw-tree ul { list-style: none; margin: 0; padding: 0; }
+  .zw-tree { margin-bottom: 6px; }
+  .zw-tree ul { margin-left: 8px; padding-left: 14px; border-left: 1px solid #1e3a52; }
+  .zw-tree li { position: relative; font-size: 12.5px; line-height: 1.7; padding: 3px 0; }
+  .zw-tree ul > li::before { content: ''; position: absolute; left: -14px; top: 14px; width: 10px; border-top: 1px solid #1e3a52; }
+  .zw-tree > li { font-weight: 700; color: #9fc7ea; }
+  .zw-material { border-left: 3px solid #e0b34a; }
+  .zw-sample { background: #0b1523; border: 1px solid #16304a; border-radius: 8px; padding: 12px; margin-bottom: 6px; }
+  .zw-sample-title { font-size: 13.5px; font-weight: 700; margin-bottom: 8px; color: #9fc7ea; }
+  .zw-sample-text p { font-size: 13px; line-height: 1.9; margin: 0 0 8px; }
+  .anno { background: rgba(224,179,74,.16); border-bottom: 1.5px solid #e0b34a; border-radius: 2px;
+    padding: 0 1px; cursor: pointer; }
+  .anno.on { background: rgba(224,179,74,.42); }
+  .anno-bar { display: none; margin-top: 8px; font-size: 12px; line-height: 1.7; color: #e0b34a;
+    background: #171507; border: 1px solid #6b5420; border-radius: 8px; padding: 8px 10px; }
+  .anno-bar.show { display: block; }
   .chain-item { font-size: 12.5px; padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; cursor: pointer;
     background: #0d1017; border: 1px solid var(--panel-border); line-height: 1.5; }
   .chain-item:hover { border-color: var(--accent); }
@@ -699,7 +724,7 @@
   } catch (e) {}
   // 补给包（R6：导学卡/变式训练/回忆卡/产出任务）：packs_yw + packs_df 两文件合并；缺失时优雅降级为空
   const packByTopic = new Map();
-  for (const url of ['data/packs_yw.json', 'data/packs_df.json']) {
+  for (const url of ['data/packs_yw.json', 'data/packs_df.json', 'data/packs_zw.json']) {
     try {
       const r = await fetch(url);
       if (r.ok) {
@@ -1379,6 +1404,7 @@
 
   const pointers = new Map();
   let panMoved = 0, panLast = null, downTime = 0, pinch = null;
+  let panStart = null, panActive = false;   // 拖拽死区：位移超过死区才开始平移，点按抖动不带动地图
   let velSamples = [];
 
   // 阻断触摸后的兼容鼠标事件（ghost click），避免抽屉刚打开就被同一坐标落的假点击误关
@@ -1405,6 +1431,7 @@
     touchPause = true;   // 触摸即停
     if (pointers.size === 1) {
       panMoved = 0; panLast = { x: e.clientX, y: e.clientY }; downTime = Date.now();
+      panStart = { x: e.clientX, y: e.clientY }; panActive = false;
       velSamples = [];
       pinch = null;
       canvas.classList.add('dragging');
@@ -1436,6 +1463,13 @@
       return;
     }
     if (pointers.size === 1 && panLast) {
+      if (!panActive) {
+        const dead = e.pointerType === 'mouse' ? 3 : 9;   // 死区内视为点按抖动，不平移
+        if (Math.hypot(e.clientX - panStart.x, e.clientY - panStart.y) < dead) return;
+        panActive = true;
+        panLast = { x: e.clientX, y: e.clientY };
+        return;
+      }
       const dx = e.clientX - panLast.x, dy = e.clientY - panLast.y;
       panMoved += Math.abs(dx) + Math.abs(dy);
       tx += dx; ty -= dy;
@@ -1478,18 +1512,20 @@
     }
     if (pointers.size === 0) {
       canvas.classList.remove('dragging');
-      if (wasSingle && panMoved < 10 && (Date.now() - downTime) < 500) {
+      const disp = panStart ? Math.hypot(e.clientX - panStart.x, e.clientY - panStart.y) : 999;
+      const tapLim = isTouch ? 26 : 8;   // 位移制 tap 判定（真机点按普遍带 10-20px 位移）
+      if (wasSingle && panMoved < 900 && disp < tapLim && (Date.now() - downTime) < 600) {
         const rect = canvas.getBoundingClientRect();
         const best = hitTest(e.clientX - rect.left, e.clientY - rect.top, isTouch);
         if (best) selectTopic(best.id);
-      } else if (wasSingle && isTouch && panMoved >= 10 && velSamples.length >= 2) {
+      } else if (wasSingle && isTouch && panActive && panMoved >= 10 && velSamples.length >= 2) {
         const last = velSamples[velSamples.length - 1];
         const recent = velSamples.filter(s => last.t - s.t <= 100);
         const first = recent[0] || last;
         const dt = Math.max(16, last.t - first.t);
         let vx = (last.x - first.x) / dt, vy = (last.y - first.y) / dt;
         const sp = Math.hypot(vx, vy);
-        if (sp > 0.05) {
+        if (sp > 0.25) {   // 只有明确的甩动才给惯性，慢速误触不再滑走
           const cap = 2.5;
           if (sp > cap) { vx *= cap / sp; vy *= cap / sp; }
           inertia = {
@@ -1499,6 +1535,7 @@
           requestDraw();
         }
       }
+      panStart = null; panActive = false;
       panLast = null;
       velSamples = [];
     }
@@ -1590,7 +1627,7 @@
   }
 
   // coaching 卡：ask 问句 + pattern 规律 + variants 课外变式 + drills 同类训练（答案默认折叠，给思路不给答案）
-  function renderCoachCard(coach, skipDrills) {
+  function renderCoachCard(coach, skipDrills, topicId) {
     const vars = Array.isArray(coach.variants) ? coach.variants : [];
     const drills = skipDrills ? [] : (Array.isArray(coach.drills) ? coach.drills : []);
     if (!coach.ask && !coach.pattern && !vars.length && !drills.length) return '';
@@ -1610,7 +1647,18 @@
       </div>`).join('')}` : '';
     return `
       <div class="ask-card">
-        ${coach.ask ? `<div class="ask-tag">家长一问 · 可观察行为</div><div class="ask-q">${esc(coach.ask)}</div>` : ''}
+        ${coach.ask ? `<div class="ask-tag">家长一问</div><div class="ask-q">${esc(coach.ask)}</div>
+          <div class="ask-cta">
+            ${(() => {
+              const v = topicId != null ? mv(topicId) : null;
+              const st = v === null ? null : mState(topicId);
+              const mTxt = v === null ? '<span class="ask-mv">还没测过，别凭感觉判断</span>'
+                : `<span class="ask-mv ${st}">当前掌握度 ${Math.round(v * 100)}%（${st === 'yes' ? '已掌握' : st === 'mid' ? '在进步' : '还不会'}）</span>`;
+              const btn = (topicId != null && quizByTopic.has(topicId))
+                ? `<button class="tbtn ask-quiz-btn" id="ask-quiz">测一测就知道 ›</button>` : '';
+              return mTxt + btn;
+            })()}
+          </div>` : ''}
         ${coach.pattern ? `<div class="ask-pattern">规律：${esc(coach.pattern)}</div>` : ''}
         ${varsHtml}
         ${drillsHtml}
@@ -1637,7 +1685,7 @@
                  : m === 'no' ? `<span class="badge m-no">还不会 ${Math.round(mVal * 100)}%</span>` : '';
     // coaching 卡（ask/pattern/variants/drills 来自 data/coaching.json；无数据时不渲染此卡）
     // 会员且有补给包时 drills 并入补给包区（合并去重），此处不再重复渲染
-    const askHtml = coach ? renderCoachCard(coach, packByTopic.has(selectedId) && isMember()) : '';
+    const askHtml = coach ? renderCoachCard(coach, packByTopic.has(selectedId) && isMember(), selectedId) : '';
     const packHtml = renderPackSection(selectedId);
     // 家长检验卡
     const assessInner = t.assessmentPrompt ? `
@@ -1710,6 +1758,8 @@
     });
     const bq = panelBody.querySelector('#btn-quiz');
     if (bq) bq.onclick = () => startNodeQuiz(selectedId, 'map');   // 测一测免费
+    const aq = panelBody.querySelector('#ask-quiz');
+    if (aq) aq.onclick = () => startNodeQuiz(selectedId, 'map');   // ask 卡：测一测就知道
     const br = panelBody.querySelector('#btn-retest');
     if (br) br.onclick = () => startNodeQuiz(selectedId, 'map');
     const ru = panelBody.querySelector('#res-unlock');
@@ -1724,6 +1774,19 @@
       pod.textContent = done ? '已完成 ✓（再点撤销）' : '完成了';
       toast(done ? '产出任务已打卡 ✓' : '已撤销打卡');
     };
+    // 作文例文标注：点击/悬停高亮句显示手法 note（移动端点按展开标注条）
+    const annoBar = panelBody.querySelector('#anno-bar');
+    if (annoBar) {
+      panelBody.querySelectorAll('.anno').forEach(m => {
+        const show = () => {
+          panelBody.querySelectorAll('.anno').forEach(x => x.classList.toggle('on', x === m));
+          annoBar.textContent = m.dataset.note || '';
+          annoBar.classList.add('show');
+        };
+        m.onclick = show;
+        m.onmouseenter = show;
+      });
+    }
     const at = panelBody.querySelector('#assess-toggle');
     if (at) at.onclick = () => {
       const w = panelBody.querySelector('#assess-wrap');
@@ -1959,27 +2022,91 @@
     if (packDone[id]) delete packDone[id]; else packDone[id] = Date.now();
     try { localStorage.setItem(PACK_DONE_KEY, JSON.stringify(packDone)); } catch (e) {}
   }
+  // 字段防御：字符串直接用；对象取 text/task/title；其余转空串（杜绝 [object Object]）
+  function sTxt(v) {
+    if (typeof v === 'string') return v;
+    if (v && typeof v === 'object') return v.text || v.task || v.title || '';
+    return v == null ? '' : String(v);
+  }
   // 导学卡（why 孩子为什么错 → rule 规律 → example 例子）
   function packGuideHtml(pack) {
     const g = pack.guide || {};
-    if (!g.why && !g.rule && !g.example) return '';
+    const why = sTxt(g.why), rule = sTxt(g.rule), example = sTxt(g.example);
+    if (!why && !rule && !example) return '';
     return `<div class="pack-guide">
       <div class="pg-tag">导学卡</div>
-      ${g.why ? `<div class="pg-sec"><b>孩子为什么错</b><div>${esc(g.why)}</div></div>` : ''}
-      ${g.rule ? `<div class="pg-sec"><b>规律</b><div>${esc(g.rule)}</div></div>` : ''}
-      ${g.example ? `<div class="pg-sec"><b>例子</b><div>${esc(g.example)}</div></div>` : ''}
+      ${why ? `<div class="pg-sec"><b>孩子为什么错</b><div>${esc(why)}</div></div>` : ''}
+      ${rule ? `<div class="pg-sec"><b>规律</b><div>${esc(rule)}</div></div>` : ''}
+      ${example ? `<div class="pg-sec"><b>例子</b><div>${esc(example)}</div></div>` : ''}
     </div>`;
   }
   // 回忆卡（正面问题，点击翻面显示答案）
   function packRecallHtml(pack) {
     const rc = pack.recall || {};
-    if (!rc.front && !rc.back) return '';
+    const front = sTxt(rc.front), back = sTxt(rc.back);
+    if (!front && !back) return '';
     return `<div class="flip-card" onclick="this.classList.toggle('flipped')" role="button" aria-label="回忆卡，点击翻面">
       <div class="flip-inner">
-        <div class="flip-face flip-front"><div class="ff-tag">回忆卡 · 问题</div><div class="ff-text">${esc(rc.front)}</div><div class="ff-hint">先自己想，点卡片翻面 ›</div></div>
-        <div class="flip-face flip-back"><div class="ff-tag">答案</div><div class="ff-text">${esc(rc.back)}</div><div class="ff-hint">再点翻回 ›</div></div>
+        <div class="flip-face flip-front"><div class="ff-tag">回忆卡 · 问题</div><div class="ff-text">${esc(front)}</div><div class="ff-hint">先自己想，点卡片翻面 ›</div></div>
+        <div class="flip-face flip-back"><div class="ff-tag">答案</div><div class="ff-text">${esc(back)}</div><div class="ff-hint">再点翻回 ›</div></div>
       </div>
     </div>`;
+  }
+  // ---- 作文补给包专属区块（type === 'composition'） ----
+  // structure：空格缩进的树状大纲 → 嵌套树（层级线连接）
+  function packStructureHtml(pack) {
+    const lines = Array.isArray(pack.structure) ? pack.structure.filter(s => typeof s === 'string' && s.trim()) : [];
+    if (!lines.length) return '';
+    const indents = lines.map(s => (s.match(/^ */) || [''])[0].length);
+    const unit = Math.min(...indents.filter(n => n > 0)) || 2;
+    let html = '<ul>', depth = 0;
+    lines.forEach((s, i) => {
+      const d = Math.min(Math.round(indents[i] / unit), depth + 1);   // 一次最多深入一层，防空行跳级
+      if (i > 0) {
+        if (d > depth) html += '<ul>';
+        else if (d < depth) { for (let k = d; k < depth; k++) html += '</li></ul>'; html += '</li>'; }
+        else html += '</li>';
+      }
+      html += `<li>${esc(s.trim())}`;
+      depth = d;
+    });
+    html += '</li>' + '</li></ul>'.repeat(depth) + '</ul>';
+    return `<div class="ask-sec">写作框架 · 按层次搭好再动笔</div><ul class="zw-tree">${html}</ul>`;
+  }
+  // materials：素材卡片列表
+  function packMaterialsHtml(pack) {
+    const mats = Array.isArray(pack.materials) ? pack.materials : [];
+    if (!mats.length) return '';
+    return `<div class="ask-sec">素材库 · 挑一个用进作文（${mats.length}）</div>` +
+      mats.map(m => `<div class="var-item zw-material"><div class="v-t">${esc(sTxt(m))}</div></div>`).join('');
+  }
+  // sample：例文 + 手法标注（quote 正文高亮，点击/悬停显示 note）
+  function packSampleHtml(pack) {
+    const s = pack.sample;
+    const text = s ? sTxt(s.text) : '';
+    if (!s || !text) return '';
+    const annos = (Array.isArray(s.annotations) ? s.annotations : [])
+      .map(a => ({ quote: sTxt(a && a.quote), note: sTxt(a && a.note) }))
+      .filter(a => a.quote && a.note);
+    const paras = text.split('\n').filter(p => p.trim()).map(para => {
+      let h = esc(para);
+      annos.forEach((a, i) => {
+        const q = esc(a.quote);
+        const pos = h.indexOf(q);
+        if (pos >= 0) h = h.slice(0, pos) + `<mark class="anno" data-note="${esc(a.note)}">${q}</mark>` + h.slice(pos + q.length);
+      });
+      return `<p>${h}</p>`;
+    }).join('');
+    return `<div class="ask-sec">例文 · 点高亮句看手法标注</div>
+      <div class="zw-sample">
+        ${sTxt(s.title) ? `<div class="zw-sample-title">${esc(sTxt(s.title))}</div>` : ''}
+        <div class="zw-sample-text">${paras}</div>
+        ${annos.length ? '<div class="anno-bar" id="anno-bar"></div>' : ''}
+      </div>`;
+  }
+  function packCompositionHtml(pack) {
+    if (!pack || pack.type !== 'composition') return '';
+    return packStructureHtml(pack) + packMaterialsHtml(pack) + packSampleHtml(pack);
   }
   // 变式训练：与 coaching.drills 合并、按题干去重（答案折叠复用 drill-item）
   function packDrills(id) {
@@ -1995,19 +2122,25 @@
     if (!drills.length) return '';
     return `<div class="ask-sec">变式训练（${drills.length}）· 先看思路提示，做完再点开核对</div>
       ${drills.map(d => `<div class="drill-item">
-        <div class="d-q">${esc(d.q)}</div>
-        ${d.hint ? `<div class="d-hint"><b>思路：</b>${esc(d.hint)}</div>` : ''}
+        <div class="d-q">${esc(sTxt(d.q))}</div>
+        ${sTxt(d.hint) ? `<div class="d-hint"><b>思路：</b>${esc(sTxt(d.hint))}</div>` : ''}
         <button class="drill-ans-btn" type="button">查看答案（先自己做完再对）</button>
-        <div class="drill-ans"><b>参考答案：</b>${esc(d.answer)}</div>
+        <div class="drill-ans"><b>参考答案：</b>${esc(sTxt(d.answer))}</div>
       </div>`).join('')}`;
   }
+  // 产出任务：output 兼容两种 schema——字符串（yw/df）或 {task, done_when} 对象（zw）
   function packOutputHtml(id) {
     const pack = packByTopic.get(id);
     if (!pack || !pack.output) return '';
+    const o = pack.output;
+    const task = sTxt(o);
+    const doneWhen = o && typeof o === 'object' ? sTxt(o.done_when) : '';
+    if (!task) return '';
     const done = isPackDone(id);
     return `<div class="ask-sec">产出任务 · 用出来才算真会</div>
       <div class="pack-output">
-        <div class="po-text">${esc(pack.output)}</div>
+        <div class="po-text">${esc(task)}</div>
+        ${doneWhen ? `<div class="po-when"><b>怎么算完成：</b>${esc(doneWhen)}</div>` : ''}
         <button class="tbtn po-done ${done ? 'done' : ''}" id="pack-output-done">${done ? '已完成 ✓（再点撤销）' : '完成了'}</button>
       </div>`;
   }
@@ -2027,10 +2160,11 @@
     return `<h3>补给包</h3>
       <div class="pack-card" id="pack-card">
         ${packGuideHtml(pack)}
+        ${packCompositionHtml(pack)}
         ${packDrillsHtml(id)}
         ${pack.recall ? '<div class="ask-sec">回忆卡 · 先自己想，点卡片翻面核对</div>' + packRecallHtml(pack) : ''}
         ${packOutputHtml(id)}
-        ${pack.source_note ? `<div class="pack-src">${esc(pack.source_note)}</div>` : ''}
+        ${pack.source_note ? `<div class="pack-src">${esc(sTxt(pack.source_note))}</div>` : ''}
       </div>`;
   }
 
