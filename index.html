@@ -644,6 +644,19 @@
     box-shadow: 0 6px 24px rgba(0,0,0,0.5); pointer-events: none; }
   #toast { color: #F6F8FB; }
 
+  /* ---------- Loop B：海报预览层（长按保存引导） ---------- */
+  #poster-modal { position: fixed; inset: 0; z-index: 90; background: rgba(16,24,40,.62);
+    display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    padding: 24px; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+  #poster-modal.show { display: flex; }
+  #poster-img { max-width: min(84vw, 400px); max-height: 72vh; border-radius: 18px;
+    box-shadow: 0 16px 48px rgba(0,0,0,.35); display: block; }
+  #poster-modal .pm-hint { color: #fff; font-size: 14px; font-weight: 600; letter-spacing: .5px;
+    background: rgba(255,255,255,.14); padding: 8px 18px; border-radius: 999px; }
+  #poster-close { position: absolute; top: calc(14px + env(safe-area-inset-top, 0px)); right: 16px;
+    width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,.16);
+    color: #fff; font-size: 22px; cursor: pointer; line-height: 1; }
+
   /* ================= v40 皮肤层：小满暖白质感 + 星空图谱 + 切换过渡 ================= */
   body { transition: background-color .2s ease; }
   body[data-tab="map"] {
@@ -957,6 +970,11 @@
 <div id="onboard"><div class="ob-box" id="ob-box"></div></div>
 <div id="member-modal"><div class="ob-box" id="member-box"></div></div>
 <div id="toast"></div>
+<div id="poster-modal">
+  <button id="poster-close" aria-label="关闭">×</button>
+  <img id="poster-img" alt="分享海报">
+  <div class="pm-hint">长按保存图片，分享到朋友圈 / 家长群</div>
+</div>
 <canvas id="fx-confetti"></canvas>
 
 <script>
@@ -3028,6 +3046,7 @@
       </div>
       ${bpIds.length && !quiz.guest ? `<div class="rp-block" id="report-chains"><div class="rp-t">断点可视化 · 最弱的 ${bpIds.length} 环（红色 = 断的那环）</div>${chainHtml}</div>` : ''}
       ${memberWall}
+      <button class="tbtn" id="qr-poster" style="width:100%;min-height:44px;margin-bottom:10px">生成海报，分享给同款家长 ›</button>
       ${quiz.guest
         ? `<button class="big-cta float-cta" id="qr-guest-done">开始第一天 ›</button>`
         : `${badIds.length
@@ -3035,6 +3054,14 @@
             : `<button class="big-cta float-cta" id="qr-gomap-cta">去图谱挑战新内容 ›</button>`}
            <button class="text-link" id="qr-gomap">去图谱看看 ›</button>`}
       <div style="height:96px"></div>`;
+    // Loop B：诊断海报数据（年级 / 测了几个 / 薄弱 TOP3 / 是否全对）
+    const reportPosterData = {
+      grade: quiz.grade, subject: quiz.subject || null, tested: byTopic.size,
+      weak: bpIds.map(id => { const t = topicById.get(id); return t ? { name: t.name, subject: t.subject } : null; }).filter(Boolean),
+      allClear: badIds.length === 0,
+    };
+    const qpost = quizBody.querySelector('#qr-poster');
+    if (qpost) qpost.onclick = () => showPoster(drawDiagPoster(reportPosterData).dataUrl);
     quizBody.parentElement.scrollTop = 0;
     const gd = quizBody.querySelector('#qr-guest-done');
     if (gd) gd.onclick = () => {   // v50 新客：体检报告看完，落入今日写档案
@@ -3430,6 +3457,7 @@
         <div class="st-flame">${streak.checkedToday ? `🔥 已连续打卡 ${streak.count} 天` : streak.count ? `🔥 连续 ${streak.count} 天 · 今天打卡就续上` : '✨ 今天完成任意打卡，点亮第 1 天'}</div>
         <div class="st-tomorrow">明天见 · ${tomorrowTxt}</div>
         <button class="big-cta" id="ss-done" style="margin-top:22px">完成 ✓</button>
+        <button class="ghost-cta" id="ss-poster" style="margin-top:10px">生成进步海报，分享一下 ›</button>
         ${s.subject ? '<button class="ghost-cta" id="ss-back-all" style="margin-top:10px">返回全科模式 ›</button>' : ''}
       </div>`;
     }
@@ -3526,6 +3554,8 @@
       const avgAfter = marked.length ? marked.reduce((sum, t) => sum + mv(t.id), 0) / marked.length : 0;
       rollNumber(sessionBody.querySelector('#ss-roll'), s.avgBefore * 100, avgAfter * 100);
       sessionBody.querySelector('#ss-done').onclick = closeSession;
+      const sPost = sessionBody.querySelector('#ss-poster');
+      if (sPost) sPost.onclick = () => showPoster(drawProgressPoster(progressPosterData(s)).dataUrl);
       const backAll = sessionBody.querySelector('#ss-back-all');
       if (backAll) backAll.onclick = closeSession;
     }
@@ -3834,9 +3864,13 @@
       <div class="gr-card gr-week" id="gr-week">
         <h3>本周战报</h3>
         <div class="c-sub">新掌握 <b>${newYes}</b> 个知识点 · 复习/练习 <b>${reviewed}</b> 个${bestDom ? ` · 进步最大领域：<b>${esc(bestDom[0])}</b>` : ''}</div>
+        <div class="td-actions" style="margin-top:10px">
+          <button class="tbtn" id="gr-poster">生成进步海报 ›</button>
+        </div>
       </div>`;
     drawGrowthCurve(growthBody.querySelector('#gr-curve'), days);
     growthBody.querySelector('#gr-star').onclick = () => openMap();
+    growthBody.querySelector('#gr-poster').onclick = () => showPoster(drawProgressPoster(progressPosterData(null)).dataUrl);
     growthBody.querySelector('#gr-retest').onclick = () => startQuickQuiz((ld && ld.grade) || (profile && profile.grade) || 7);
     growthBody.querySelector('#gr-say').onclick = () => renderSay(growthBody);
   }
@@ -4349,9 +4383,225 @@
     toastTimer = setTimeout(() => { el.style.display = 'none'; }, 2600);
   }
 
+  // ================= Loop B：分享海报生成器（750×1334 竖版，canvas 离屏绘制，长按保存） =================
+  const POSTER_W = 750, POSTER_H = 1334;
+  const POSTER_FONT = '"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+  function roundRectPath(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  function wrapPosterText(ctx, text, maxW) {
+    const lines = [];
+    let line = '';
+    for (const ch of text) {
+      if (ch === '\n') { lines.push(line); line = ''; continue; }
+      if (ctx.measureText(line + ch).width > maxW && line) { lines.push(line); line = ch; }
+      else line += ch;
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+  function ellipsize(ctx, text, maxW) {
+    if (ctx.measureText(text).width <= maxW) return text;
+    let s = text;
+    while (s.length > 1 && ctx.measureText(s + '…').width > maxW) s = s.slice(0, -1);
+    return s + '…';
+  }
+  // 海报骨架：暖白底 + 顶部品牌行 + 底部品牌条；T() 记录所有绘制文案（测试断言用）
+  function posterBase(eyebrow) {
+    const c = document.createElement('canvas');
+    c.width = POSTER_W; c.height = POSTER_H;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#FAF7F2';
+    ctx.fillRect(0, 0, POSTER_W, POSTER_H);
+    const texts = [];
+    const T = (txt, x, y, size, color, weight, align) => {
+      ctx.font = `${weight || 400} ${size}px ${POSTER_FONT}`;
+      ctx.fillStyle = color;
+      ctx.textAlign = align || 'left';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(txt, x, y);
+      texts.push(txt);
+    };
+    // 顶部品牌行：青绿圆标「满」+ 小满伴学 + 右侧胶囊标签
+    ctx.beginPath(); ctx.arc(90, 88, 26, 0, Math.PI * 2);
+    ctx.fillStyle = '#16C7B7'; ctx.fill();
+    ctx.font = `700 26px ${POSTER_FONT}`; ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('满', 90, 91);
+    T('小满伴学', 128, 98, 30, '#101828', 700);
+    if (eyebrow) {
+      ctx.font = `600 22px ${POSTER_FONT}`;
+      const w = ctx.measureText(eyebrow).width + 40;
+      roundRectPath(ctx, POSTER_W - 64 - w, 66, w, 44, 22);
+      ctx.fillStyle = '#DFF7F4'; ctx.fill();
+      T(eyebrow, POSTER_W - 64 - w / 2, 95, 22, '#0E9C8F', 600, 'center');
+    }
+    const card = (x, y, w, h) => {
+      ctx.save();
+      ctx.shadowColor = 'rgba(16,24,40,.08)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 8;
+      roundRectPath(ctx, x, y, w, h, 28);
+      ctx.fillStyle = '#FFFFFF'; ctx.fill();
+      ctx.restore();
+    };
+    const footer = () => {
+      const dots = ['#16C7B7', '#F5C542', '#EC5A32'];
+      dots.forEach((col, i) => {
+        ctx.beginPath(); ctx.arc(POSTER_W / 2 - 30 + i * 30, POSTER_H - 172, 8, 0, Math.PI * 2);
+        ctx.fillStyle = col; ctx.fill();
+      });
+      T('小满伴学', POSTER_W / 2, POSTER_H - 122, 30, '#101828', 700, 'center');
+      T('孩子卡在哪，今天干什么，一看就懂', POSTER_W / 2, POSTER_H - 78, 24, '#667085', 400, 'center');
+    };
+    return { c, ctx, texts, T, card, footer };
+  }
+
+  // ① 诊断报告海报：年级 + 测了 N 个知识点 + 薄弱 TOP3 + 人话结论（无分数、无排名、不制造焦虑）
+  function drawDiagPoster(data) {
+    const { ctx, texts, T, card, footer, c } = posterBase('体检报告');
+    const weak = (data.weak || []).slice(0, 3);
+    T('学 习 体 检 报 告', 64, 192, 26, '#0E9C8F', 700);
+    T(`${data.grade} 年级 · 测了 ${data.tested} 个知识点`, 64, 258, 50, '#101828', 800);
+    const now = new Date();
+    T(`${now.getMonth() + 1} 月 ${now.getDate()} 日 · ${data.allClear ? '这次没有发现断点' : `找出 ${weak.length} 个主要断点`}`, 64, 308, 26, '#667085');
+    let y = 348;
+    if (data.allClear) {
+      card(64, y, POSTER_W - 128, 220);
+      ctx.beginPath(); ctx.arc(POSTER_W / 2, y + 84, 40, 0, Math.PI * 2);
+      ctx.fillStyle = '#16C7B7'; ctx.fill();
+      T('✓', POSTER_W / 2, y + 99, 44, '#fff', 700, 'center');
+      T('这次测的知识点全部拿下', POSTER_W / 2, y + 168, 32, '#101828', 700, 'center');
+      y += 220;
+    } else {
+      const rowH = 92, cardH = 96 + weak.length * rowH + 8;
+      card(64, y, POSTER_W - 128, cardH);
+      T('断点在哪环', 96, y + 58, 30, '#101828', 700);
+      weak.forEach((wk, i) => {
+        const ry = y + 96 + i * rowH;
+        // 红橙序号块
+        roundRectPath(ctx, 96, ry, 52, 52, 12);
+        ctx.fillStyle = '#EC5A32'; ctx.fill();
+        T(String(i + 1), 96 + 26, ry + 36, 26, '#fff', 700, 'center');
+        ctx.font = `700 30px ${POSTER_FONT}`;
+        T(ellipsize(ctx, wk.name, 330), 168, ry + 37, 30, '#101828', 700);
+        // 学科胶囊
+        const sc = COLORS[wk.subject] || '#667085';
+        ctx.font = `600 20px ${POSTER_FONT}`;
+        const pw = ctx.measureText(wk.subject).width + 28;
+        ctx.save(); ctx.globalAlpha = 0.12;
+        roundRectPath(ctx, POSTER_W - 96 - pw, ry + 8, pw, 36, 18);
+        ctx.fillStyle = sc; ctx.fill();
+        ctx.restore();
+        T(wk.subject, POSTER_W - 96 - pw / 2, ry + 34, 20, sc, 600, 'center');
+      });
+      y += cardH;
+    }
+    // 结论卡：金左条 + 人话
+    y += 32;
+    const concl = data.allClear
+      ? '基础很扎实。去知识星图挑战新内容，一天 15 分钟，保持手感。'
+      : '卡住的不是孩子，是这几个知识点。每个断点都配好了补法：一天 15 分钟，断哪环补哪环。';
+    ctx.font = `400 28px ${POSTER_FONT}`;
+    const lines = wrapPosterText(ctx, concl, POSTER_W - 128 - 72);
+    const cH = 56 + lines.length * 44;
+    card(64, y, POSTER_W - 128, cH);
+    roundRectPath(ctx, 64, y + 16, 6, cH - 32, 3);
+    ctx.fillStyle = '#F5C542'; ctx.fill();
+    lines.forEach((ln, i) => T(ln, 96, y + 62 + i * 44, 28, '#101828'));
+    footer();
+    return { dataUrl: c.toDataURL('image/png'), texts, width: POSTER_W, height: POSTER_H };
+  }
+
+  // ② 进步海报：streak + 忆/学/练 + 本周断点（无分数）
+  function drawProgressPoster(data) {
+    const { ctx, texts, T, card, footer, c } = posterBase('每日 15 分钟');
+    T('今 日 完 成', 64, 192, 26, '#0E9C8F', 700);
+    // streak 区：麦黄火焰 + 大数字
+    T('🔥', 64, 288, 64, '#101828', 400);
+    const streakTxt = data.streak > 1 ? `连续打卡 ${data.streak} 天` : '打卡第 1 天';
+    T(streakTxt, 156, 280, 52, '#B98A1D', 800);
+    T('一天 15 分钟，断哪环补哪环', 156, 326, 26, '#667085');
+    let y = 376;
+    // 忆/学/练 三格（有会话数据才画）
+    if (data.quiz) {
+      card(64, y, POSTER_W - 128, 168);
+      const cols = [
+        ['忆 · 复习', data.quiz.recallN, '题'],
+        ['学 · 新知', data.quiz.learnN, '个'],
+        ['练 · 变式', data.quiz.practiceN, '题'],
+      ];
+      const cw = (POSTER_W - 128) / 3;
+      cols.forEach(([label, n, unit], i) => {
+        const cx = 64 + cw * i + cw / 2;
+        ctx.font = `800 48px ${POSTER_FONT}`;
+        const nw = ctx.measureText(String(n)).width;
+        ctx.font = `400 22px ${POSTER_FONT}`;
+        const uw = ctx.measureText(unit).width + 4;
+        T(String(n), cx - uw / 2, y + 84, 48, '#0E9C8F', 800, 'center');
+        T(unit, cx - uw / 2 + nw / 2 + 4, y + 84, 22, '#667085', 400, 'left');
+        T(label, cx, y + 128, 22, '#667085', 400, 'center');
+      });
+      y += 168 + 32;
+    }
+    // 本周断点卡
+    const wins = data.week || { count: 0, names: [] };
+    const rows = wins.names.slice(0, 3);
+    const cardH = 96 + (rows.length ? rows.length * 60 : 44) + 12;
+    card(64, y, POSTER_W - 128, cardH);
+    T(wins.count ? `本周拿下 ${wins.count} 个断点` : '本周战报', 96, y + 58, 30, '#101828', 700);
+    if (rows.length) {
+      rows.forEach((nm, i) => {
+        const ry = y + 96 + i * 60;
+        ctx.beginPath(); ctx.arc(96 + 18, ry + 18, 18, 0, Math.PI * 2);
+        ctx.fillStyle = '#16C7B7'; ctx.fill();
+        T('✓', 96 + 18, ry + 26, 22, '#fff', 700, 'center');
+        ctx.font = `700 28px ${POSTER_FONT}`;
+        T(ellipsize(ctx, nm, POSTER_W - 128 - 130), 96 + 52, ry + 28, 28, '#101828', 700);
+      });
+    } else {
+      T('继续保持，断点一个个来', 96, y + 116, 26, '#667085');
+    }
+    footer();
+    return { dataUrl: c.toDataURL('image/png'), texts, width: POSTER_W, height: POSTER_H };
+  }
+
+  // 近 7 天新拿下的断点（掌握度升到已掌握的节点）
+  function weekWins() {
+    const weekAgo = Date.now() - 7 * 86400000;
+    const names = [];
+    for (const [id, meta] of Object.entries(masteryMeta)) {
+      if (!meta || !meta.ts || meta.ts < weekAgo) continue;
+      if (mState(id) !== 'yes') continue;
+      const t = topicById.get(id);
+      if (t) names.push(t.name);
+    }
+    return { count: names.length, names: names.slice(0, 3) };
+  }
+  function progressPosterData(s) {
+    return {
+      streak: streakInfo().count,
+      quiz: s ? { recallN: s.recall.length, learnN: s.learnTopicId ? 1 : 0, practiceN: s.practice.length } : null,
+      week: weekWins(),
+    };
+  }
+
+  // 预览层：全屏展示 + 长按保存引导（微信 H5 无法直接触发分享）
+  const posterModal = document.getElementById('poster-modal');
+  const posterImg = document.getElementById('poster-img');
+  function showPoster(dataUrl) {
+    posterImg.src = dataUrl;
+    posterModal.classList.add('show');
+  }
+  document.getElementById('poster-close').onclick = () => posterModal.classList.remove('show');
+  posterModal.addEventListener('click', (e) => { if (e.target === posterModal) posterModal.classList.remove('show'); });
+
   // ---------- 启动 ----------
-  let mapInited = false;
-  function initMapView() {
+  let mapInited = false;  function initMapView() {
     mapInited = true;
     if (window.innerWidth < 860 && !isMobile()) panel.classList.add('hidden');
     if (isMobile()) {
@@ -4415,6 +4665,12 @@
     startNodeQuiz,
     addToTodayPlan,
     drawOf: (id) => { const t = topicById.get(id); return t ? [t._dr || 0, t._da == null ? 1 : t._da, t._de == null ? 1 : t._de] : null; },
+    drawDiagPoster,
+    drawProgressPoster,
+    progressPosterData,
+    weekWins,
+    showPoster,
+    renderSession,
   };
 })();
 </script>
