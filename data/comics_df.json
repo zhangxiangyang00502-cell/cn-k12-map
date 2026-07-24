@@ -1,0 +1,90 @@
+{
+ "comics": {
+  "cn_df_snym_01": {
+   "image": "assets/comics/snym_01.jpg",
+   "title": "新起点 · 新礼物",
+   "caption": "中学时代 = 新机会 ＋ 新要求。珍视当下，把握机遇。",
+   "alt": "背着书包的少年站在中学校门口，望着通往日出的里程碑小路"
+  },
+  "cn_df_snym_02": {
+   "image": "assets/comics/snym_02.jpg",
+   "title": "定方向 · 配双脚 · 天天跑",
+   "caption": "先定目标，再配行动，然后天天落实。",
+   "alt": "少年在书桌前把手绘路线图上的小旗插到终点，墙上挂着打了勾的周计划表"
+  },
+  "cn_df_snym_03": {
+   "image": "assets/comics/snym_03.jpg",
+   "title": "三面镜子照自己",
+   "caption": "自我分析 · 他人评价 · 生活实践。",
+   "alt": "少年对着镜子微笑，镜子旁浮着三面小镜子"
+  },
+  "cn_df_snym_04": {
+   "image": "assets/comics/snym_04.jpg",
+   "title": "接纳全部的自己",
+   "caption": "欣赏闪光点，也接纳不完美——然后扬长、改短、挖潜能。",
+   "alt": "少年拼一幅自画像拼图，最后一块缺口发着光"
+  },
+  "cn_df_snym_05": {
+   "image": "assets/comics/snym_05.jpg",
+   "title": "有梦想，就有希望",
+   "caption": "少年的梦想：连着个人志向，也连着时代与祖国。",
+   "alt": "夜晚的屋顶上，少年放飞纸飞机，纸飞机飞向星空和月亮"
+  },
+  "cn_df_snym_06": {
+   "image": "assets/comics/snym_06.jpg",
+   "title": "处处皆课堂",
+   "caption": "学习不只是课本——所看所听所触所做，都可以是学习。",
+   "alt": "书本搭成的阶梯通向山顶的小旗，少年拾级而上"
+  },
+  "cn_df_snym_07": {
+   "image": "assets/comics/snym_07.jpg",
+   "title": "会学习三件套",
+   "caption": "有兴趣 · 有方法 · 有方式。",
+   "alt": "少年打开工具箱，里面飞出番茄钟、思维导图气泡和灯泡"
+  }
+ },
+ "materials": {
+  "snym_01_m": {
+   "image": "assets/comics/snym_01_m.jpg",
+   "topicId": "cn_df_snym_01",
+   "scene": "开学第一天：新校园、新同学、新课程表",
+   "alt": "开学第一天，新生们在教学楼前互相打招呼，旁边有社团招新摊位"
+  },
+  "snym_02_m": {
+   "image": "assets/comics/snym_02_m.jpg",
+   "topicId": "cn_df_snym_02",
+   "scene": "同样是早晨：一个井井有条，一个手忙脚乱",
+   "alt": "对比画面：左边的同学按计划表整理书包打勾，右边的同学手忙脚乱翻找散落的书本"
+  },
+  "snym_03_m": {
+   "image": "assets/comics/snym_03_m.jpg",
+   "topicId": "cn_df_snym_03",
+   "scene": "小组活动后，同学们互写评价卡",
+   "alt": "小组活动后，几个同学互相递彩色评价卡片，主角低头看卡片若有所思"
+  },
+  "snym_04_m": {
+   "image": "assets/comics/snym_04_m.jpg",
+   "topicId": "cn_df_snym_04",
+   "scene": "比赛失利的他，微笑着给自己打气",
+   "alt": "演讲台边，没得奖的少年微笑着竖起大拇指给自己打气，同学递水鼓励"
+  },
+  "snym_05_m": {
+   "image": "assets/comics/snym_05_m.jpg",
+   "topicId": "cn_df_snym_05",
+   "scene": "书桌前，他望着火箭海报出神",
+   "alt": "夜晚书桌前，少年仰望墙上的火箭海报，纸飞机排成一列飞向窗台"
+  },
+  "snym_06_m": {
+   "image": "assets/comics/snym_06_m.jpg",
+   "topicId": "cn_df_snym_06",
+   "scene": "博物馆、田野、实验室——他的“课堂”不止一间",
+   "alt": "三个小场景：少年在博物馆看青铜器、在田野观察麦穗、在实验室做实验"
+  },
+  "snym_07_m": {
+   "image": "assets/comics/snym_07_m.jpg",
+   "topicId": "cn_df_snym_07",
+   "scene": "学习小组的“思维导图时间”",
+   "alt": "四个孩子围坐圆桌讨论，桌中央一张大思维导图，一人举手指着图讲解"
+  }
+ }
+}

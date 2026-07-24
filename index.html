@@ -259,6 +259,14 @@
   .pg-sec:first-of-type { margin-top: 2px; }
   .pg-sec b { color: var(--hint-blue); display: block; margin-bottom: 2px; }
   .pack-src { font-size: 11px; color: var(--text-dim); margin-top: 10px; border-top: 1px dashed var(--line-soft); padding-top: 8px; }
+  /* 知识漫画（v64 少年有梦切片） */
+  .comic-card { border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line-soft); background: var(--card-inset); margin: 4px 0 10px; }
+  .comic-img { display: block; width: 100%; height: auto; }
+  .comic-cap { padding: 8px 12px 10px; font-size: 13px; line-height: 1.55; }
+  .comic-cap b { display: block; font-size: 14px; margin-bottom: 2px; }
+  .comic-cap span { color: var(--text-dim); }
+  .comic-material { margin: 0 0 10px; border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line-soft); background: var(--card-inset); }
+  .comic-scene { padding: 6px 12px 8px; font-size: 12px; color: var(--text-dim); }
   .pack-output { background: var(--card-inset); border: 1px solid var(--green-soft-border); border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
   .po-text { font-size: 12.5px; line-height: 1.7; font-weight: 600; }
   .po-when { font-size: 12px; line-height: 1.7; color: var(--text-dim); margin-top: 6px; }
@@ -1046,6 +1054,17 @@
       }
     } catch (e) {}
   }
+  // 知识漫画 + 漫画材料题图（v64 少年有梦切片）：缺失时优雅降级为空
+  const comicByTopic = new Map();
+  const comicMaterialByKey = new Map();
+  try {
+    const r = await fetch('data/comics_df.json');
+    if (r.ok) {
+      const d = await r.json();
+      for (const [k, v] of Object.entries((d && d.comics) || {})) if (v && v.image) comicByTopic.set(k, v);
+      for (const [k, v] of Object.entries((d && d.materials) || {})) if (v && v.image) comicMaterialByKey.set(k, v);
+    }
+  } catch (e) {}
   document.getElementById('loading').remove();
 
   const topics = topicsData.topics;
@@ -2485,6 +2504,24 @@
     if (v && typeof v === 'object') return v.text || v.task || v.title || '';
     return v == null ? '' : String(v);
   }
+  // 知识漫画卡（v64：图 + 文字覆盖层，全员可见，懒加载）
+  function comicCardHtml(id) {
+    const c = comicByTopic.get(id);
+    if (!c) return '';
+    return `<div class="comic-card">
+      <img class="comic-img" src="${esc(c.image)}" alt="${esc(c.alt || '')}" loading="lazy">
+      <div class="comic-cap"><b>${esc(c.title || '')}</b>${c.caption ? `<span>${esc(c.caption)}</span>` : ''}</div>
+    </div>`;
+  }
+  // 漫画材料题图（v64：图 + 场景标注，懒加载）
+  function comicMaterialHtml(key) {
+    const m = comicMaterialByKey.get(key);
+    if (!m) return '';
+    return `<figure class="comic-material">
+      <img class="comic-img" src="${esc(m.image)}" alt="${esc(m.alt || '')}" loading="lazy">
+      ${m.scene ? `<figcaption class="comic-scene">${esc(m.scene)}</figcaption>` : ''}
+    </figure>`;
+  }
   // 导学卡（why 孩子为什么错 → rule 规律 → example 例子）
   function packGuideHtml(pack) {
     const g = pack.guide || {};
@@ -2604,17 +2641,18 @@
   // 图谱节点详情的补给包区：有 pack 才显示；非会员只见标题与锁定卡
   function renderPackSection(id) {
     const pack = packByTopic.get(id);
-    if (!pack) return '';
+    const comicHtml = comicByTopic.has(id) ? `<h3>知识漫画</h3>${comicCardHtml(id)}` : '';   // v64：漫画全员可见
+    if (!pack) return comicHtml;
     const t = topicById.get(id);
     if (!isMember()) {
-      return `<h3>补给包</h3>
+      return comicHtml + `<h3>补给包</h3>
         <div class="res-locked" id="pack-locked">
           <div class="res-locked-t">会员专享 · 「${esc(t ? t.name : id)}」补给包</div>
           <div class="res-locked-s">导学卡 + 变式训练 + 回忆卡 + 产出任务，专攻这一个薄弱点</div>
           <button class="tbtn" id="pack-unlock" style="min-height:44px">开通会员解锁 ›</button>
         </div>`;
     }
-    return `<h3>补给包</h3>
+    return comicHtml + `<h3>补给包</h3>
       <div class="pack-card" id="pack-card">
         ${packGuideHtml(pack)}
         ${packCompositionHtml(pack)}
@@ -2635,9 +2673,9 @@
           text: String(text).replace(/^[A-D][.、．]\s*/, ''),
           correct: 'ABCD'[i] === q.answer,
         }));
-        return { topicId: q.topicId, type: 'choice', q: q.q, options: shuffle(opts), explain: q.explain };
+        return { topicId: q.topicId, type: 'choice', q: q.q, options: shuffle(opts), explain: q.explain, comic: q.comic || null };
       }
-      return { topicId: q.topicId, type: 'judge', q: q.q, answer: !!q.answer, explain: q.explain };
+      return { topicId: q.topicId, type: 'judge', q: q.q, answer: !!q.answer, explain: q.explain, comic: q.comic || null };
     });
   }
   function showQuizScreen() { quizScreen.classList.add('show'); }
@@ -2753,6 +2791,7 @@
       <h2>${title}</h2>
       <div class="quiz-meta">第 ${quiz.idx + 1} / ${quiz.items.length} 题 · ${item.type === 'choice' ? '单选题' : '判断题'}${quiz.mode === 'quick' || quiz.mode === 'first3' ? ` · ${esc(it.subject)}：<span style="color:${it._color}">${esc(it.name)}</span>` : ''}</div>
       ${quiz.mode === 'first3' ? `<button class="fq-change" id="fq-change">默认 ${quiz.grade} 年级 · 全科混抽（点这里修改）</button>` : ''}
+      ${item.comic ? comicMaterialHtml(item.comic) : ''}
       <div class="quiz-q">${esc(item.q)}</div>
       <div class="quiz-opts">${optsHtml}</div>
       ${answered ? `<div class="quiz-fb ${ok ? 'ok' : 'bad'}">${ok ? '✓ 回答正确' : '✗ 回答错误'}</div>
@@ -3408,6 +3447,7 @@
         ? '这张卡自己读，读完用里面的规律解决后面的新题。'
         : child ? '这张卡给爸爸妈妈，读完大声讲给孩子听。' : '这张卡给爸爸妈妈，读完用自己的话讲给孩子听。'}</div>
       <div class="ss-tag">${esc(t.subject)} · <span style="color:${t._color}">${esc(t.name)}</span>${mv(t.id) !== null ? ` · 掌握度 ${Math.round(mv(t.id) * 100)}%` : ' · 新内容'}</div>
+      ${comicCardHtml(s.learnTopicId)}
       ${guideHtml}
       ${pack && !isMember() ? `<button class="text-link" id="ss-unlock">会员可看完整补给包（变式训练 + 回忆卡 + 产出任务）›</button>` : ''}
       <button class="big-cta" id="ss-go" style="margin-top:14px">${s.practice.length ? (child ? '读完了，考考孩子 ›' : '我读完了，让孩子练 ›') : '完成 ›'}</button>`;
@@ -3425,6 +3465,7 @@
         <div class="ss-speaker parent">给爸爸妈妈</div>
         ${s.qIdx === 0 ? `<div class="ss-hint">${s.phase === 'recall' ? '爸妈读题，孩子口头答；答完点「看答案」，对错由你判。' : '轮到孩子了：爸妈读题，孩子用刚听讲的规律口头答。'}</div>` : ''}
         ${tag}
+        ${item.comic ? comicMaterialHtml(item.comic) : ''}
         <div class="ss-big-q child">${esc(item.q)}</div>
         ${optsHtml}
         <button class="tbtn" id="ss-show-ans" style="margin-top:10px">看答案（给爸妈判分）</button>
@@ -3441,6 +3482,7 @@
         <div class="ss-speaker">给孩子</div>
         ${s.qIdx === 0 ? `<div class="ss-hint">${s.phase === 'recall' ? '凭记忆答，想不起来就点「想不起来」——想不起来本身就是信号。' : '用刚听讲的规律解决新题。'}</div>` : ''}
         ${tag}
+        ${item.comic ? comicMaterialHtml(item.comic) : ''}
         <div class="ss-big-q">${esc(item.q)}</div>
         <div class="quiz-opts">${optsHtml}</div>
         ${s.phase === 'recall' && !s.answered ? '<button class="text-link" id="ss-forget">想不起来 ›</button>' : ''}
