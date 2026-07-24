@@ -804,6 +804,46 @@
   .gr-week .n { font-size: 19px; font-weight: 800; color: var(--accent-deep); font-variant-numeric: tabular-nums; }
   .gr-week .l { font-size: 10.5px; color: var(--text-dim); margin-top: 2px; }
 
+  /* ================= v60 会话流：沙发上的 15 分钟（忆→学→练→结算，全屏无 tab） ================= */
+  body.in-session #td-progress { display: none; }
+  #session-screen { position: fixed; inset: 0; z-index: 46; background: var(--bg); display: none;
+    overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  #session-screen.show { display: block; }
+  .ss-top { position: sticky; top: 0; z-index: 6; padding: 10px 16px 12px;
+    background: linear-gradient(var(--bg) 80%, rgba(250,247,242,0)); }
+  .ss-toprow { display: flex; align-items: center; justify-content: space-between; max-width: 640px; margin: 0 auto; }
+  .ss-close { width: 40px; height: 40px; border-radius: 999px; border: 1px solid var(--panel-border); background: var(--panel);
+    color: var(--text-dim); font-size: 20px; line-height: 1; cursor: pointer; flex: 0 0 auto; }
+  .ss-stage { font-size: 12px; font-weight: 700; color: var(--text-dim); letter-spacing: 1px; }
+  .ss-progress { height: 2px; background: var(--input-bg); border-radius: 999px; max-width: 640px; margin: 8px auto 0; overflow: hidden; }
+  .ss-progress i { display: block; height: 100%; background: linear-gradient(90deg, #16C7B7, #F5C542); border-radius: 999px; transition: width .3s ease; }
+  #session-body { max-width: 640px; margin: 0 auto; padding: 4px 16px calc(44px + env(safe-area-inset-bottom, 0px)); }
+  .ss-speaker { display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #0D9488;
+    background: var(--teal-soft); border-radius: 999px; padding: 4px 12px; margin: 12px 0 8px; }
+  .ss-speaker.parent { color: #8A6D1F; background: #FDF3D7; }
+  .ss-coach { font-size: var(--fs-body); line-height: var(--lh-body); font-weight: 600; margin-bottom: 14px; }
+  .ss-tag { font-size: var(--fs-aux); line-height: var(--lh-aux); color: var(--text-dim); margin: 2px 0 8px; }
+  .ss-big-q { font-size: 17px; line-height: 1.8; font-weight: 600; margin-bottom: 14px; }
+  .ss-big-q.child { font-size: 21px; line-height: 1.75; }
+  .ss-opts-readonly .quiz-opt { cursor: default; }
+  .ss-judge-btns { display: flex; gap: 12px; margin-top: 18px; }
+  .ss-judge { flex: 1; min-height: 60px; border-radius: var(--r-btn); font-size: 17px; font-weight: 800; cursor: pointer; border: 1.5px solid; font-family: inherit; }
+  .ss-judge.ok { background: var(--green-soft); border-color: var(--green-bright); color: var(--green-bright); }
+  .ss-judge.bad { background: var(--red-soft); border-color: var(--bad); color: var(--bad); }
+  .ss-ans { background: var(--input-bg); border: 1px solid var(--panel-border); border-radius: var(--r-tag);
+    padding: 12px; margin-top: 12px; font-size: 14px; line-height: 1.7; }
+  .ss-intro { text-align: center; padding-top: 10vh; }
+  .ss-kicker { font-size: 13px; font-weight: 800; letter-spacing: 3px; color: var(--gold-text); }
+  .ss-intro h2 { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: 800; margin: 8px 0 6px; }
+  .ss-mode-desc { font-size: var(--fs-body); color: var(--text-dim); line-height: 1.7; }
+  .ss-mode-row { display: flex; gap: 8px; justify-content: center; margin: 18px 0 6px; }
+  .ss-mode-chip { border: 1.5px solid var(--panel-border); background: var(--panel); border-radius: 999px; padding: 8px 14px;
+    font-size: 13px; font-weight: 700; color: var(--text-dim); cursor: pointer; font-family: inherit; }
+  .ss-mode-chip.on { border-color: var(--accent); color: var(--accent); background: var(--teal-soft); }
+  .ss-plan-line { font-size: var(--fs-aux); color: var(--text-dim); margin: 12px 0 24px; }
+  .td-start { margin-top: 6px; font-size: 17px; min-height: 56px; }
+  #td-focus-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
   /* ---------- 减少动态效果：全部特效关闭 ---------- */
   @media (prefers-reduced-motion: reduce) {
     .view.active { animation: none; }
@@ -884,6 +924,8 @@
 <div id="td-progress"><i></i></div>
 
 <div id="quiz-screen"><div id="quiz-body"></div></div>
+
+<div id="session-screen"><div id="session-body"></div></div>
 
 <div id="course-screen">
   <div class="cs-top">
@@ -2529,29 +2571,38 @@
     showQuizScreen();
     renderQuiz();
   }
-  function startQuickQuiz(grade, subject) {
-    const subj = subject || '道德与法治';
-    const pool = topics.filter(t => t.subject === subj
-      && t.gradeRangeStart <= grade && t.gradeRangeEnd >= grade && quizByTopic.has(t.id));
-    const pickedTopics = shuffle(pool).slice(0, Math.min(10, pool.length));
+  // v60：跨学科混抽——按学科分组轮转取题，题池不足的学科自动跳过，不看学科只看年级
+  function startQuickQuiz(grade) {
+    grade = grade || 7;
+    const bySubj = new Map();
+    for (const t of topics) {
+      if (!(t.gradeRangeStart <= grade && t.gradeRangeEnd >= grade) || !quizByTopic.has(t.id)) continue;
+      if (!bySubj.has(t.subject)) bySubj.set(t.subject, []);
+      bySubj.get(t.subject).push(t);
+    }
+    const queues = shuffle([...bySubj.values()].map(arr => shuffle(arr)));
+    const pickedTopics = [];
+    while (pickedTopics.length < 10 && queues.some(q => q.length)) {
+      for (const q of queues) {
+        if (q.length && pickedTopics.length < 10) pickedTopics.push(q.pop());
+      }
+    }
     if (!pickedTopics.length) { toast('该年级题库建设中'); return; }
     const qs = pickedTopics.map(t => {
       const arr = quizByTopic.get(t.id);
       return arr[Math.floor(Math.random() * arr.length)];
     });
-    quiz = { mode: 'quick', grade, subject: subj, returnTo: isGuest() ? 'guest' : 'today', guest: isGuest(), items: buildQuizItems(qs), idx: 0, answers: {}, scored: false };
+    quiz = { mode: 'quick', grade, subject: null, returnTo: isGuest() ? 'guest' : 'today', guest: isGuest(), items: buildQuizItems(qs), idx: 0, answers: {}, scored: false };
     showQuizScreen();
     renderQuiz();
   }
-  // ---------- 快诊断落地：零选择直接 3 道题（默认 7 年级语文，答前可一行小字改） ----------
-  function first3Pool(grade, subject) {
-    return topics.filter(t => t.subject === subject
-      && t.gradeRangeStart <= grade && t.gradeRangeEnd >= grade && quizByTopic.has(t.id));
+  // ---------- 快诊断落地：零选择直接 3 道题（默认 7 年级，全科混抽，答前可一行小字改年级） ----------
+  function first3Pool(grade) {
+    return topics.filter(t => t.gradeRangeStart <= grade && t.gradeRangeEnd >= grade && quizByTopic.has(t.id));
   }
-  function startFirst3(grade, subject) {
-    grade = grade || 7; subject = subject || '语文';
-    let pool = first3Pool(grade, subject);
-    if (pool.length < 3 && subject !== '道德与法治') { subject = '道德与法治'; pool = first3Pool(grade, subject); }
+  function startFirst3(grade) {
+    grade = grade || 7;
+    const pool = first3Pool(grade);
     if (pool.length < 3) {   // 题库实在不够：退回档案引导
       openOnboard();
       return;
@@ -2561,7 +2612,7 @@
       const arr = quizByTopic.get(t.id);
       return arr[Math.floor(Math.random() * arr.length)];
     });
-    quiz = { mode: 'first3', grade, subject, returnTo: 'today', items: buildQuizItems(qs), idx: 0, answers: {}, scored: false };
+    quiz = { mode: 'first3', grade, subject: null, returnTo: 'today', items: buildQuizItems(qs), idx: 0, answers: {}, scored: false };
     showQuizScreen();
     renderQuiz();
   }
@@ -2570,7 +2621,7 @@
     const topicId = quiz && quiz.topicId;
     const returnTo = quiz && quiz.returnTo;
     if (mode === 'first3' && !profile) {   // 中途退出也落一份默认档案，下次不再强制快诊断
-      profile = { role: 'parent', grade: quiz.grade, subject: quiz.subject, via: 'first3' };
+      profile = { role: 'parent', grade: quiz.grade, via: 'first3' };
       saveProfile();
     }
     quiz = null;
@@ -2619,11 +2670,11 @@
       ? `测一测：<span style="color:${it._color}">${esc(it.name)}</span>`
       : quiz.mode === 'first3'
         ? '3 道题，定位孩子卡在哪'
-        : `快速诊断 · ${quiz.grade} 年级 ${esc(quiz.subject)}`;
+        : `快速诊断 · ${quiz.grade} 年级 · 全科`;
     quizBody.innerHTML = `
       <h2>${title}</h2>
-      <div class="quiz-meta">第 ${quiz.idx + 1} / ${quiz.items.length} 题 · ${item.type === 'choice' ? '单选题' : '判断题'}${quiz.mode === 'quick' || quiz.mode === 'first3' ? ` · 知识点：<span style="color:${it._color}">${esc(it.name)}</span>` : ''}</div>
-      ${quiz.mode === 'first3' ? `<button class="fq-change" id="fq-change">默认 ${quiz.grade} 年级 · ${esc(quiz.subject)}（点这里修改）</button>` : ''}
+      <div class="quiz-meta">第 ${quiz.idx + 1} / ${quiz.items.length} 题 · ${item.type === 'choice' ? '单选题' : '判断题'}${quiz.mode === 'quick' || quiz.mode === 'first3' ? ` · ${esc(it.subject)}：<span style="color:${it._color}">${esc(it.name)}</span>` : ''}</div>
+      ${quiz.mode === 'first3' ? `<button class="fq-change" id="fq-change">默认 ${quiz.grade} 年级 · 全科混抽（点这里修改）</button>` : ''}
       <div class="quiz-q">${esc(item.q)}</div>
       <div class="quiz-opts">${optsHtml}</div>
       ${answered ? `<div class="quiz-fb ${ok ? 'ok' : 'bad'}">${ok ? '✓ 回答正确' : '✗ 回答错误'}</div>
@@ -2756,21 +2807,21 @@
     }
     // ---- 快诊断落地结果：一句击中人的话 + 迷你断点卡 + 完整诊断 CTA ----
     if (quiz.mode === 'first3') {
-      const grade = quiz.grade, subject = quiz.subject;
+      const grade = quiz.grade;
       if (!quiz.scored) {
         quiz.scored = true;
         for (const r of results) applyAnswer(r.item.topicId, r.ok, r.err);   // 快诊断结果写入掌握度，与完整诊断打通
         markCheckinDay();
-        if (!profile) { profile = { role: 'parent', grade, subject, via: 'first3' }; saveProfile(); }
+        if (!profile) { profile = { role: 'parent', grade, via: 'first3' }; saveProfile(); }
         try {
-          localStorage.setItem('cnk12_lastdiag', JSON.stringify({ ts: Date.now(), grade, subject, ok: okCount, total, bad: total - okCount }));
+          localStorage.setItem('cnk12_lastdiag', JSON.stringify({ ts: Date.now(), grade, subject: null, ok: okCount, total, bad: total - okCount }));
         } catch (e) {}
       }
       const wrong = results.filter(r => !r.ok);
       const wrongTopics = [...new Map(wrong.map(r => [r.item.topicId, topicById.get(r.item.topicId)])).values()]
         .filter(Boolean).sort((a, b) => a.gradeRangeStart - b.gradeRangeStart);
       // v50 新客：记录上下文，供断点补完后的桥接页统计
-      guestCtx.grade = grade; guestCtx.subject = subject;
+      guestCtx.grade = grade;
       guestCtx.wrongIds = wrongTopics.map(t => t.id);
       guestCtx.fixedId = null;
       // 一句击中人的话：优先归到没打通的直接先修上
@@ -2791,7 +2842,7 @@
         ? wrongTopics.map(t => `<div class="bp-row"><span class="bp-name" style="color:${t._color}">${esc(t.name)}</span><span class="bp-meta">${gradeTxtOf(t)} · 掌握度已写入</span></div>`).join('')
         : `<div class="bp-row"><span class="bp-name">本次 3 题全对，没抓到断点</span><span class="bp-meta">抽样有限</span></div>`;
       quizBody.innerHTML = `
-        <h2>快诊断完成 · ${grade} 年级 ${esc(subject)}</h2>
+        <h2>快诊断完成 · ${grade} 年级 · 全科</h2>
         <div class="quiz-meta">${okCount} / ${total} 题答对 · 结果已写入图谱掌握度</div>
         <div class="fq-punch">${punch}</div>
         <div class="fq-bp"><div class="bp-t">迷你断点卡</div>${bpRows}</div>
@@ -2806,7 +2857,7 @@
         startNodeQuiz(wrongTopics[0].id, 'guest');
       };
       const ffd = quizBody.querySelector('#fq-fulldiag');
-      if (ffd) ffd.onclick = () => startQuickQuiz(grade, subject);
+      if (ffd) ffd.onclick = () => startQuickQuiz(grade);
       return;
     }
     // ---- v50 新客桥接页：补完断点后，指向完整诊断 ----
@@ -2830,7 +2881,7 @@
         <button class="big-cta" id="fq-fulldiag">${n > 0 ? `做完整诊断，排掉这 ${n} 个断点 ›` : '做完整诊断（2 分钟）确认一下 ›'}</button>
         <div style="height:20px"></div>`;
       quizBody.parentElement.scrollTop = 0;
-      quizBody.querySelector('#fq-fulldiag').onclick = () => startQuickQuiz(guestCtx.grade, guestCtx.subject);
+      quizBody.querySelector('#fq-fulldiag').onclick = () => startQuickQuiz(guestCtx.grade);
       return;
     }
     // ---- 完整诊断结果：一页体检报告（画像 / 总览 / 断点链 / 立即补 / 会员墙） ----
@@ -2878,8 +2929,8 @@
     } else {
       portraitHtml = '<div>本次诊断样本不足，先做几道题再来看看。</div>';
     }
-    // ② 掌握度总览：本学科全部知识点按三档统计
-    const subjTopics = topics.filter(t => t.subject === quiz.subject);
+    // ② 掌握度总览：全科知识点按三档统计（v60 跨学科诊断）
+    const subjTopics = quiz.subject ? topics.filter(t => t.subject === quiz.subject) : topics;
     let sYes = 0, sMid = 0, sNo = 0;
     for (const t of subjTopics) {
       const s = mState(t.id);
@@ -2916,10 +2967,10 @@
         <button class="big-cta" id="report-unlock" style="margin-top:0">早鸟价开通 ›</button>
       </div>`;
     quizBody.innerHTML = `
-      <h2>体检报告 · ${quiz.grade} 年级 ${esc(quiz.subject)}</h2>
+      <h2>体检报告 · ${quiz.grade} 年级${quiz.subject ? ` ${esc(quiz.subject)}` : ' · 全科'}</h2>
       <div class="quiz-meta">${okCount} / ${total} 题答对 · 涉及 ${byTopic.size} 个知识点 · 结果已自动写入图谱掌握度</div>
       <div class="rp-block" id="report-portrait"><div class="rp-t">孩子画像</div><div class="rp-portrait">${portraitHtml}</div></div>
-      <div class="rp-block" id="report-overview"><div class="rp-t">掌握度总览 · 本学科 ${subjTopics.length} 个知识点</div>
+      <div class="rp-block" id="report-overview"><div class="rp-t">掌握度总览 · ${quiz.subject ? '本学科' : '全部'} ${subjTopics.length} 个知识点</div>
         <div class="rp-ov-nums">
           <div class="rp-ov-num ok"><div class="n">${pY}<small>%</small></div><div class="l">已掌握 ${sYes} 个</div></div>
           <div class="rp-ov-num mid"><div class="n">${pM}<small>%</small></div><div class="l">在进步 ${sMid} 个</div></div>
@@ -3038,9 +3089,12 @@
       }
       const hits = sayMatch(q);
       box.innerHTML = hits.length
-        ? `<div class="card" style="margin-top:12px"><h3>最可能卡在这 ${hits.length} 个知识点</h3><div class="c-sub" style="margin-bottom:10px">点任意一张卡片，跳到图谱看先修链和补法。</div></div>` + hits.map(sayHitCard).join('')
+        ? `<div class="card" style="margin-top:12px"><h3>最可能卡在这 ${hits.length} 个知识点</h3><div class="c-sub" style="margin-bottom:10px">点任意一张卡片，跳到图谱看先修链和补法；或者直接生成一个只补这几个点的专项会话。</div>
+          <button class="big-cta" id="say-focus" style="margin-top:0">专攻这几个点 ›</button></div>` + hits.map(sayHitCard).join('')
         : `<div class="card" style="margin-top:12px"><h3>没直接匹配到</h3><div class="c-sub">换个说法试试，比如：${SAY_EXAMPLES.map(e => `<span class="say-ex">${e}</span>`).join('')}<br>或者直接用「再测一次」随机抽题排查。</div></div>`;
       bindExamples();
+      const sf = box.querySelector('#say-focus');
+      if (sf) sf.onclick = () => startSession({ topicIds: hits.map(t => t.id) });
       box.querySelectorAll('.say-hit').forEach(el => el.onclick = () => {
         openMap();
         selectTopic(el.dataset.id);
@@ -3076,7 +3130,362 @@
     container.querySelector('#say-back').onclick = () => renderGrowthTab();
     setTimeout(() => input.focus(), 50);
   }
-  // ---------- 今日 tab（教练视角：忆 → 测练 → 学） ----------
+  // ================= v60 会话流：沙发上的 15 分钟（忆→学→练→结算，全屏无 tab） =================
+  const sessionScreen = document.getElementById('session-screen');
+  const sessionBody = document.getElementById('session-body');
+  const SESSION_MODE_KEY = 'cnk12_session_mode';
+  const SESSION_MODES = {
+    child:     { key: 'child', name: '亲子模式', range: '1–3 年级', minutes: 8, recallN: 2, practiceN: 1,
+                 desc: '爸爸妈妈读题，孩子口头答，对错由爸妈判' },
+    companion: { key: 'companion', name: '陪伴模式', range: '4–6 年级', minutes: 12, recallN: 3, practiceN: 2,
+                 desc: '孩子自己读题答题，爸妈在旁边陪着就好' },
+    self:      { key: 'self', name: '自主模式', range: '7–9 年级', minutes: 15, recallN: 3, practiceN: 3,
+                 desc: '孩子自己完成，学区内容给孩子自己看也行' },
+  };
+  function autoSessionModeKey() {
+    const g = (profile && profile.grade) || 7;
+    return g <= 3 ? 'child' : g <= 6 ? 'companion' : 'self';
+  }
+  function sessionModeKey() {   // 手动切换过的档位优先（记忆选择），否则按档案年级自动
+    try {
+      const k = localStorage.getItem(SESSION_MODE_KEY);
+      if (k && SESSION_MODES[k]) return k;
+    } catch (e) {}
+    return autoSessionModeKey();
+  }
+  function setSessionModeKey(k) {
+    if (!SESSION_MODES[k]) return;
+    try { localStorage.setItem(SESSION_MODE_KEY, k); } catch (e) {}
+  }
+
+  let session = null;
+  /* 会话生成器：输入（年级 + 学科/节点过滤 + 优先级），输出 忆→学→练 编排。
+     跨学科混排：按断点严重度排序，不看学科；专项 = 同一个生成器加学科/节点过滤 */
+  function buildSession(opts) {
+    opts = opts || {};
+    const mode = SESSION_MODES[sessionModeKey()];
+    const inScope = (t) => {
+      if (opts.topicIds && opts.topicIds.length) return opts.topicIds.includes(t.id);
+      if (opts.subject) return t.subject === opts.subject;
+      return true;
+    };
+    const now = Date.now();
+    // 忆：已到复习期的旧题节点——还没消化的优先，掌握但超过 1 天没碰的防遗忘（跨学科按严重度排）
+    const recallPool = topics.filter(t => inScope(t) && quizByTopic.has(t.id) && mv(t.id) !== null
+      && (mv(t.id) < 0.67 || (masteryMeta[t.id] && masteryMeta[t.id].ts && now - masteryMeta[t.id].ts > 86400000)));
+    recallPool.sort((a, b) => mv(a.id) - mv(b.id) || ((masteryMeta[a.id] || {}).ts || 0) - ((masteryMeta[b.id] || {}).ts || 0));
+    const recallTopics = recallPool.slice(0, mode.recallN);
+    // 学练：掌握度最弱节点，优先有补给包的；专项（topicIds）里未测节点也算断点
+    let learnPool = topics.filter(t => inScope(t)
+      && (mv(t.id) !== null ? mv(t.id) < 0.67 : !!(opts.topicIds && opts.topicIds.length)));
+    learnPool.sort((a, b) => (packByTopic.has(b.id) ? 1 : 0) - (packByTopic.has(a.id) ? 1 : 0)
+      || (mv(a.id) == null ? -1 : mv(a.id)) - (mv(b.id) == null ? -1 : mv(b.id)));
+    // 没有弱点了：拓新——挑孩子年级附近、有题可测的未测节点
+    if (!learnPool.length) {
+      const g = (profile && profile.grade) || 7;
+      learnPool = topics.filter(t => inScope(t) && mv(t.id) === null && quizByTopic.has(t.id)
+        && t.gradeRangeStart <= g + 1 && t.gradeRangeEnd >= g - 2)
+        .sort((a, b) => Math.abs(a.gradeRangeStart - g) - Math.abs(b.gradeRangeStart - g));
+    }
+    const learnTopic = learnPool[0] || null;
+    // 练：学练节点（+ 次弱节点）题池抽变式
+    const practiceTopics = learnPool.slice(0, 2).filter(t => quizByTopic.has(t.id));
+    const queues = practiceTopics.map(t => shuffle(quizByTopic.get(t.id).slice()));
+    const picked = [];
+    while (picked.length < mode.practiceN && queues.some(q => q.length)) {
+      for (const q of queues) { if (q.length && picked.length < mode.practiceN) picked.push(q.pop()); }
+    }
+    const marked = topics.filter(t => mv(t.id) !== null);
+    const avg = marked.length ? marked.reduce((s, t) => s + mv(t.id), 0) / marked.length : 0;
+    const randItem = (tid) => {
+      const arr = quizByTopic.get(tid);
+      return buildQuizItems([arr[Math.floor(Math.random() * arr.length)]])[0];
+    };
+    return {
+      mode: mode.key, subject: opts.subject || null, focusIds: opts.topicIds || null,
+      recall: recallTopics.map(t => ({ topicId: t.id, item: randItem(t.id) })),
+      learnTopicId: learnTopic ? learnTopic.id : null,
+      practice: picked.map(q => ({ topicId: q.topicId, item: buildQuizItems([q])[0] })),
+      avgBefore: avg, phase: 'intro', qIdx: 0, answered: false,
+    };
+  }
+
+  function startSession(opts) {
+    const s = buildSession(opts);
+    if (!s.recall.length && !s.learnTopicId) {
+      toast(opts && (opts.subject || opts.topicIds) ? '这个范围暂时没有可编排的断点' : '先做一次快速诊断，标出断点再来开会');
+      return;
+    }
+    sessionLearnMarked = false;
+    session = s;
+    sessionScreen.classList.add('show');
+    document.body.classList.add('in-session');
+    renderSession();
+  }
+  function closeSession() {
+    session = null;
+    sessionScreen.classList.remove('show');
+    document.body.classList.remove('in-session');
+    sessionScreen.scrollTop = 0;
+    switchTab(currentTab && TAB_NAMES[currentTab] ? currentTab : 'today');
+  }
+  function sessionStepsTotal(s) { return s.recall.length + (s.learnTopicId ? 1 : 0) + s.practice.length + 1; }
+  function sessionStepsDone(s) {
+    if (s.phase === 'intro' || s.phase === 'recall-intro') return 0;
+    if (s.phase === 'recall') return s.qIdx;
+    if (s.phase === 'learn') return s.recall.length;
+    if (s.phase === 'practice-intro') return s.recall.length + (s.learnTopicId ? 1 : 0);
+    if (s.phase === 'practice') return s.recall.length + (s.learnTopicId ? 1 : 0) + s.qIdx;
+    return sessionStepsTotal(s) - 1;   // settle
+  }
+  function sessionStageTxt(s) {
+    if (s.phase === 'recall' || s.phase === 'recall-intro') return `忆 · 回忆旧题${s.phase === 'recall' ? ` ${s.qIdx + 1} / ${s.recall.length}` : ''}`;
+    if (s.phase === 'learn') return '学 · 导学卡';
+    if (s.phase === 'practice' || s.phase === 'practice-intro') return `练 · 新题${s.phase === 'practice' ? ` ${s.qIdx + 1} / ${s.practice.length}` : ''}`;
+    if (s.phase === 'settle') return '结算';
+    return '';
+  }
+  function sessionNext() {
+    const s = session;
+    if (!s) return;
+    const afterRecall = () => s.learnTopicId ? 'learn' : (s.practice.length ? 'practice-intro' : 'settle');
+    if (s.phase === 'intro') s.phase = s.recall.length ? 'recall-intro' : afterRecall();
+    else if (s.phase === 'recall-intro') { s.phase = 'recall'; s.qIdx = 0; }
+    else if (s.phase === 'recall') {
+      if (s.qIdx + 1 < s.recall.length) s.qIdx++; else s.phase = afterRecall();
+    } else if (s.phase === 'learn') s.phase = s.practice.length ? 'practice-intro' : 'settle';
+    else if (s.phase === 'practice-intro') { s.phase = 'practice'; s.qIdx = 0; }
+    else if (s.phase === 'practice') {
+      if (s.qIdx + 1 < s.practice.length) s.qIdx++; else s.phase = 'settle';
+    }
+    s.answered = false;
+    renderSession();
+    sessionScreen.scrollTop = 0;
+  }
+  function ssChrome(s) {
+    const total = sessionStepsTotal(s), done = sessionStepsDone(s);
+    const stage = sessionStageTxt(s);
+    return `<div class="ss-top">
+      <div class="ss-toprow">
+        <button class="ss-close" id="ss-close" aria-label="关闭会话">×</button>
+        <div class="ss-stage">${stage}${s.subject ? ` · 专项 ${esc(s.subject)}` : ''}</div>
+        <div style="width:40px"></div>
+      </div>
+      <div class="ss-progress"><i style="width:${Math.round(done / total * 100)}%"></i></div>
+    </div>`;
+  }
+  // 简易导学卡：没有补给包的节点，用 evidence / assessmentPrompt / coaching 拼一张
+  function simpleGuideHtml(t, coach) {
+    const why = coach.ask || (t.evidence && t.evidence.length ? `先检验：孩子能${t.evidence[0]}吗？` : '');
+    const rule = coach.pattern || t.description || '';
+    const example = (coach.variants && coach.variants[0] && coach.variants[0].text)
+      || (t.assessmentPrompt ? `问问孩子：${t.assessmentPrompt}` : '');
+    if (!why && !rule && !example) return `<div class="c-sub">${esc(t.description || '这个节点的导学内容在建设中。')}</div>`;
+    return `<div class="pack-guide">
+      <div class="pg-tag">导学卡 · 简版</div>
+      ${why ? `<div class="pg-sec"><b>先看孩子卡没卡</b><div>${esc(why)}</div></div>` : ''}
+      ${rule ? `<div class="pg-sec"><b>规律</b><div>${esc(rule)}</div></div>` : ''}
+      ${example ? `<div class="pg-sec"><b>例子</b><div>${esc(example)}</div></div>` : ''}
+    </div>`;
+  }
+  function renderSession() {
+    const s = session;
+    if (!s) return;
+    const m = SESSION_MODES[s.mode];
+    const child = s.mode === 'child';
+    let inner = '';
+    if (s.phase === 'intro') {
+      inner = `${ssChrome(s)}
+      <div class="ss-intro">
+        <div class="ss-kicker">今天的 ${m.minutes} 分钟</div>
+        <h2 id="ss-mode-name">${m.name}</h2>
+        <div class="ss-mode-desc">${m.desc}</div>
+        <div class="ss-mode-row">${Object.values(SESSION_MODES).map(x =>
+          `<button class="ss-mode-chip ${x.key === s.mode ? 'on' : ''}" data-mode="${x.key}">${x.name}<br><span style="font-size:11px;font-weight:400">${x.range}</span></button>`).join('')}</div>
+        <div class="ss-plan-line">${s.recall.length ? `忆 ${s.recall.length} 题 → ` : ''}${s.learnTopicId ? '学 1 张卡' : ''}${s.practice.length ? ` → 练 ${s.practice.length} 题` : ''}${s.subject ? ` · 专项：${esc(s.subject)}` : ''}</div>
+        <button class="big-cta" id="ss-go">开始 ›</button>
+      </div>`;
+    } else if (s.phase === 'recall-intro') {
+      inner = `${ssChrome(s)}
+      <div class="ss-intro" style="padding-top:16vh">
+        <div class="ss-speaker parent">给爸爸妈妈</div>
+        <div class="ss-coach">${child
+          ? '接下来是回忆题：爸爸妈妈读题，孩子口头答。答完点「看答案」核对，然后由你判对错。'
+          : '让孩子自己读题，凭记忆答，想不起来就点「想不起来」——想不起来本身就是信号。'}</div>
+        <button class="big-cta" id="ss-go">开始回忆 ›</button>
+      </div>`;
+    } else if (s.phase === 'practice-intro') {
+      inner = `${ssChrome(s)}
+      <div class="ss-intro" style="padding-top:16vh">
+        <div class="ss-speaker">给孩子</div>
+        <div class="ss-coach">现在轮到孩子：用刚听的规律解决新题。</div>
+        <button class="big-cta" id="ss-go">开始练 ›</button>
+      </div>`;
+    } else if (s.phase === 'learn') {
+      const t = topicById.get(s.learnTopicId);
+      const pack = packByTopic.get(s.learnTopicId);
+      const coach = coaching[s.learnTopicId] || {};
+      const guideHtml = pack && isMember() ? packGuideHtml(pack) : simpleGuideHtml(t, coach);
+      inner = `${ssChrome(s)}
+      <div class="ss-speaker ${s.mode === 'self' ? '' : 'parent'}">${s.mode === 'self' ? '给孩子 · 自己看也行' : '给爸爸妈妈'}</div>
+      <div class="ss-coach">${s.mode === 'self'
+        ? '这张卡自己读，读完用里面的规律解决后面的新题。'
+        : child ? '这张卡给爸爸妈妈，读完大声讲给孩子听。' : '这张卡给爸爸妈妈，读完用自己的话讲给孩子听。'}</div>
+      <div class="ss-tag">${esc(t.subject)} · <span style="color:${t._color}">${esc(t.name)}</span>${mv(t.id) !== null ? ` · 掌握度 ${Math.round(mv(t.id) * 100)}%` : ' · 新内容'}</div>
+      ${guideHtml}
+      ${pack && !isMember() ? `<button class="text-link" id="ss-unlock">会员可看完整补给包（变式训练 + 回忆卡 + 产出任务）›</button>` : ''}
+      <button class="big-cta" id="ss-go" style="margin-top:14px">${s.practice.length ? (child ? '读完了，考考孩子 ›' : '我读完了，让孩子练 ›') : '完成 ›'}</button>`;
+    } else if (s.phase === 'recall' || s.phase === 'practice') {
+      const arr = s.phase === 'recall' ? s.recall : s.practice;
+      const cur = arr[s.qIdx];
+      const t = topicById.get(cur.topicId);
+      const item = cur.item;
+      const tag = `<div class="ss-tag">${esc(t.subject)} · <span style="color:${t._color}">${esc(t.name)}</span></div>`;
+      if (child) {   // 亲子模式：家长读题判对错，题面加大，选项只读
+        const optsHtml = item.type === 'choice'
+          ? `<div class="quiz-opts ss-opts-readonly">${item.options.map((o, i) => `<button class="quiz-opt" data-i="${i}" type="button" tabindex="-1">${esc(o.text)}</button>`).join('')}</div>`
+          : '';
+        inner = `${ssChrome(s)}
+        <div class="ss-speaker parent">给爸爸妈妈</div>
+        ${tag}
+        <div class="ss-big-q child">${esc(item.q)}</div>
+        ${optsHtml}
+        <button class="tbtn" id="ss-show-ans" style="margin-top:10px">看答案（给爸妈判分）</button>
+        <div class="ss-ans" id="ss-ans" style="display:none"><b>正确答案：</b>${esc(item.type === 'choice' ? item.options.find(o => o.correct).text : (item.answer ? '对' : '错'))}<br>${esc(item.explain)}</div>
+        <div class="ss-judge-btns">
+          <button class="ss-judge ok" id="ss-ok">答对了 ✓</button>
+          <button class="ss-judge bad" id="ss-bad">没答对 ✗</button>
+        </div>`;
+      } else {   // 陪伴/自主：孩子自己答，系统判
+        const optsHtml = item.type === 'choice'
+          ? item.options.map((o, i) => `<button class="quiz-opt" data-i="${i}">${esc(o.text)}</button>`).join('')
+          : `<div class="quiz-judge"><button class="quiz-opt judge" data-v="1">✓ 对</button><button class="quiz-opt judge" data-v="0">✗ 错</button></div>`;
+        inner = `${ssChrome(s)}
+        <div class="ss-speaker">给孩子</div>
+        ${tag}
+        <div class="ss-big-q">${esc(item.q)}</div>
+        <div class="quiz-opts">${optsHtml}</div>
+        ${s.phase === 'recall' && !s.answered ? '<button class="text-link" id="ss-forget">想不起来 ›</button>' : ''}
+        <div class="ss-fb"></div>`;
+      }
+    } else if (s.phase === 'settle') {
+      const marked = topics.filter(t => mv(t.id) !== null);
+      const avgAfter = marked.length ? marked.reduce((sum, t) => sum + mv(t.id), 0) / marked.length : 0;
+      const streak = streakInfo();
+      const weak = weakestNode();
+      const tomorrowTxt = weak ? `明天继续攻「${esc(weak.name)}」` : '明天来解锁一个新知识点';
+      inner = `${ssChrome(s)}
+      <div class="td-settle ss-settle" style="padding-top:10vh">
+        <div class="ss-speaker ${s.mode === 'self' ? '' : 'parent'}" style="margin-top:0">${s.mode === 'self' ? '给孩子 · 自己看也行' : '给爸爸妈妈'}</div>
+        <div class="st-label">今日掌握度</div>
+        <div class="st-pct"><span id="ss-roll">${Math.round(s.avgBefore * 100)}</span><small>%</small></div>
+        <div class="st-flame">${streak.checkedToday ? `🔥 已连续打卡 ${streak.count} 天` : streak.count ? `🔥 连续 ${streak.count} 天 · 今天打卡就续上` : '✨ 今天完成任意打卡，点亮第 1 天'}</div>
+        <div class="st-tomorrow">明天见 · ${tomorrowTxt}</div>
+        <button class="big-cta" id="ss-done" style="margin-top:22px">完成 ✓</button>
+        ${s.subject ? '<button class="ghost-cta" id="ss-back-all" style="margin-top:10px">返回全科模式 ›</button>' : ''}
+      </div>`;
+    }
+    sessionBody.innerHTML = inner;
+    // ---- 绑定 ----
+    const closeBtn = sessionBody.querySelector('#ss-close');
+    if (closeBtn) closeBtn.onclick = closeSession;
+    const goBtn = sessionBody.querySelector('#ss-go');
+    if (goBtn) goBtn.onclick = sessionNext;
+    sessionBody.querySelectorAll('.ss-mode-chip').forEach(chip => chip.onclick = () => {
+      setSessionModeKey(chip.dataset.mode);   // 记忆选择
+      session = buildSession({ subject: session.subject, topicIds: session.focusIds });
+      renderSession();
+    });
+    const unlockBtn = sessionBody.querySelector('#ss-unlock');
+    if (unlockBtn) unlockBtn.onclick = openMemberModal;
+    if (s.phase === 'learn') markCheckinDayOnce();
+    if (s.phase === 'recall' || s.phase === 'practice') {
+      const arr = s.phase === 'recall' ? s.recall : s.practice;
+      const cur = arr[s.qIdx];
+      if (child) {
+        const ansBtn = sessionBody.querySelector('#ss-show-ans');
+        const ansBox = sessionBody.querySelector('#ss-ans');
+        ansBtn.onclick = () => {
+          const open = ansBox.style.display === 'none';
+          ansBox.style.display = open ? 'block' : 'none';
+          ansBtn.textContent = open ? '收起答案' : '看答案（给爸妈判分）';
+        };
+        const judge = (ok2) => {
+          applyAnswer(cur.topicId, ok2, ok2 ? undefined : 'transfer');
+          markCheckinDay();
+          if (ok2) confetti();
+          sessionNext();
+        };
+        sessionBody.querySelector('#ss-ok').onclick = () => judge(true);
+        sessionBody.querySelector('#ss-bad').onclick = () => judge(false);
+      } else {
+        const fb = sessionBody.querySelector('.ss-fb');
+        const commit = (ok2, pickedHtml) => {
+          if (s.answered) return;
+          s.answered = true;
+          const mPrev = mv(cur.topicId);
+          applyAnswer(cur.topicId, ok2, ok2 ? undefined : 'transfer');
+          markCheckinDay();
+          if (ok2) confetti();
+          fb.innerHTML = `<div class="quiz-fb ${ok2 ? 'ok' : 'bad'}">${ok2 ? '✓ 回答正确' : s.phase === 'recall' ? '✗ 没答出来——这正说明该复习' : '✗ 回答错误'} · 掌握度 <span class="mastery-roll">${Math.round((mv(cur.topicId) || 0) * 100)}</span>%</div>
+            ${!ok2 ? `<div class="err-row">错因：${['concept', 'transfer', 'careless'].map(k =>
+              `<button class="err-chip ${k === 'transfer' ? 'on' : ''}" data-err="${k}">${ERR_CN[k]}</button>`).join('')}</div>` : ''}
+            <div class="quiz-explain">${esc(cur.item.explain)}</div>
+            <button class="tbtn quiz-next" id="ss-next">${s.qIdx + 1 < arr.length ? '下一题 ›' : s.phase === 'recall' ? '进入学区 ›' : '完成 ›'}</button>`;
+          rollNumber(fb.querySelector('.mastery-roll'), (mPrev || 0) * 100, (mv(cur.topicId) || 0) * 100);
+          fb.querySelectorAll('.err-chip').forEach(c => c.onclick = () => {
+            setErr(cur.topicId, c.dataset.err);
+            fb.querySelectorAll('.err-chip').forEach(x => x.classList.toggle('on', x === c));
+          });
+          fb.querySelector('#ss-next').onclick = sessionNext;
+          const forget = sessionBody.querySelector('#ss-forget');
+          if (forget) forget.style.display = 'none';
+        };
+        sessionBody.querySelectorAll('.quiz-opt').forEach(btn => btn.onclick = () => {
+          if (s.answered) return;
+          let ok2;
+          if (cur.item.type === 'choice') {
+            const i = +btn.dataset.i;
+            ok2 = cur.item.options[i].correct;
+            sessionBody.querySelectorAll('.quiz-opt').forEach((b, bi) => {
+              if (cur.item.options[bi].correct) b.classList.add('correct');
+              else if (bi === i) b.classList.add('wrong');
+              b.disabled = true;
+            });
+          } else {
+            const v = btn.dataset.v === '1';
+            ok2 = (v === cur.item.answer);
+            sessionBody.querySelectorAll('.quiz-opt').forEach(b => {
+              const bv = b.dataset.v === '1';
+              if (bv === cur.item.answer) b.classList.add('correct');
+              else if (bv === v) b.classList.add('wrong');
+              b.disabled = true;
+            });
+          }
+          commit(ok2);
+        });
+        const forget = sessionBody.querySelector('#ss-forget');
+        if (forget) forget.onclick = () => {   // 想不起来 = 该复习的信号，记答错
+          sessionBody.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+          commit(false);
+        };
+      }
+    }
+    if (s.phase === 'settle') {
+      markCheckinDay();
+      confetti();
+      const marked = topics.filter(t => mv(t.id) !== null);
+      const avgAfter = marked.length ? marked.reduce((sum, t) => sum + mv(t.id), 0) / marked.length : 0;
+      rollNumber(sessionBody.querySelector('#ss-roll'), s.avgBefore * 100, avgAfter * 100);
+      sessionBody.querySelector('#ss-done').onclick = closeSession;
+      const backAll = sessionBody.querySelector('#ss-back-all');
+      if (backAll) backAll.onclick = closeSession;
+    }
+  }
+  let sessionLearnMarked = false;   // 学区卡读过一次即算打卡（同一会话只记一次）
+  function markCheckinDayOnce() { if (!sessionLearnMarked) { sessionLearnMarked = true; markCheckinDay(); } }
+
+  // ---------- 今日 tab（v60：首屏只剩一个主按钮「开始今天的 15 分钟」） ----------
   const todayBody = document.getElementById('today-body');
   const ERR_COACH = { concept: '概念还没吃透', transfer: '换个问法就容易错', careless: '会但容易粗心' };
   function weakestNode() {
@@ -3180,204 +3589,66 @@
         ${helloHtml()}
         <div class="card td-empty">
           <h3>先摸清起点，再谈今天学什么</h3>
-          <div class="c-sub">做一组快速诊断（约 5 分钟），系统会标出孩子的薄弱点。<br>之后每天打开这里，就是一份现成的「忆 → 练 → 学」任务单。</div>
+          <div class="c-sub">做一组快速诊断（全科混抽，约 5 分钟），系统会标出孩子的薄弱点。<br>之后每天打开这里，点一个按钮就是「忆 → 学 → 练」的 15 分钟。</div>
           <button class="big-cta" id="td-godiag">开始第一次诊断 ›</button>
         </div>`;
-      todayBody.querySelector('#td-godiag').onclick = () => startQuickQuiz((profile && profile.grade) || 7, (profile && profile.subject) || '语文');
+      todayBody.querySelector('#td-godiag').onclick = () => startQuickQuiz((profile && profile.grade) || 7);
       requestAnimationFrame(updateTdProgress);
       return;
     }
-    const weak = weakestNode();
-    const queue = recallQueue();
-    const weakMeta = weak ? (masteryMeta[weak.id] || {}) : {};
-    const coach = weak ? (coaching[weak.id] || null) : null;
-    const drills = coach && Array.isArray(coach.drills) ? coach.drills : [];
-    const course = weak ? courseOf(weak.id) : null;
+    sessionLearnMarked = false;
+    const mode = SESSION_MODES[sessionModeKey()];
 
-    // 掌握度小卡：关注学科的平均掌握度 + 三档计数（结算页大数字同源）
-    const focusSubj = (profile && profile.subject) || (weak && weak.subject) || '语文';
-    const subjMarked = topics.filter(t => t.subject === focusSubj && mv(t.id) !== null);
-    const avgNow = subjMarked.length ? subjMarked.reduce((s, t) => s + mv(t.id), 0) / subjMarked.length : 0;
+    // 掌握度小卡：全科已测节点的平均掌握度 + 三档计数（v60 去学科）
+    const markedAll = topics.filter(t => mv(t.id) !== null);
+    const avgNow = markedAll.length ? markedAll.reduce((s, t) => s + mv(t.id), 0) / markedAll.length : 0;
     const avgPct = Math.round(avgNow * 100);
-    let masteryCardHtml = '';
-    if (subjMarked.length) {
-      let cY = 0, cM = 0, cN = 0;
-      for (const t of subjMarked) {
-        const s = mState(t.id);
-        if (s === 'yes') cY++; else if (s === 'mid') cM++; else cN++;
-      }
-      masteryCardHtml = `
-        <div class="td-mastery-card">
-          <div class="row">
-            <div class="subj">${esc(focusSubj)} · 当前掌握度</div>
-            <div class="pct" id="td-pct">${avgPct}<small>%</small></div>
-          </div>
-          <div class="bar"><i style="width:${avgPct}%"></i></div>
-          <div class="note">已掌握 <b>${cY}</b> · 在进步 <b>${cM}</b> · 还不会 <b>${cN}</b>（共测 ${subjMarked.length} 个）</div>
-        </div>`;
+    let cY = 0, cM = 0, cN = 0;
+    for (const t of markedAll) {
+      const s = mState(t.id);
+      if (s === 'yes') cY++; else if (s === 'mid') cM++; else cN++;
     }
-
-    const recallHtml = queue.length ? `
-      <div class="card" id="td-recall-card">
-        <h3><span class="td-tag recall">忆</span>先回忆旧题（${queue.length}）</h3>
-        <div class="c-sub">凭记忆作答，做完才给答案和解析——想不起来本身就是信号。</div>
-        ${queue.map(t => `<div class="td-recall-item" data-tid="${t.id}"></div>`).join('')}
-      </div>` : '';
-
-    const drillHtml = weak ? `
-      <div class="card">
-        <h3><span class="td-tag drill">练</span>当前最弱：${esc(weak.name)}<span class="td-mastery">掌握度 ${Math.round(mv(weak.id) * 100)}%${weakMeta.err ? ` · 上次错因：${ERR_CN[weakMeta.err]}` : ''}</span></h3>
-        ${coach && coach.pattern ? `<div class="c-sub" style="margin-bottom:8px">规律：${esc(coach.pattern)}</div>` : ''}
-        ${drills.length ? drills.map(d => `<div class="drill-item">
-          <div class="d-q">${esc(d.q)}</div>
-          ${d.hint ? `<div class="d-hint"><b>思路：</b>${esc(d.hint)}</div>` : ''}
-          <button class="drill-ans-btn" type="button">查看答案（先自己做完再对）</button>
-          <div class="drill-ans"><b>参考答案：</b>${esc(d.answer)}</div>
-        </div>`).join('') : '<div class="c-sub">该节点的变式训练在建设中，先测一测定位问题。</div>'}
-        <div class="td-actions">
-          ${quizByTopic.has(weak.id) ? `<button class="tbtn" id="td-quiz">测一测 · ${quizByTopic.get(weak.id).length} 道题</button>` : ''}
-          <button class="tbtn" id="td-locate">图谱定位 ›</button>
+    const masteryCardHtml = `
+      <div class="td-mastery-card">
+        <div class="row">
+          <div class="subj">全部学科 · 当前掌握度</div>
+          <div class="pct" id="td-pct">${avgPct}<small>%</small></div>
         </div>
-      </div>` : `
-      <div class="card">
-        <h3><span class="td-tag drill">练</span>没有待攻克的薄弱点</h3>
-        <div class="c-sub">所有测过的知识点都达标了。去图谱找一个没学过的节点，往前推进一步。</div>
-        <div class="td-actions"><button class="tbtn" id="td-locate">去图谱 ›</button></div>
+        <div class="bar"><i style="width:${avgPct}%"></i></div>
+        <div class="note">已掌握 <b>${cY}</b> · 在进步 <b>${cM}</b> · 还不会 <b>${cN}</b>（共测 ${markedAll.length} 个）</div>
       </div>`;
 
-    // 学区：有补给包优先展示（导学卡+回忆卡内联，会员专享），没有才降级到课程链接
-    const weakPack = weak ? packByTopic.get(weak.id) : null;
-    let learnHtml = '';
-    if (weak && weakPack) {
-      learnHtml = isMember() ? `
-        <div class="card">
-          <h3><span class="td-tag learn">学</span>补给包 · ${esc(weak.name)}</h3>
-          ${packGuideHtml(weakPack)}
-          ${weakPack.recall ? '<div class="c-sub" style="margin:4px 0 6px">回忆卡 · 先自己想，点卡片翻面核对</div>' + packRecallHtml(weakPack) : ''}
-          <div class="td-actions"><button class="tbtn" id="td-pack-more">完整补给包（变式训练 + 产出任务） ›</button></div>
-        </div>` : `
-        <div class="card">
-          <h3><span class="td-tag learn">学</span>补给包 · ${esc(weak.name)}</h3>
-          <div class="res-locked">
-            <div class="res-locked-t">会员专享 · 这个薄弱点有现成补给包</div>
-            <div class="res-locked-s">导学卡 + 变式训练 + 回忆卡 + 产出任务，专攻「${esc(weak.name)}」</div>
-            <button class="tbtn" id="td-pack-unlock" style="min-height:44px">开通会员解锁 ›</button>
-          </div>
-        </div>`;
-    } else if (weak && course) {
-      learnHtml = `
-        <div class="card">
-          <h3><span class="td-tag learn">学</span>配套课程</h3>
-          <div class="c-sub">${esc(course.title)}${course.note ? ` · ${esc(course.note)}` : ''}</div>
-          <div class="td-actions"><button class="tbtn" id="td-course">看课${isMember() ? '' : '（会员）'} ›</button></div>
-        </div>`;
+    // 专项过滤器：有断点的学科优先，按断点数排序
+    const weakBySubj = new Map();
+    for (const t of topics) {
+      if (mv(t.id) !== null && mv(t.id) < 0.67) weakBySubj.set(t.subject, (weakBySubj.get(t.subject) || 0) + 1);
     }
+    const focusSubjects = (weakBySubj.size ? [...weakBySubj.entries()].sort((a, b) => b[1] - a[1]).map(e => e[0])
+      : subjects.filter(s => topics.some(t => t.subject === s && quizByTopic.has(t.id)))).slice(0, 6);
 
     const ld = lastDiag();
-    const streak = streakInfo();
-    const tomorrowTxt = weak ? `明天继续攻「${esc(weak.name)}」，忆一忆今天练过的` : '明天来解锁一个新知识点';
-
-    // v50 沉浸流：hero（问候 + 教练话术大字）→ 忆 → 练 → 学 → 今日清单 → 阶段复测 → 结算
     todayBody.innerHTML = `
-      <div class="td-hero">${helloHtml()}<div class="coach-big">${coachLine(weak)}</div></div>
+      <div class="td-hero" style="min-height:0;padding-bottom:4px">${helloHtml()}</div>
+      <button class="big-cta td-start" id="td-start">开始今天的 ${mode.minutes} 分钟 ›</button>
+      <button class="text-link" id="td-focus-link" style="display:block;margin:2px auto 0">想专攻一科？</button>
+      <div id="td-focus-picker" style="display:none;justify-content:center">
+        ${focusSubjects.map(s => `<button class="tbtn td-focus-chip" data-s="${esc(s)}">${esc(s)}</button>`).join('')}
+      </div>
       ${masteryCardHtml}
-      ${recallHtml}
-      ${drillHtml}
-      ${learnHtml}
       ${planSectionHtml()}
-      <button class="ghost-cta" id="td-retest">阶段复测（重做诊断）›</button>
-      <div class="td-settle" id="td-settle">
-        <div class="st-label">今日掌握度</div>
-        <div class="st-pct"><span id="st-roll">${avgPct}</span><small>%</small></div>
-        <div class="st-flame">${streak.checkedToday ? `🔥 已连续打卡 ${streak.count} 天` : streak.count ? `🔥 连续 ${streak.count} 天 · 今天打卡就续上` : '✨ 今天完成任意打卡，点亮第 1 天'}</div>
-        <div class="st-tomorrow">明天见 · ${tomorrowTxt}</div>
-      </div>`;
+      <button class="ghost-cta" id="td-retest">阶段复测（全科诊断）›</button>`;
 
-    // 忆：内联旧题回忆——先作答，提交后才揭示对错与解析
-    todayBody.querySelectorAll('.td-recall-item').forEach(slot => {
-      const tid = slot.dataset.tid;
-      const t = topicById.get(tid);
-      const qs = quizByTopic.get(tid);
-      const item = buildQuizItems([qs[Math.floor(Math.random() * qs.length)]])[0];
-      const optsHtml = item.type === 'choice'
-        ? item.options.map((o, i) => `<button class="quiz-opt" data-i="${i}">${esc(o.text)}</button>`).join('')
-        : `<div class="quiz-judge"><button class="quiz-opt judge" data-v="1">✓ 对</button><button class="quiz-opt judge" data-v="0">✗ 错</button></div>`;
-      slot.innerHTML = `
-        <div class="quiz-meta" style="margin-top:6px">回忆 · <span style="color:${t._color}">${esc(t.name)}</span></div>
-        <div class="quiz-q">${esc(item.q)}</div>
-        <div class="quiz-opts">${optsHtml}</div>
-        <div class="td-fb"></div>`;
-      const fb = slot.querySelector('.td-fb');
-      slot.querySelectorAll('.quiz-opt').forEach(btn => btn.onclick = () => {
-        if (slot.dataset.done) return;
-        slot.dataset.done = '1';
-        let ok2;
-        if (item.type === 'choice') {
-          const i = +btn.dataset.i;
-          ok2 = item.options[i].correct;
-          slot.querySelectorAll('.quiz-opt').forEach((b, bi) => {
-            if (item.options[bi].correct) b.classList.add('correct');
-            else if (bi === i) b.classList.add('wrong');
-            b.disabled = true;
-          });
-        } else {
-          const v = btn.dataset.v === '1';
-          ok2 = (v === item.answer);
-          slot.querySelectorAll('.quiz-opt').forEach(b => {
-            const bv = b.dataset.v === '1';
-            if (bv === item.answer) b.classList.add('correct');
-            else if (bv === v) b.classList.add('wrong');
-            b.disabled = true;
-          });
-        }
-        const mPrevR = mv(tid);   // v40：滚动动画起点
-        applyAnswer(tid, ok2, 'transfer');
-        markCheckinDay();
-        if (ok2) confetti();
-        fb.innerHTML = `<div class="quiz-fb ${ok2 ? 'ok' : 'bad'}">${ok2 ? '✓ 还记得' : '✗ 记错了——这正说明该复习'} · 掌握度 <span class="mastery-roll">${Math.round((mv(tid) || 0) * 100)}</span>%</div>
-          ${!ok2 ? `<div class="err-row">错因：${['concept', 'transfer', 'careless'].map(k =>
-            `<button class="err-chip ${k === 'transfer' ? 'on' : ''}" data-err="${k}">${ERR_CN[k]}</button>`).join('')}</div>` : ''}
-          <div class="quiz-explain">${esc(item.explain)}</div>`;
-        rollNumber(fb.querySelector('.mastery-roll'), (mPrevR || 0) * 100, (mv(tid) || 0) * 100);
-        fb.querySelectorAll('.err-chip').forEach(c => c.onclick = () => {
-          setErr(tid, c.dataset.err);
-          fb.querySelectorAll('.err-chip').forEach(x => x.classList.toggle('on', x === c));
-        });
-        // v50 沉浸流：答完自动滑到下一题；忆区全答完 → 彩带 + 滑到结算页
-        setTimeout(() => {
-          const next = todayBody.querySelector('.td-recall-item:not([data-done])');
-          if (next) {
-            next.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          } else if (queue.length) {
-            confetti();
-            const settle = todayBody.querySelector('#td-settle');
-            if (settle) settle.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            const marked = topics.filter(t => t.subject === focusSubj && mv(t.id) !== null);
-            const newAvg = marked.length ? marked.reduce((s, t) => s + mv(t.id), 0) / marked.length : 0;
-            const rollEl = todayBody.querySelector('#st-roll');
-            if (rollEl) rollNumber(rollEl, avgPct, Math.round(newAvg * 100));
-          }
-        }, 600);
-      });
-    });
-
-    todayBody.querySelectorAll('.drill-ans-btn').forEach(btn => btn.onclick = () => {
-      const item = btn.closest('.drill-item');
-      const open = item.classList.toggle('open');
-      btn.textContent = open ? '收起答案' : '查看答案（先自己做完再对）';
-    });
-    const qBtn = todayBody.querySelector('#td-quiz');
-    if (qBtn && weak) qBtn.onclick = () => startNodeQuiz(weak.id, 'today');
-    const locBtn = todayBody.querySelector('#td-locate');
-    if (locBtn) locBtn.onclick = () => { switchTab('map'); if (weak) selectTopic(weak.id); };
-    const cBtn = todayBody.querySelector('#td-course');
-    if (cBtn && weak && course) cBtn.onclick = () => requireMember(() => openCourse(weak.id, course.url, course.title));
-    const pmBtn = todayBody.querySelector('#td-pack-more');
-    if (pmBtn && weak) pmBtn.onclick = () => { switchTab('map'); selectTopic(weak.id); };
-    const puBtn = todayBody.querySelector('#td-pack-unlock');
-    if (puBtn) puBtn.onclick = () => requireMember(() => renderTodayTab());
+    todayBody.querySelector('#td-start').onclick = () => startSession();
+    const fl = todayBody.querySelector('#td-focus-link');
+    const fp = todayBody.querySelector('#td-focus-picker');
+    fl.onclick = () => {
+      const open = fp.style.display === 'none';
+      fp.style.display = open ? 'flex' : 'none';
+      fl.textContent = open ? '收起 ▴' : '想专攻一科？';
+    };
+    fp.querySelectorAll('.td-focus-chip').forEach(chip => chip.onclick = () => startSession({ subject: chip.dataset.s }));
     const rtBtn = todayBody.querySelector('#td-retest');
-    if (rtBtn) rtBtn.onclick = () => startQuickQuiz((ld && ld.grade) || (profile && profile.grade) || 7, (ld && ld.subject) || (profile && profile.subject) || '语文');
+    if (rtBtn) rtBtn.onclick = () => startQuickQuiz((ld && ld.grade) || (profile && profile.grade) || 7);
     bindPlanSection();
     requestAnimationFrame(updateTdProgress);
   }
@@ -3518,7 +3789,7 @@
       </div>`;
     drawGrowthCurve(growthBody.querySelector('#gr-curve'), days);
     growthBody.querySelector('#gr-star').onclick = () => openMap();
-    growthBody.querySelector('#gr-retest').onclick = () => startQuickQuiz((ld && ld.grade) || (profile && profile.grade) || 7, (ld && ld.subject) || (profile && profile.subject) || '语文');
+    growthBody.querySelector('#gr-retest').onclick = () => startQuickQuiz((ld && ld.grade) || (profile && profile.grade) || 7);
     growthBody.querySelector('#gr-say').onclick = () => renderSay(growthBody);
   }
 
@@ -3733,12 +4004,10 @@
       else if (s === 'no') no++;
     }
     const gradeTxt = profile && profile.grade ? profile.grade + ' 年级' : '未设置';
-    const subjTxt = profile && profile.subject ? profile.subject : '未设置';
     meBody.innerHTML = `
       <div class="card">
         <h3>学习档案</h3>
         <div class="me-row"><span class="k">年级</span><span class="v">${gradeTxt}</span></div>
-        <div class="me-row"><span class="k">关注学科</span><span class="v">${esc(subjTxt)}</span></div>
         <div class="me-row"><span class="k"></span><button class="tbtn" id="me-profile">修改档案</button></div>
       </div>
       <div class="card" id="me-member-card">
@@ -3913,25 +4182,24 @@
     lg.classList.toggle('open');
   };
 
-  // ---------- 首次使用引导（分步：年级 → 学科 → 进入；默认家长视角） ----------
+  // ---------- 首次使用引导（v60：只问年级，不再选学科；旧档案的学科字段保留但不再使用） ----------
   const onboard = document.getElementById('onboard');
   const obBox = document.getElementById('ob-box');
-  const OB_SUBJECTS = ['道德与法治', '语文'];
-  let obState = { step: 1, grade: null, subject: null };
+  let obState = { step: 1, grade: null };
   function skipOnboard() {
     if (!profile) { profile = { skipped: true }; saveProfile(); }
     onboard.classList.remove('show');
   }
   function applyOnboard() {
-    profile = { role: 'parent', grade: obState.grade, subject: obState.subject };
+    profile = { role: 'parent', grade: obState.grade };
     saveProfile();
     onboard.classList.remove('show');
-    if (quiz && quiz.mode === 'first3') {   // 快诊断答前改年级学科：用新选择重抽 3 题
-      startFirst3(profile.grade, profile.subject);
+    if (quiz && quiz.mode === 'first3') {   // 快诊断答前改年级：用新选择重抽 3 题
+      startFirst3(profile.grade);
       return;
     }
-    switchTab('growth');
-    toast(`档案已保存。先做一次「再测一次」，看看 ${obState.grade} 年级${obState.subject}哪里需要补。`);
+    switchTab('today');
+    toast(`档案已保存。先做一组快速诊断（全科混抽），看看 ${obState.grade} 年级哪里需要补。`);
   }
   function renderOnboard() {
     const s = obState;
@@ -3939,7 +4207,7 @@
       obBox.innerHTML = `
         <div class="ob-step-tag">第 1 步 / 共 2 步</div>
         <div class="ob-title">孩子现在上几年级？</div>
-        <div class="ob-sub">选完诊断会按对应年级抽题。</div>
+        <div class="ob-sub">诊断和每天的会话都按年级编排，学科不用选——断点在哪科就补哪科。</div>
         <div class="ob-grades">${[1,2,3,4,5,6,7,8,9].map(g =>
           `<button data-grade="${g}">${g} 年级</button>`).join('')}</div>
         <button class="ob-close" id="ob-skip">先随便看看 ›</button>`;
@@ -3947,40 +4215,23 @@
         obState.grade = +b.dataset.grade; obState.step = 2; renderOnboard();
       });
       obBox.querySelector('#ob-skip').onclick = skipOnboard;
-    } else if (s.step === 2) {
+    } else {
+      const modeName = s.grade <= 3 ? '亲子模式（爸妈读题孩子答，约 8 分钟）' : s.grade <= 6 ? '陪伴模式（孩子自己答，约 12 分钟）' : '自主模式（孩子独立完成，约 15 分钟）';
       obBox.innerHTML = `
         <div class="ob-step-tag">第 2 步 / 共 2 步</div>
-        <div class="ob-title">想先看哪门学科？</div>
-        <div class="ob-sub">这两门已按 2024 版新教材完整填充，其他学科正在建设中。</div>
-        <div class="ob-subjects">${OB_SUBJECTS.map(sub =>
-          `<button data-subject="${esc(sub)}">${esc(sub)}</button>`).join('')}</div>
-        <button class="ob-back" id="ob-back">‹ 上一步</button>
-        <button class="ob-close" id="ob-skip">先随便看看 ›</button>`;
-      obBox.querySelectorAll('.ob-subjects button').forEach(b => b.onclick = () => {
-        obState.subject = b.dataset.subject; obState.step = 3; renderOnboard();
-      });
-      obBox.querySelector('#ob-back').onclick = () => { obState.step = 1; renderOnboard(); };
-      obBox.querySelector('#ob-skip').onclick = skipOnboard;
-    } else {
-      obBox.innerHTML = `
-        <div class="ob-step-tag">都选好了</div>
         <div class="ob-title">准备就绪</div>
         <div class="ob-summary">
           年级：<b>${s.grade} 年级</b><br>
-          学科：<b>${esc(s.subject)}</b>
+          每天会话：<b>${modeName}</b>
         </div>
         <button class="ob-close ob-enter" id="ob-enter">开始第一次诊断 ✓</button>
         <button class="ob-back" id="ob-back">‹ 上一步</button>`;
       obBox.querySelector('#ob-enter').onclick = applyOnboard;
-      obBox.querySelector('#ob-back').onclick = () => { obState.step = 2; renderOnboard(); };
+      obBox.querySelector('#ob-back').onclick = () => { obState.step = 1; renderOnboard(); };
     }
   }
   function openOnboard() {
-    obState = {
-      step: 1,
-      grade: profile ? profile.grade : null,
-      subject: profile ? profile.subject : null,
-    };
+    obState = { step: 1, grade: profile ? profile.grade : null };
     renderOnboard();
     onboard.classList.add('show');
   }
@@ -4031,8 +4282,8 @@
     if (window.innerWidth < 860 && !isMobile()) panel.classList.add('hidden');
     if (isMobile()) {
       sheetState = 'collapsed'; panel.classList.remove('hidden');
-      // 移动端单学科模式：默认当前档案学科（否则第一个学科），chips 单选切换
-      mobileSubject = (profile && profile.subject && subjects.includes(profile.subject)) ? profile.subject : subjects[0];
+      // 移动端单学科模式：默认第一个学科（v60 去学科导航，图谱仅作探索工具），chips 单选切换
+      mobileSubject = subjects[0];
       activeSubjects.clear();
       activeSubjects.add(mobileSubject);
       syncChips();
@@ -4080,6 +4331,14 @@
     openMap,
     closeMap,
     isGuest,
+    startSession,
+    closeSession,
+    session: () => session,
+    sessionNext,
+    sessionModeKey,
+    buildSession,
+    openOnboard,
+    startNodeQuiz,
   };
 })();
 </script>
