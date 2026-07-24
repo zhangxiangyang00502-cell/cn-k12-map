@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:,">
+<title>小满伴学 · 今日（v1 小满暖白）</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    background: #FAF7F2;
+    color: #2B2620;
+    padding: 0 18px calc(96px + env(safe-area-inset-bottom, 0px));
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  /* ---------- 顶部品牌 ---------- */
+  header { padding: 22px 2px 4px; display: flex; align-items: center; gap: 10px; }
+  .logo {
+    width: 34px; height: 34px; border-radius: 12px;
+    background: linear-gradient(135deg, #16C7B7, #0EA795);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 16px; font-weight: 800;
+    box-shadow: 0 4px 12px rgba(22,199,183,.32);
+  }
+  .brand h1 { font-size: 19px; font-weight: 800; letter-spacing: .5px; }
+  .brand p { font-size: 11.5px; color: #A39A8B; margin-top: 2px; letter-spacing: .2px; }
+  /* ---------- 问候 ---------- */
+  .hello { padding: 18px 2px 16px; }
+  .hello .hi { font-size: 26px; font-weight: 800; letter-spacing: .5px; }
+  .hello .streak { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px;
+    font-size: 13px; color: #8A6D1F; background: #FDF3D7; border-radius: 999px; padding: 5px 12px; font-weight: 600; }
+  /* ---------- 教练话术卡 ---------- */
+  .coach {
+    background: linear-gradient(135deg, #FFF8E6 0%, #FFFFFF 78%);
+    border: 1px solid #F5E7C0;
+    border-radius: 20px; padding: 16px 18px;
+    box-shadow: 0 2px 6px rgba(120,95,30,.04), 0 14px 34px rgba(120,95,30,.08);
+  }
+  .coach .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700;
+    color: #B98A1D; margin-bottom: 8px; letter-spacing: 1px; }
+  .coach .tag::before { content: ''; width: 16px; height: 2px; border-radius: 1px; background: #F5C542; }
+  .coach .line { font-size: 16.5px; line-height: 1.75; font-weight: 600; }
+  .coach .line b { color: #0E9C8F; font-weight: 800; }
+  /* ---------- 今日三件事 ---------- */
+  .sec { display: flex; align-items: baseline; justify-content: space-between; padding: 22px 2px 12px; }
+  .sec h2 { font-size: 17px; font-weight: 800; letter-spacing: .3px; }
+  .sec span { font-size: 12px; color: #A39A8B; }
+  .task {
+    background: #FFFFFF; border-radius: 18px; padding: 15px 16px; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 13px;
+    box-shadow: 0 2px 5px rgba(90,70,40,.03), 0 10px 28px rgba(90,70,40,.06);
+  }
+  .task .badge {
+    flex: 0 0 42px; width: 42px; height: 42px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; font-weight: 800;
+  }
+  .task .badge.yi { background: #FDF3D7; color: #B98A1D; }
+  .task .badge.lian { background: #DFF7F4; color: #0E9C8F; }
+  .task .badge.xue { background: #E7F4E9; color: #4E9A5F; }
+  .task .main { flex: 1; min-width: 0; }
+  .task .main .t { font-size: 15.5px; font-weight: 700; }
+  .task .main .s { font-size: 12px; color: #A39A8B; margin-top: 3px; line-height: 1.5; }
+  .task .go {
+    flex: 0 0 auto; border: none; cursor: pointer; font-family: inherit;
+    background: #F3EFE8; color: #7A7264; font-size: 12.5px; font-weight: 700;
+    border-radius: 999px; padding: 8px 14px;
+  }
+  .task.hot { border: 1.5px solid rgba(22,199,183,.45); }
+  .task.hot .go {
+    background: linear-gradient(135deg, #16C7B7, #12B0A1); color: #fff;
+    padding: 9px 16px; box-shadow: 0 4px 12px rgba(22,199,183,.35);
+  }
+  /* ---------- 掌握度小卡 ---------- */
+  .mastery {
+    background: #FFFFFF; border-radius: 18px; padding: 16px 18px; margin-top: 2px;
+    box-shadow: 0 2px 5px rgba(90,70,40,.03), 0 10px 28px rgba(90,70,40,.06);
+  }
+  .mastery .row { display: flex; align-items: baseline; justify-content: space-between; }
+  .mastery .subj { font-size: 14px; font-weight: 700; color: #6B6255; }
+  .mastery .pct { font-size: 28px; font-weight: 800; color: #0E9C8F; letter-spacing: .5px; }
+  .mastery .pct small { font-size: 13px; font-weight: 700; color: #A39A8B; margin-left: 3px; }
+  .bar { height: 9px; border-radius: 5px; background: #F1EAE0; margin-top: 12px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 62%; border-radius: 5px;
+    background: linear-gradient(90deg, #16C7B7 0%, #F5C542 100%); }
+  .mastery .note { font-size: 12px; color: #A39A8B; margin-top: 9px; }
+  .mastery .note b { color: #B98A1D; font-weight: 700; }
+  /* ---------- 底部 tab ---------- */
+  nav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: rgba(255,255,255,.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid #F0EAE0;
+    display: flex; max-width: 480px; margin: 0 auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  nav a {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 9px 0 8px; text-decoration: none; color: #B0A797; font-size: 10.5px; font-weight: 600;
+  }
+  nav a svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  nav a.on { color: #0E9C8F; }
+  nav a.on .dot { width: 4px; height: 4px; border-radius: 2px; background: #16C7B7; }
+  nav a .dot { width: 4px; height: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">满</div>
+  <div class="brand">
+    <h1>小满伴学</h1>
+    <p>孩子卡在哪，今天干什么，一看就懂</p>
+  </div>
+</header>
+
+<div class="hello">
+  <div class="hi">早上好 ☀️</div>
+  <div class="streak">🔥 今天是连续打卡第 6 天</div>
+</div>
+
+<div class="coach">
+  <div class="tag">教练说</div>
+  <div class="line">「<b>国家监察机关</b>」概念还没吃透，今天先回忆旧题，再练新题——先回忆，后看答案。</div>
+</div>
+
+<div class="sec"><h2>今日三件事</h2><span>约 25 分钟</span></div>
+
+<div class="task hot">
+  <div class="badge yi">忆</div>
+  <div class="main">
+    <div class="t">先回忆旧题 · 2 道</div>
+    <div class="s">凭记忆作答，做完才给答案和解析</div>
+  </div>
+  <button class="go">开始回忆</button>
+</div>
+
+<div class="task">
+  <div class="badge lian">练</div>
+  <div class="main">
+    <div class="t">变式训练 · 3 道</div>
+    <div class="s">当前最弱：国家监察机关 · 先看思路再对答案</div>
+  </div>
+  <button class="go">去练习</button>
+</div>
+
+<div class="task">
+  <div class="badge xue">学</div>
+  <div class="main">
+    <div class="t">补给包 · 导学卡</div>
+    <div class="s">孩子为什么错 → 规律 → 例子，配回忆卡</div>
+  </div>
+  <button class="go">去看卡</button>
+</div>
+
+<div class="sec"><h2>掌握度</h2><span>本周 +8%</span></div>
+
+<div class="mastery">
+  <div class="row">
+    <div class="subj">语文 · 当前掌握度</div>
+    <div class="pct">62<small>%</small></div>
+  </div>
+  <div class="bar"><i></i></div>
+  <div class="note">在进步 · 再答对 <b>2</b> 道变式题，「文言实词」就能标记为已掌握</div>
+</div>
+
+<nav>
+  <a class="on" href="#">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.3l2.4 2.4 4.6-5.2"/></svg>
+    今日<span class="dot"></span>
+  </a>
+  <a href="#">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></svg>
+    诊断<span class="dot"></span>
+  </a>
+  <a href="#">
+    <svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 5.5l1.3 1.3L7.6 4.5M4 11.5l1.3 1.3 2.3-2.3M4 17.5l1.3 1.3 2.3-2.3"/></svg>
+    计划<span class="dot"></span>
+  </a>
+  <a href="#">
+    <svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.4"/><circle cx="12" cy="6" r="2.4"/><circle cx="18.5" cy="15" r="2.4"/><path d="M7.4 16.2l3.2-8M13.9 7.6l3.4 5.6"/></svg>
+    图谱<span class="dot"></span>
+  </a>
+  <a href="#">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.5-3.5 4.3-5 7.5-5s6 1.5 7.5 5"/></svg>
+    我的<span class="dot"></span>
+  </a>
+</nav>
+
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>小满伴学 · 今日页 UI 方向对比</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    background: #F4F5F7; color: #1A2330;
+    padding: 24px 18px 40px; max-width: 480px; margin: 0 auto;
+  }
+  .head { text-align: center; margin-bottom: 22px; }
+  .head h1 { font-size: 20px; font-weight: 800; }
+  .head p { font-size: 12.5px; color: #8A93A3; margin-top: 6px; line-height: 1.6; }
+  .card {
+    display: block; text-decoration: none; color: inherit;
+    background: #fff; border-radius: 18px; overflow: hidden; margin-bottom: 18px;
+    box-shadow: 0 2px 6px rgba(30,40,60,.05), 0 14px 34px rgba(30,40,60,.08);
+  }
+  .shot { height: 300px; overflow: hidden; position: relative; }
+  .shot iframe {
+    width: 390px; height: 844px; border: none; pointer-events: none;
+    transform: scale(.78); transform-origin: top left;
+  }
+  .shot::after { content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 78%, rgba(255,255,255,.9)); }
+  .meta { padding: 14px 16px 16px; display: flex; align-items: center; gap: 12px; }
+  .meta .no {
+    flex: 0 0 34px; width: 34px; height: 34px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: #fff;
+  }
+  .card:nth-of-type(1) .no { background: linear-gradient(135deg, #16C7B7, #F5C542); }
+  .card:nth-of-type(2) .no { background: #1A2330; }
+  .card:nth-of-type(3) .no { background: linear-gradient(135deg, #10182B, #2A3C63); }
+  .meta .txt { flex: 1; }
+  .meta .txt .name { font-size: 15.5px; font-weight: 800; }
+  .meta .txt .desc { font-size: 12px; color: #8A93A3; margin-top: 3px; line-height: 1.5; }
+  .meta .arrow { font-size: 18px; color: #C4CBD6; }
+  .foot { text-align: center; font-size: 11px; color: #B4BCC8; margin-top: 6px; line-height: 1.7; }
+  @media (min-width: 420px) { .shot iframe { transform: scale(.88); } }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>今日页 · 三版 UI 方向稿</h1>
+  <p>同一屏内容、三种性格。点开任意一版全屏查看，<br>挑一个方向，细节再往里收。</p>
+</div>
+
+<a class="card" href="./v1.html">
+  <div class="shot"><iframe src="./v1.html" scrolling="no" tabindex="-1" title="v1 预览"></iframe></div>
+  <div class="meta">
+    <div class="no">v1</div>
+    <div class="txt">
+      <div class="name">小满暖白</div>
+      <div class="desc">亲和护眼，麦黄点题"小满"——家长孩子通吃的温度感</div>
+    </div>
+    <div class="arrow">›</div>
+  </div>
+</a>
+
+<a class="card" href="./v2.html">
+  <div class="shot"><iframe src="./v2.html" scrolling="no" tabindex="-1" title="v2 预览"></iframe></div>
+  <div class="meta">
+    <div class="no">v2</div>
+    <div class="txt">
+      <div class="name">清爽工具</div>
+      <div class="desc">专业信任、效率感——让家长觉得"这是个严肃的工具，值 199"</div>
+    </div>
+    <div class="arrow">›</div>
+  </div>
+</a>
+
+<a class="card" href="./v3.html">
+  <div class="shot"><iframe src="./v3.html" scrolling="no" tabindex="-1" title="v3 预览"></iframe></div>
+  <div class="meta">
+    <div class="no">v3</div>
+    <div class="txt">
+      <div class="name">星空明亮版</div>
+      <div class="desc">保留深色高级感但绝不阴间——证明深色也能明亮通透</div>
+    </div>
+    <div class="arrow">›</div>
+  </div>
+</a>
+
+<div class="foot">小满伴学 · 今日页方向评审 · 预览为 390×844 实时渲染</div>
+
+</body>
+</html>
